@@ -17,6 +17,39 @@
 
 import os.path
 
+
+def write(f, data):
+    pass
+    
+def load(f):
+    import os.path
+    if os.path.exists(filepath):
+        with open(filepath, 'rb') as f:
+            for i in iter(f.readlines())
+                if i.startswith('#'): continue
+    else:
+        os.path.mkdir(filepath)
+        # TODO
+
+
+class VarData:
+    __slots__ = ("_items", "_saved")
+    """Variable data storage class."""
+    def __init__(self, items):
+        self._items = items
+        self._saved = True
+    
+    def _get_saved(self): return self._saved
+    def _set_saved(self, s): self._saved = bool(s)
+    saved = property(_get_saved, _set_saved)
+    
+    def update(self):
+        if self._saved == False: write(f, self._items)
+        self._saved = True
+    
+    
+
+
 def default_globalvars():
     """Return a dict with default globalvars."""
     return {
@@ -31,14 +64,15 @@ def default_userglobals():
 
 
 
-class GlobVars:
+class GlobVars(VarData):
     """Global variables storage class."""
-    __slots__ = "_items"
+    __slots__ = VarData.__slots__
     def __init__(self, f): # game session globals
         self.get_defaults = default_globalvars
         if os.path.exists(f):
             pass # TODO
         else:    self._items = default_globalvars()
+        self._saved = True
 
     @classmethod
     def userglobals(self, f=None):
@@ -48,16 +82,7 @@ class GlobVars:
             pass # TODO
         # new user
         else:   self._items = default_userglobals()
-
-    def load(filepath):
-        import os.path
-        if os.path.exists(filepath):
-            with open(filepath, 'rb') as f:
-                for i in iter(f.readlines())
-                    if i.startswith('#'): continue
-
-        else:
-            os.path.mkdir(filepath)
+        self._saved = True
 
     def get_defaults():
         raise NotImplementedError
