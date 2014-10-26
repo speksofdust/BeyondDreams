@@ -22,13 +22,31 @@ class User:
         self._globvars = None
         self._data = None
         
+    @property
+    def globvars(self):
+        return self._globvars
         
+    @property
+    def data(self):
+        return self._data
+        
+    def is_saved(self):
+        return (self._globvars._saved and self._data._saved) == True
+            
     def _update_write(self):
-        pass
+        try: 
+            self._globvars.update
+            self._data.update
+        except: pass
     
-    def logout(self):
+    def logout(self, q=False):
         """Logout the current user. (if any)"""
+        self._globvars.update
+        self._data.update
         self._gvars = None
+        self._data = None
+        if q: # quit
+            pass
             
 
 class UserRoster:
