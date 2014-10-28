@@ -15,6 +15,10 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+__all__ = ()
+
+def _get_new_char():
+    return
 
 class CharBase:
     """Base class for characters."""
