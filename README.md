@@ -1,6 +1,6 @@
-BeyondDreams
-============
-Version - 0.1.1
+#BeyondDreams
+
+##Version - 0.1.1
 -----------
 *This program is free software: you can redistribute it and/or modify*
 *it under the terms of the GNU General Public License as published by*
@@ -20,8 +20,7 @@ for full licencing info see LICENCE
 
 This game is currently in pre-alpha stage and is not yet playable.
 
-Warning
--------
+##Warning
 This game is intended for mature audiences.
 Scenes may include, (but not limited to):
 * Violence, blood and gore
