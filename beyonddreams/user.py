@@ -47,9 +47,9 @@ class User:
         self._data = None
         if q: # quit
             pass
-            
 
 class UserRoster:
+    __slots__ = "_data"
     def __init__(self):
         self._data = {}
         
