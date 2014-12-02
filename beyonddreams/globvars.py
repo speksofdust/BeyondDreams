@@ -17,6 +17,7 @@
 
 import os.path
 
+__all__ = ()
 
 def write(f, data):
     pass
@@ -33,22 +34,19 @@ def load(f):
 
 
 class VarData:
-    __slots__ = ("_items", "_saved")
     """Variable data storage class."""
     def __init__(self, items):
         self._items = items
         self._saved = True
     
-    def _get_saved(self): return self._saved
-    def _set_saved(self, s): self._saved = bool(s)
-    saved = property(_get_saved, _set_saved)
+    def is_saved(self):
+        """True if no (writable) changes have been made since the last save."""
+        return self._saved == True
     
     def update(self):
         if self._saved == False: write(f, self._items)
         self._saved = True
     
-    
-
 
 def default_globalvars():
     """Return a dict with default globalvars."""
@@ -66,7 +64,6 @@ def default_userglobals():
 
 class GlobVars(VarData):
     """Global variables storage class."""
-    __slots__ = VarData.__slots__
     def __init__(self, f): # game session globals
         self.get_defaults = default_globalvars
         if os.path.exists(f):
@@ -77,16 +74,18 @@ class GlobVars(VarData):
     @classmethod
     def userglobals(self, f=None):
         self.get_defaults = default_userglobals
-        if is not None:
-            try:
-            pass # TODO
-        # new user
-        else:   self._items = default_userglobals()
+        if f is None:   # New User
+            self._items = default_userglobals()
+        else:           # Attempt to load users globvars file
+            pass        # TODO
+            
         self._saved = True
 
-    def get_defaults():
+    def get_defaults(self):
+        """Return a dict of the default variables."""
         raise NotImplementedError
 
     def clear(self):
+        """Reset all variables to the defaults."""
         self._items = get_defaults()
 
