@@ -19,8 +19,39 @@ __all__ = ()
 
 def _get_new_char():
     return
-
-class CharBase:
-    """Base class for characters."""
-    __slots__ = ()
     
+    
+from attribs import Body
+from attribs import Wallet
+from attribs import Inventory
+from attribs import Equip
+
+    
+class Char:
+    def __init__(self):
+        self._body =        Body(self)
+        self._wallet =      Wallet(self)
+        self._inventory =   Inventory(self)
+        self._equip =       Equip(self)
+
+    @property
+    def body(self):
+        """This characters body attributes."""
+        return self._body
+
+    @property
+    def wallet(self):
+        """This characters money."""
+        return self._wallet
+
+    @property
+    def inventory(self):
+        """This characters inventory."""
+        return self._inventory
+
+    @property
+    def equip(self):
+        """This characters equipment."""
+        return self._equip
+        
+        
