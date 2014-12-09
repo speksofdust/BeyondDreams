@@ -15,36 +15,10 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-VERSION = "0.1.1"
-BD_GLOBALS_PATH = ""
-
-session = None
-
-__all__ = "BD_GLOBALS_PATH", "session"
-
-
 if __name__ == "__main__":
-    
-    #import xsquare
-    
-    # TODO set BD_GLOBALS_PATH by operating system
-    
-    # init session then run xsquare app
-    session = _Session()
-    xsquare.app.run()
+    import bd
+    bd._start
     
 
-class Session:
-    __slots__ = "_user", "_globvars", "_screen"
-    def __init__(self):
-        from globvars import GlobVars
-        from user import User
 
-        #self._globvars = GlobVars(BD_GLOBALS_PATH)
-        self._user = User()
-        self._screen = None # The current screen
-        
-    def quit(self):
-        self._globvars.update
-        self._user.logout("q")
         
