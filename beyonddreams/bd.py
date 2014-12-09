@@ -28,7 +28,9 @@ def datapath(*args):
 
 __all__ = "datapath", "session"
 
+
 def _start():
+    global session
     import xsquare
     
     # TODO set BD_GLOBALS_PATH by operating system
