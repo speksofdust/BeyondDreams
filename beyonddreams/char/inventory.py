@@ -17,6 +17,7 @@
 
 from attrib import CharAttrib
 
+#pocket ids
 CONSUMABLES = 0
 WEARABLES = 1
 WEAPONS = 2
