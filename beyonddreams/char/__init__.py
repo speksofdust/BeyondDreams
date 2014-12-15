@@ -23,7 +23,7 @@ def _get_new_char():
     
 from attribs import Body
 from attribs import Wallet
-from attribs import Inventory
+from inventory import Inventory
 from attribs import Equip
 
     
