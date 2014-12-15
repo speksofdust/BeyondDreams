@@ -27,46 +27,6 @@ class CharAttrib:
     def char(self):
         """The char this attribute belongs to."""
         return self._char
-
-
-CONSUMABLES =   "consumables"
-WEARABLES =     "wearables"
-WEAPONS =       "weapons"
-        
-class Pocket:
-    __slots__ = "_inventory", "_items", "_pockettype"
-    def __init__(self, inventory, pockettype, items=[]):
-        self._inventory =   inventory
-        self._pockettype =  pockettype
-        self._items =       list(items)
-        
-        
-class Inventory(CharAttrib):
-    __slots__ = "_char", "_pockets"
-    def __init__(self, char):
-        self._char = char
-        self._pockets = (
-            Pocket(self, CONSUMABLES),
-            Pocket(self, WEARABLES),
-            Pocket(self, WEAPONS),
-            )
-        
-    def consumables(self):
-        """Consumable items."""
-        return self._pocket[0]
-        
-    def wearables(self):
-        """Wearable items."""
-        return self._pocket[1]
-        
-    def weapons(self):
-        """Weapon items."""
-        return self._pocket[2]
-        
-    def total_items(self):
-        """Return the total number of items."""
-        return (len(self._pockets[0]) + len(self._pockets[1]) +
-            len(self._pockets[2]))
     
 
 class Wallet(CharAttrib):
