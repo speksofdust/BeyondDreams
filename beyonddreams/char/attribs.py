@@ -30,9 +30,17 @@ class CharAttrib:
     
 
 class Wallet(CharAttrib):
-    __slots__ = ("_char",)
+    __slots__ = "_char", "_cash"
     def __init__(self, char):
         self._char = char
+        self._cash = (0,)
+        
+    def __str__(self): return str(self._cash)
+
+    @property
+    def zil(self):
+        """The primary form of currency in bd."""
+        return self._cash[0]
 
 
 class Equip(CharAttrib):
