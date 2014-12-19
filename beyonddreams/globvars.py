@@ -19,20 +19,36 @@ import os.path
 
 __all__ = ()
 
-def write(f, data):
-    pass
+def write(filepath, data):
+    with open filepath, 'wb') as f:
+        for i in data:
+            f.write(i)
     
-def load(f):
-    import os.path
-    if os.path.exists(filepath):
-        with open(filepath, 'rb') as f:
-            for i in iter(f.readlines())
-                if i.startswith('#'): continue
-    else:
-        os.path.mkdir(filepath)
-        # TODO
+def iterlines(filepath):
+    with open(filepath, 'rb') as f:
+        for i in iter(f.readlines()):
+            if i.startswith('#'): continue
+            else: yield i
+            
+def read_as_dict(filepath, sep, d={}):
+    for i in iterlines(filepath):
+        x, y = i.split(sep)
+        d[x] = y
+    
+    
+def default_globalvars():
+    """Return a dict with default globalvars."""
+    return {
 
+        }
 
+def default_userglobals():
+    """Return a dict with default userglobals."""
+    return {
+        'Bestiary':     set(),  # a new empty bestiary
+        }
+        
+        
 class VarData:
     """Variable data storage class."""
     def __init__(self, items):
@@ -46,21 +62,7 @@ class VarData:
     def update(self):
         if self._saved == False: write(f, self._items)
         self._saved = True
-    
-
-def default_globalvars():
-    """Return a dict with default globalvars."""
-    return {
-
-        }
-
-def default_userglobals():
-    """Return a dict with default userglobals."""
-    return {
-        'Bestiary':     set(),  # a new empty bestiary
-        }
-
-
+        
 
 class GlobVars(VarData):
     """Global variables storage class."""
