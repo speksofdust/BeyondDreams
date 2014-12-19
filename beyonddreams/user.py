@@ -16,10 +16,14 @@
 # ---------------------------------------------------------------------------- #
 
 
+
+
+from globvars import GlobVars
+
 class User:
-    __slots__ = "_globvars", "_data"
-    def __init__(self):
-        self._globvars = None
+    def __init__(self, filepath=None):
+        # makes a new user if filepath is None
+        self._globvars = GlobVars.userglobals(filepath)
         self._data = None
         
     @property
@@ -45,8 +49,9 @@ class User:
         self._data.update
         self._gvars = None
         self._data = None
-        if q: # quit
+        if q: # quitting
             pass
+        
 
 class UserRoster:
     __slots__ = "_data"
