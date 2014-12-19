@@ -19,12 +19,14 @@ VERSION =           "0.1.1"
 DATA_PATH =         "beyonddreams"
 BD_GLOBALS_PATH =   ""
 
-session = None
+session =   None
+
 
 def datapath(*args):
     """Returns the absolute path of "beyonddreams/data/" joined with args."""
-    import os
-    return os.path.join(os.path.abspath(__file__), "data", *args)
+    import os.path
+    return os.path.join(os.path.split(os.path.abspath(__file__)),
+        "data", *args)
 
 __all__ = "datapath", "session"
 
@@ -41,15 +43,22 @@ def _start():
     
 
 class Session:
-    __slots__ = "_user", "_globvars", "_screen"
     def __init__(self):
         from globvars import GlobVars
         from user import User
 
+        self._globvars = None   # temporary - until BD_GLOBALS_PATHS gets sorted out
         #self._globvars = GlobVars(BD_GLOBALS_PATH)
         self._user = User()
         self._screen = None # The current screen
         
+    @property
+    def screen(self):
+        """The current screen."""
+        return self._screen
+        
     def quit(self):
+        """Quit Beyond Dreams."""
         self._globvars.update
         self._user.logout("q")
+
