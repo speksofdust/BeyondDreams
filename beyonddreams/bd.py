@@ -46,10 +46,10 @@ class Session:
     def __init__(self):
         from globvars import GlobVars
         from user import User
-
-        self._globvars = None   # temporary - until BD_GLOBALS_PATHS gets sorted out
-        #self._globvars = GlobVars(BD_GLOBALS_PATH)
-        self._user = User()
+        
+        # If no globals path can be found defaults will be used
+        self._globvars = GlobVars(BD_GLOBALS_PATH)
+        self._user = None
         self._screen = None # The current screen
         
     @property
@@ -60,5 +60,5 @@ class Session:
     def quit(self):
         """Quit Beyond Dreams."""
         self._globvars.update
-        self._user.logout("q")
-
+        try: self._user.logout("q")
+        except: pass
