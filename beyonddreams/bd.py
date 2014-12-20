@@ -16,7 +16,6 @@
 # ---------------------------------------------------------------------------- #
 
 VERSION =           "0.1.1"
-DATA_PATH =         "beyonddreams"
 BD_GLOBALS_PATH =   ""
 
 session =   None
@@ -90,6 +89,7 @@ class BDScreen:
         
         
     def start(self):
+        """Start this screen."""
         if session._screen != self:
             try: self.pre_run
             except: pass
