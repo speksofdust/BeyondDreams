@@ -62,3 +62,52 @@ class Session:
         self._globvars.update
         try: self._user.logout("q")
         except: pass
+    
+
+class BDScreen:
+    """Base class for Beyond Dreams "Screen" Objects.
+        This defines what will be displayed when 
+        'session.screen' = a given screen object.
+    """
+    _running =  False
+    _name =     "dummy"
+    def __init__(self): pass
+        
+    # eq, ne -- test 'x is self', then x 'isinstance of' and so on
+    def __eq__(self, x):
+        if x is not self:
+            if (isinstance(x, BDScreen): return x._name == self._name
+            raise TypeError("cannot compare type '{}' to BDScreen type.".format(
+                x.type))
+        return True
+        
+    def __ne__(self, x):
+        if x is not self:
+            if isinstance(x, BDScreen): return x._name != self._name
+            raise TypeError("cannot compare type '{}' to BDScreen type.".format(
+                x.type))
+        return False
+        
+        
+    def start(self):
+        if session._screen != self:
+            try: self.pre_run
+            except: pass
+            session._screen = self
+            self.run
+        
+    def pre_run(self):
+        """Called before the screen becomes active."""
+        raise NotImplementedError
+        
+    def run(self):
+        raise NotImplementedError
+        
+    @property
+    def name(self):
+        """The name of this screen."""
+        return self._name
+
+    def is_running(self):
+        """True if this scene is currently running."""
+        return self._running
