@@ -20,7 +20,8 @@ __all__ = ()
 def _get_new_char():
     return
     
-    
+from .bd import session
+
 from attribs import Body
 from attribs import Wallet
 from inventory import Inventory
@@ -33,6 +34,20 @@ class Char:
         self._wallet =      Wallet(self)
         self._inventory =   Inventory(self)
         self._equip =       Equip(self)
+        self._stats =       None
+
+    def is_player(self):
+        """True if this char is controlled by the "player" object
+            on the local machine."""
+        return self in session.screen.player.chars
+
+    def is_alive(self):
+        """True if this character is alive."""
+        return self._stats.health != 0
+
+    def is_critical(self):
+        """True if this characters health level is in the critical range."""
+        return 0 < self._stats.health <= 20
 
     @property
     def body(self):
