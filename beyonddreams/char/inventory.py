@@ -183,8 +183,8 @@ class Pocket:
         
 class Inventory(CharAttrib):
     __slots__ = "_char", "_pockets"
-    def __init__(self, char):
-        self._char = char
+    def __init__(self):
+        self._char = None
         self._pockets = (
             Pocket(self, CONSUMABLES),
             Pocket(self, WEARABLES),
