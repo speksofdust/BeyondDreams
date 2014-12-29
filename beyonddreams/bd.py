@@ -61,8 +61,9 @@ class Session:
         self._globvars.update
         try: self._user.logout("q")
         except: pass
-    
+  
 
+# ---------------------------------------------------------------------------- #
 class BDScreen:
     """Base class for Beyond Dreams "Screen" Objects.
         This defines what will be displayed when 
@@ -79,15 +80,15 @@ class BDScreen:
             raise TypeError("cannot compare type '{}' to BDScreen type.".format(
                 x.type))
         return True
-        
+
     def __ne__(self, x):
         if x is not self:
             if isinstance(x, BDScreen): return x._name != self._name
             raise TypeError("cannot compare type '{}' to BDScreen type.".format(
                 x.type))
         return False
-        
-        
+
+
     def start(self):
         """Start this screen."""
         if session._screen != self:
@@ -95,14 +96,14 @@ class BDScreen:
             except: pass
             session._screen = self
             self.run
-        
+
     def pre_run(self):
         """Called before the screen becomes active."""
         raise NotImplementedError
         
     def run(self):
         raise NotImplementedError
-        
+
     @property
     def name(self):
         """The name of this screen."""
@@ -111,3 +112,20 @@ class BDScreen:
     def is_running(self):
         """True if this scene is currently running."""
         return self._running
+
+
+from xsquare import typedef
+
+# Some overides so we can tell were using BD specific instances and
+# so we can do future tweaks if needed
+class BDTDef(typedef.TypeDef):
+    """Beyond Dreams Type Definition class. Base class for all BeyondDreams
+    type definitions.
+    """ 
+    pass
+
+class BDTDefSet(typedef.TypeDefSet):
+    """Beyond Dreams Type Definition Set class. Base class for all Beyond Dreams
+    type definiton container classes.
+    """
+    pass
