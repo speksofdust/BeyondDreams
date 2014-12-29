@@ -28,44 +28,40 @@ class InventoryItem:
     __slots__ = "_item"
     def __init__(self, item):
         self._item = item
-        
+
     def __del__(self):
         self._item = None
         try: self._qty = None
         except: pass
-        
-        
+
+    def __repr__(self): return str(self._item.name, self.qty)
+
     # Note: AttributeError will be raised if comparing an item that is not an
     #   instance of InventoryItem (doesnt have a qty attrib)
     #   to compare item only use the item property
-    def __eq__(self, x): 
-        return (self._item == x._item and self.qty == x.qty) 
-    
-    def __ne__(self, x):
-        return (self._item != x._item or self.qty != x.qty) 
-        
+    def __eq__(self, x): return (self._item == x._item and self.qty == x.qty) 
+    def __ne__(self, x): return (self._item != x._item or self.qty != x.qty) 
+
     # lt, gt, ge, le compare qty -- both items must be the same
     def __lt__(self, x):
         if self._item == x._item: return self.qty < self.qty
         raise Exception("tried to compare mismatched items ({} != {})".format(
             self._item.name, x._item.name)
-    
+
     def __gt__(self, x):
         if self._item == x._item: return self.qty > self.qty
         raise Exception("tried to compare mismatched items ({} != {})".format(
             self._item.name, x._item.name)
-        
+
     def __ge__(self, x):
         if self._item == x._item: return self.qty >= self.qty
         raise Exception("tried to compare mismatched items ({} != {})".format(
             self._item.name, x._item.name)
-        
+
     def __le__(self, x):
         if self._item == x._item: return self.qty <= self.qty
         raise Exception("tried to compare mismatched items ({} != {})".format(
             self._item.name, x._item.name)
-        
-    def __repr__(self): return str(self._item.name, self.qty)
 
     @property
     def itemdata(self):
@@ -84,7 +80,7 @@ class InventoryItem:
     def name(self):
         """The name of this item."""
         return self._item.name
-        
+
 
 class InvItem(InventoryItem):
     """"""
@@ -113,6 +109,11 @@ class Pocket:
         self._pockettype =  pockettype
         self._items =       list(items)
 
+    def __iter__(self, x):      return iter(self._items)
+    def __repr__(self):         return str(self._items)
+    def __len__(self):          return len(self._items)
+    def __contains__(self, x):  return any(x == (i or i.name) for i in self._items)
+
     # Note: Pocket x Pocket comparison must compare pockettype
     def __eq__(self, x):
         if isinstance(x, Pocket):       # Pocket x Pocket comp
@@ -130,16 +131,7 @@ class Pocket:
         try: return x != self._items    # Pocket x OtherType comp
         except: raise TypeError(
             "Cannot compare type: {} to Inventory 'Pocket' type.".format(type(x))
-        
-    def __len__(self):          return len(self._items)
-    def __contains__(self, x):  
-        for i in self._items:
-            if (x == i or x == i.name): return True
-        return False
-        
-    def __iter__(self, x):      return iter(self._items)
-    def __repr__(self):         return str(self._items)
-        
+
     def _additem(self, item):
         for i in self._items:
             if i == item:
@@ -153,8 +145,7 @@ class Pocket:
             return self._items[i]
         self._items.append(item)
         return self._items[-1]
-        
-        
+
     @property
     def pockettype(self):
         """The type of pocket. This determines what item types get 
@@ -173,14 +164,13 @@ class Pocket:
         """Return all items in this pocket and x."""
         return set(self._items).intersection(x)
 
-        
     def search_tags(self, include=None, exclude=None):
         """Yield items with all tags in include 
             and none of the tags in exclude"""
         raise NotImplementedError
         # TODO
-        
-        
+
+
 class Inventory(CharAttrib):
     __slots__ = "_char", "_pockets"
     def __init__(self):
@@ -202,16 +192,16 @@ class Inventory(CharAttrib):
     def consumables(self):
         """Consumable items."""
         return self._pocket[0]
-        
+
     def wearables(self):
         """Wearable items."""
         return self._pocket[1]
-        
+
     def weapons(self):
         """Weapon items."""
         return self._pocket[2]
-        
+
     def total_items(self):
         """Return the total number of items in the inventory."""
         return sum(len(i) for i in iter(self._pockets)):
-            
+
