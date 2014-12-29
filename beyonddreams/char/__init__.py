@@ -17,8 +17,6 @@
 
 __all__ = ()
 
-def _get_new_char():
-    return
     
 from .bd import session
 
@@ -29,13 +27,29 @@ from attribs import Equip
 
     
 class Char:
-    def __init__(self, defaults, body=None, wallet=None, inventory=None, equip=None):
-        self._defaults =    defaults
-        self._body =        body
-        self._wallet =      Wallet(self, wallet)
-        self._inventory =   Inventory(self, inventory)
-        self._equip =       Equip(self, equip)
-        self._stats =       None
+    def __init__(self, defaults, body=None, inventory=None, equip=None, wallet=None):
+        if defaults is None: raise ValueError("Cannot create char without with defaults")
+        self._defaults =        defaults
+        if body is None:        self._body = self._defaults.body()
+        else:                   self._body = body
+        if inventory is None:   self._inventory = self._defaults.inventory()
+        else:                   self._inventory = inventory
+        if equip is None:       self._equip = self._defaults.equip()
+        else:                   self._equip = equip    
+        self._stats =           None
+        if wallet is None:      self._wallet = self._defaults.wallet()
+        else:                   self._wallet = wallet
+
+    @classmethod
+    def new(self, defaults):
+        if defaults is None: raise ValueError("Cannot create char without with defaults")
+        self._defaults =        defaults
+        self._body =            self._defaults.body()
+        self._inventory =       self._defaults.inventory()
+        self._equip =           self._defaults.equip()
+        self._stats =           None
+        self._wallet =          self._wallet = self._defaults.wallet()
+        
 
     def is_player(self):
         """True if this char is controlled by the "player" object
