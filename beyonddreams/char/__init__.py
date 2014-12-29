@@ -61,6 +61,20 @@ class Char:
         self._wallet =          self._defaults.wallet()
         self._initchar(True)
         
+    def __bool__(self): return True
+        
+    def __hash__(self):
+        import random
+        return hash(id(self), random.uniform(0.0, 9999.9))) 
+        
+    def __eq__(self, x):
+        if isinstance(x, type(self)): return x is self
+        raise TypeError("Cannot compare type: '{type(self)}' to '{type(x)}'")
+    
+    def __ne__(self, x):
+        if isinstance(x, type(self)): return x is not self
+        raise TypeError("Cannot compare type: '{type(self)}' to '{type(x)}'")
+        
     def _initchar(self, isnew):
         _ac(self)
 
