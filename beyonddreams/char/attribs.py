@@ -17,12 +17,16 @@
 
 from .. import bd
 
+
 class CharAttrib:
     __slots__ = ("_char",)
     """Base class for all character attributes."""
     def __init__(self):
         self._char = None
 
+    def __setac(self, c):
+        self._char = c
+        
     @property
     def char(self):
         """The char this attribute belongs to."""
@@ -75,3 +79,9 @@ class Body(CharAttrib):
     @property
     def attribs(self):
         return self._attribs
+    
+        
+class Stats(CharAttrib):
+    __slots__ = CharAttrib.__slots__
+    def __init__(self):
+        self._char = None
