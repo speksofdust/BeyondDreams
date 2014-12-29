@@ -20,22 +20,33 @@ from .. import bd
 class CharAttrib:
     __slots__ = ("_char",)
     """Base class for all character attributes."""
-    def __init__(self, c):
-        self._char = c
+    def __init__(self):
+        self._char = None
 
     @property
     def char(self):
         """The char this attribute belongs to."""
         return self._char
     
+    
+class Coupons:
+    __slots__ = "_wallet", "_items"
+    def __init__(self, wallet, items=[]): 
+        self._wallet = wallet
+        self._items = list(items)
+    
 
 class Wallet(CharAttrib):
-    __slots__ = "_char", "_cash"
-    def __init__(self, char):
-        self._char = char
-        self._cash = (0,)
+    __slots__ = CharAttrib.__slots__ + "_cash", "_coupons"
+    def __init__(self, zil=0, coupons=[]):
+        self._char = None
+        self._cash = (zil,)
+        self._coupons = Coupons(self, coupons)
         
-    def __str__(self): return str(self._cash)
+    @classmethod
+    def default(self):
+        self._cash = (0,)
+        self._coupons = Coupons(self) 
 
     @property
     def zil(self):
@@ -44,15 +55,15 @@ class Wallet(CharAttrib):
 
 
 class Equip(CharAttrib):
-    __slots__ = ("_char",)
-    def __init__(self, char):
-        self._char = char
+    __slots__ = CharAttrib.__slots__
+    def __init__(self):
+        self._char = None
 
 
 class Body(CharAttrib):
-    __slots__ = "_char", "_subparts", "_attribs", "_mesh"
-    def __init__(self, char):
-        self._char = char
+    __slots__ = CharAttrib.__slots__ + "_subparts", "_attribs", "_mesh"
+    def __init__(self):
+        self._char = None
         self._subparts = {}
         self._attribs = {}
         #bd.datapath()  TODO
