@@ -29,11 +29,12 @@ from attribs import Equip
 
     
 class Char:
-    def __init__(self):
-        self._body =        Body(self)
-        self._wallet =      Wallet(self)
-        self._inventory =   Inventory(self)
-        self._equip =       Equip(self)
+    def __init__(self, defaults, body=None, wallet=None, inventory=None, equip=None):
+        self._defaults =    defaults
+        self._body =        body
+        self._wallet =      Wallet(self, wallet)
+        self._inventory =   Inventory(self, inventory)
+        self._equip =       Equip(self, equip)
         self._stats =       None
 
     def is_player(self):
@@ -48,6 +49,11 @@ class Char:
     def is_critical(self):
         """True if this characters health level is in the critical range."""
         return 0 < self._stats.health <= 20
+
+    @property
+    def get_defaults(self):
+        """Default values for this character."""
+        return self._defaults
 
     @property
     def body(self):
