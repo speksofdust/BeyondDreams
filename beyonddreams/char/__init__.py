@@ -51,7 +51,7 @@ class Char:
         return 0 < self._stats.health <= 20
 
     @property
-    def get_defaults(self):
+    def defaults(self):
         """Default values for this character."""
         return self._defaults
 
