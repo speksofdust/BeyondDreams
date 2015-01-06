@@ -113,19 +113,3 @@ class BDScreen:
         """True if this scene is currently running."""
         return self._running
 
-
-from xsquare import typedef
-
-# Some overides so we can tell were using BD specific instances and
-# so we can do future tweaks if needed
-class BDTDef(typedef.TypeDef):
-    """Beyond Dreams Type Definition class. Base class for all BeyondDreams
-    type definitions.
-    """ 
-    pass
-
-class BDTDefSet(typedef.TypeDefSet):
-    """Beyond Dreams Type Definition Set class. Base class for all Beyond Dreams
-    type definiton container classes.
-    """
-    pass
