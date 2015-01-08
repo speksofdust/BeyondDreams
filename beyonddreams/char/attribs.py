@@ -31,6 +31,28 @@ class CharAttrib:
     def char(self):
         """The char this attribute belongs to."""
         return self._char
+        
+    @property
+    def char_defaults(self):
+        """Defaults for the char which this attribute belongs to."""
+        return self._char._defaults
+        
+        
+class CharAttribSubAttrib:
+    """Subattribute class for use within a CharAttrib class."""
+    __slots__ = ()
+    def __init__(self, charattrib):
+        self._charattrib = charattrib
+
+    @property
+    def charattrib(self):
+        """The charattrib this is part of."""
+        return self._charattrib
+
+    @property
+    def char(self):
+        """The character which this belongs to."""
+        return self._charattrib._char
     
     
 class Coupons:
