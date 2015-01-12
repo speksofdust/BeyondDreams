@@ -17,7 +17,7 @@
 
 __all__ = ()
 
-    
+
 from .bd import session
 
 from attribs import Body
@@ -35,9 +35,12 @@ def _ac(char):
         
         
 class Char:
-    def __init__(self, defaults, body=None, inventory=None, equip=None, wallet=None):
+    _type = ""
+    
+    def __init__(self, defaults, player, body=None, inventory=None, equip=None, wallet=None):
         if defaults is None: raise ValueError("Cannot create char without with defaults")
         self._defaults =        defaults
+        self._player =          player
         if body is None:        self._body = self._defaults.body()
         else:                   self._body = body
         if inventory is None:   self._inventory = self._defaults.inventory()
@@ -48,7 +51,10 @@ class Char:
         else:                   self._stats = stats
         if wallet is None:      self._wallet = self._defaults.wallet()
         else:                   self._wallet = wallet
+        import random
+        self._seed =            random.uniform(0.0, 99999.9)
         self._initchar(False)
+        
 
     @classmethod
     def new(self, defaults):
@@ -59,13 +65,12 @@ class Char:
         self._equip =           self._defaults.equip()
         self._stats =           self._defaults.stats()
         self._wallet =          self._defaults.wallet()
+        import random
+        self._seed =            random.uniform(0.0, 99999.9)
         self._initchar(True)
         
     def __bool__(self): return True
-        
-    def __hash__(self):
-        import random
-        return hash(id(self), random.uniform(0.0, 9999.9))) 
+    def __hash__(self): return hash(id(self), self._seed)
         
     def __eq__(self, x):
         if isinstance(x, type(self)): return x is self
@@ -81,7 +86,7 @@ class Char:
     def is_player(self):
         """True if this char is controlled by the "player" object
             on the local machine."""
-        return self in session.screen.player.chars
+        return self._player == session.screen.player
 
     def is_alive(self):
         """True if this character is alive."""
@@ -90,6 +95,11 @@ class Char:
     def is_critical(self):
         """True if this characters health level is in the critical range."""
         return 0 < self._stats.health <= 20
+
+    @property
+    def party(self):
+        """The party this char is in."""
+        return self._player.party
 
     @property
     def defaults(self):
