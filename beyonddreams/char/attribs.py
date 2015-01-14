@@ -21,11 +21,8 @@ from .. import bd
 class CharAttrib:
     __slots__ = ("_char",)
     """Base class for all character attributes."""
-    def __init__(self):
-        self._char = None
-
-    def __setac(self, c):
-        self._char = c
+    def __init__(self, char):
+        self._char = char
         
     @property
     def char(self):
@@ -64,8 +61,8 @@ class Coupons:
 
 class Wallet(CharAttrib):
     __slots__ = CharAttrib.__slots__ + "_cash", "_coupons"
-    def __init__(self, zil=0, coupons=[]):
-        self._char = None
+    def __init__(self, char, zil=0, coupons=[]):
+        self._char = char
         self._cash = (zil,)
         self._coupons = Coupons(self, coupons)
         
@@ -82,14 +79,14 @@ class Wallet(CharAttrib):
 
 class Equip(CharAttrib):
     __slots__ = CharAttrib.__slots__
-    def __init__(self):
-        self._char = None
+    def __init__(self, char):
+        self._char = char
 
 
 class Body(CharAttrib):
     __slots__ = CharAttrib.__slots__ + "_subparts", "_attribs", "_mesh"
-    def __init__(self):
-        self._char = None
+    def __init__(self, char):
+        self._char = char
         self._subparts = {}
         self._attribs = {}
         #bd.datapath()  TODO
@@ -105,5 +102,17 @@ class Body(CharAttrib):
         
 class Stats(CharAttrib):
     __slots__ = CharAttrib.__slots__
-    def __init__(self):
-        self._char = None
+    def __init__(self, char):
+        self._char = char
+        
+    def base(self):
+        return self._char._base._stats
+        
+        
+class StatusEffects(CharAttrib):
+    __slots__ = CharAttrib.__slots__
+    def __init__(self, char):
+        self._char = char
+        
+    def base(self):
+        return self._char._base._stats
