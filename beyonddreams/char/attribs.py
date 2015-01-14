@@ -30,9 +30,9 @@ class CharAttrib:
         return self._char
         
     @property
-    def char_defaults(self):
+    def base(self):
         """Defaults for the char which this attribute belongs to."""
-        return self._char._defaults
+        return self._char._base
         
         
 class CharAttribSubAttrib:
@@ -78,10 +78,17 @@ class Wallet(CharAttrib):
 
 
 class Equip(CharAttrib):
-    __slots__ = CharAttrib.__slots__
-    def __init__(self, char):
+    __slots__ = CharAttrib.__slots__ + "_slots"
+    def __init__(self, char, slots):
         self._char = char
-
+        self._slots = {}
+        
+    def __bool__(self):         return len(self._slots) > 0
+    def __len__(self):          return len(self._slots)
+    def __iter__(self):         return iter(self._slots)
+    def __contains__(self, i):  return i in self._slots
+    def __getitem__(self, i):   return self._slots[i]
+    
 
 class Body(CharAttrib):
     __slots__ = CharAttrib.__slots__ + "_subparts", "_attribs", "_mesh"
@@ -89,6 +96,7 @@ class Body(CharAttrib):
         self._char = char
         self._subparts = {}
         self._attribs = {}
+        self._mesh = None
         #bd.datapath()  TODO
 
     @property
@@ -104,15 +112,17 @@ class Stats(CharAttrib):
     __slots__ = CharAttrib.__slots__
     def __init__(self, char):
         self._char = char
-        
-    def base(self):
+
+    def base_stats(self):
+        """The base stats."""
         return self._char._base._stats
-        
-        
+
+
 class StatusEffects(CharAttrib):
     __slots__ = CharAttrib.__slots__
     def __init__(self, char):
         self._char = char
-        
-    def base(self):
-        return self._char._base._stats
+
+    def base_statuseffects(self):
+        """The base status effects."""
+        return self._char._base._statuseffects
