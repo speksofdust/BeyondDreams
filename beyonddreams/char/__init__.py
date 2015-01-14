@@ -24,50 +24,31 @@ from attribs import Body
 from attribs import Wallet
 from inventory import Inventory
 from attribs import Equip
-
-CHAR_ATTRIBNAMES = "body", "inventory", "equip", "stats", "wallet"
-
-
-def _ac(char):
-    global CHAR_ATTRIBNAMES
-    # give all char attribs ref to char
-    for i in CHAR_ATTRIBNAMES: getattr(char, "_{}".format(i))(char)
+from attribs import Stats
+from attribs import StatusEffects
         
+def _initca(char, v, attribcls):
+    # helper for initalizing each charattirb type
+    if isinstance(v, attribcls): return charattrib
+    elif v is None: return charratrib(char)
+    else: return charattrib(char, *v)
         
 class Char:
-    _type = ""
-    
-    def __init__(self, defaults, player, body=None, inventory=None, equip=None, wallet=None):
-        if defaults is None: raise ValueError("Cannot create char without with defaults")
-        self._defaults =        defaults
+    _type = "normal"
+    CHARATTRIB_NAMES = "body", "inventory", "equip", "wallet", "stats", "statuseffects"
+    def __init__(self, player, base=None, body=None, inventory=None, equip=None, 
+        wallet=None, stats=None, statuseffects=None):
         self._player =          player
-        if body is None:        self._body = self._defaults.body()
-        else:                   self._body = body
-        if inventory is None:   self._inventory = self._defaults.inventory()
-        else:                   self._inventory = inventory
-        if equip is None:       self._equip = self._defaults.equip()
-        else:                   self._equip = equip    
-        if stats is None:       self._stats = self._defaults.stats()
-        else:                   self._stats = stats
-        if wallet is None:      self._wallet = self._defaults.wallet()
-        else:                   self._wallet = wallet
+        self._base =            base
+        self._body =            _initca(self, body, Body)
+        self._inventory =       _initca(self, inventory, Inventory)
+        self._equip =           _initca(self, equip, Equip)
+        self._wallet =          _initca(self, wallet, Wallet)
+        self._stats =           _initca(self, stats, Stats)
+        self._statuseffects =   _initca(self, statuseffects, StatusEffects)
         import random
-        self._seed =            random.uniform(0.0, 99999.9)
-        self._initchar(False)
+        self._seed =        random.uniform(0.0, 99999.9)
         
-
-    @classmethod
-    def new(self, defaults):
-        if defaults is None: raise ValueError("Cannot create char without with defaults")
-        self._defaults =        defaults
-        self._body =            self._defaults.body()
-        self._inventory =       self._defaults.inventory()
-        self._equip =           self._defaults.equip()
-        self._stats =           self._defaults.stats()
-        self._wallet =          self._defaults.wallet()
-        import random
-        self._seed =            random.uniform(0.0, 99999.9)
-        self._initchar(True)
         
     def __bool__(self): return True
     def __hash__(self): return hash(id(self), self._seed)
@@ -79,9 +60,6 @@ class Char:
     def __ne__(self, x):
         if isinstance(x, type(self)): return x is not self
         raise TypeError("Cannot compare type: '{type(self)}' to '{type(x)}'")
-        
-    def _initchar(self, isnew):
-        _ac(self)
 
     def is_player(self):
         """True if this char is controlled by the "player" object
@@ -113,7 +91,7 @@ class Char:
 
     @property
     def wallet(self):
-        """This characters money."""
+        """This characters wallet."""
         return self._wallet
 
     @property
@@ -125,5 +103,8 @@ class Char:
     def equip(self):
         """This characters equipment."""
         return self._equip
+
         
-        
+class NPC(Char):
+    """Non playable char."""
+    
