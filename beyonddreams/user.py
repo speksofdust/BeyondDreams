@@ -15,10 +15,19 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-
-
+import string
 
 from globvars import GlobVars
+
+
+def valid_username_chars():
+    yield '_'
+    yield string.ascii_lowercase
+    yield string.digits
+
+def valid_charname_chars():
+    yield string.ascii_letters
+
 
 class User:
     def __init__(self, filepath=None):
