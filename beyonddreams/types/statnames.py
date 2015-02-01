@@ -15,7 +15,7 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-# Non-Elemental
+# Non-Elementals
 PHYS =      "physical"
 PSYC =      "psychic"
 SPIR =      "spirit"
@@ -32,7 +32,7 @@ DARK =      "dark"
 MAG =       "magnetic"
 ELEMS =     FIRE, ICE, WATER, WIND, ELEC, LIGHT, DARK, MAG
 
-# Stats
+# ---- Stats ----------------------------------------------------------------- #
 HP =        "health"
 WIL =       "willpower"
 INT =       "intellect"
@@ -48,6 +48,7 @@ STATS = HP, WIL, INT, STR, FOC, STA, LUC, KAR
 MNTL =      "mental"
 STAT_GROUPS = PHYS, MNTL
 
+# ---- Statuses -------------------------------------------------------------- #
 # Groups
 MIND =      "mind"
 TFORM =     "transform"
@@ -80,10 +81,11 @@ STATUSGROUP_TFORM = SHRINK
 
 # SENS type
 BLIND =     "blind"
+CONV =      "convulsion"
 NUMB =      "numb"
 PARA =      "para"
 STUPOR =    "stupor"
-STATUSGROUP_SENS = BLIND, NUMB, PARA, STUPOR
+STATUSGROUP_SENS = BLIND, CONV, NUMB, PARA, STUPOR
 
 # HEX type
 CURSED =    "cursed"
@@ -108,6 +110,8 @@ ADREN =     "adrenalin"
 
 UNGROUPED_STATUSES = (POISON, DRUNK, EXAUST, HALLU, RADIA, RAGE, BLUST, ADREN)
 
+
+# ---- Abbr ------------------------------------------------------------------ #
 ABBRS = {
     # stats
     HP:     "HP",
@@ -127,4 +131,4 @@ ABBRS = {
     MAG:    "MAG",
 }
 
-ABBRS_TRIM_TO_4 = ELEC, PARA, MUTA, SENS, PHYS, SPIR, PSYC
+ABBRS_TRIM_TO_4 = ELEC, CONV, PARA, MUTA, SENS, PHYS, SPIR, PSYC
