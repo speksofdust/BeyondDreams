@@ -55,6 +55,7 @@ TFORM =     "transform"
 MUTA =      "mutation"
 SENS =      "sensory"
 SPD =       "speed"
+UNDEAD =    "undead"
 WOUND =     "wound"
 STATUS_GROUPS = MIND, TFORM, MUTA, SENS, SPD, WOUND
 
@@ -109,7 +110,23 @@ BLUST =     "blood lust"
 ADREN =     "adrenalin"
 
 UNGROUPED_STATUSES = (POISON, DRUNK, EXAUST, HALLU, RADIA, RAGE, BLUST, ADREN)
+GROUPED_STATUSES = (STATUSGROUP_MIND + STATUSGROUP_SENS + STATUSGROUP_SPD +
+    STATUSGROUP_TFORM + STATUSGROUP_HEX + STATUSGROUP_UNDEAD + STATUSGROUP_WOUND)
+ALL_STATUS_NAMES = GROUPED_STATUSES + UNGROUPED_STATUSES
 
+# ---- Family Types ---------------------------------------------------------- #
+BEAST =     "beast"
+INSECT =    "insectoid"
+REPT =      "reptillion"
+PLANT =     "plant"
+SLIME =     "slime"
+MECH =      "mech"
+PFAMS =     BEAST, INSECT, REPT, PLANT, SLIME, MECH
+
+AQUA =     "aquatic"
+FLYING =   "flying"
+SPIRIT =    SPIR
+SFAMS =     AQUA, FLYING, POISON, UNDEAD, SPIR
 
 # ---- Abbr ------------------------------------------------------------------ #
 ABBRS = {
