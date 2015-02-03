@@ -32,7 +32,23 @@ class CharAttrib:
     @property
     def base(self):
         """Defaults for the char which this attribute belongs to."""
-        return self._char._base
+        return self._char.base
+        
+        
+class CharAttribDict(CharAttrib):
+    __slots__ = CharAttrib.__slots__ + "_items"
+    def __init__(self, char):
+        self._char = char
+        self._items = {}
+
+    def __getitem__(self, i):       return self._items[i]
+    def __len__(self):              return len(self._items)
+    def __contains__(self, i):      return i in self._items
+    def __iter__(self):             return iter(self._items)
+    def __str__(self):              return str(self._items)[0:-1]
+    def __repr__(self):             return repr(self._items)
+
+    def _getiter(self, n):          return iter(self._items[i] for i in n)
         
         
 class CharAttribSubAttrib:
