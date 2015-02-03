@@ -51,6 +51,11 @@ class CharAttribDict(CharAttrib):
     def _getiter(self, n):          return iter(self._items[i] for i in n)
         
         
+class StatAttrib(CharAttribDict):
+    __slots__ = CharAttribDict.__slots__
+    
+    def __setitem__(self, i, v):    self._items[i].value = v
+        
 class CharAttribSubAttrib:
     """Subattribute class for use within a CharAttrib class."""
     __slots__ = ()
