@@ -52,9 +52,14 @@ class CharRoster(CharStorageBC):
 
 
 class Party(CharStorageBC):
+    MAX_CHARS = 8
     def __init__(self):
         self._items = CharRoster()
         self._current = None    # stored as an index (int)
+        
+    def is_full(self):
+        """True if no more members can be added to this party."""
+        return len(self._items) == self.MAX_CHARS
         
     def next(self):
         """Set the next item as the current item."""
