@@ -19,7 +19,7 @@ from itemtypes import ItemType
 from itemtypes import regitem
 
 class ConsumableType(ItemType):
-    CATTYPE =       CONSUMABLE
+    CATTYPE =       "consumable"
     edible =        0   # 0-False 1-True 2-Drinkable ('can' be eaten/drunk)
     _perishable =   0   # 0=False or time as 3 ints (min, hours, days)
     _ingredient =   0   # 0=False, 1=Dry, 2=Wet
