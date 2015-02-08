@@ -25,13 +25,13 @@ class ItemDict(BDTypeDict):
         return iter(i for i in self._items if i.CATTYPE == cattype)
 
     def consumables(self):
-        return self._iterbycattype(CONSUMABLE)
+        return self._iterbycattype("consumable")
 
     def wearables(self):
-        return self._iterbycattype(WEARABLE)
+        return self._iterbycattype("wearable")
 
     def weapons(self):
-        return self._iterbycattype(WEAPONS)
+        return self._iterbycattype("weapons")
         
         
 def regitem(i):
