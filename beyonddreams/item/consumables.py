@@ -18,7 +18,9 @@
 from itemtypes import ItemType
 from itemtypes import regitem
 
+
 class ConsumableType(ItemType):
+    """Base class for all consumable item types."""
     CATTYPE =       "consumable"
     edible =        0   # 0-False 1-True 2-Drinkable ('can' be eaten/drunk)
     _perishable =   0   # 0=False or time as 3 ints (min, hours, days)
@@ -31,4 +33,30 @@ class ConsumableType(ItemType):
     def is_perishable(self):
         """True if this item is perishable."""
         return self._perishable != 0
+        
+    def typetags(self):
+        """Yield all type tags for this."""
+        for i in self._inc_ttags: yield i
+        if self._perishable: yield "perishable"
+        if self._ingredient == 1:
+            yield "ingredient"
+            yield "dry"
+        elif: self._ingredient == 2:
+            yield "ingredient"
+            yield "wet"
+            yield "liquid"
+        else: pass
+        for i in self._typetags: yield i
+        yield self.TYPENAME
+        yield self.CATTYPE
+        
+        
+class Ingredient(ConsumableType):
+    """Consumable types that can always be used as an ingredient."""
+
+class DryIngredient(Ingredient):
+    pass
+
+class WetIngredient(Ingredient):
+    edible =    2
 
