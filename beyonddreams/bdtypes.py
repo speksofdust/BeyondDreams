@@ -14,14 +14,19 @@
 #     along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
-
-"""Easy access to all bd types."""
-
-from item.itemtypes import ItemDict
+"""Provides easy access to all bd types."""
 
 
-itemtypes = ItemDict()
+from items.itemtypes import ItemDict
+from realms import RealmTypes
 
 
-__all__ = ("itemtypes"
+itemtypes =     ItemDict()
+realmtypes =    None
+elemtypes =     None
+statustypes =   None
+famtypes =      None
+
+
+__all__ = ("itemtypes", "realmtypes", "elemtypes", "statustypes", "famtypes",
     )
