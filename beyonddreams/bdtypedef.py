@@ -25,41 +25,36 @@ from xsquare import typedef
 class BDTypeDef(typedef.TypeDef):
     """Beyond Dreams Type Definition class. Base class for all BeyondDreams
     type definitions.
-    """ 
-    pass
+    """
+    def __init__(self, name, cls=None):
+        self._name = name
+        self._cls = cls
+
+    def typetags(self):
+        """Tags to describe this type. (non-exclusive)"""
+        return self._typetags
 
 
 class BDTypeDefSet(typedef.TypeDefSet):
     """Beyond Dreams Type Definition Set class. Base class for all Beyond Dreams
     type definiton container classes.
     """
-    pass
+
+    def _cont_as_iter(self, n):
+        return iter(self._items[i] for i in n)
 
 
-class BDType:
-    """Base class for Beyond Dreams types."""
-    _typetags = ()
-    _typedesc = ""
-    def __init__(self, tags=()):
-        self._tags = tags
-
-    @property
-    def typedesc(self):
-        """A brief description about this type."""
-        return self._typedesc
-
-    @property
-    def typename(self):
-        """The name of this type as a string"""
-        return self.__class__.__name__
-
-    def typetags(self):
-        """Return an iterator of all typetags."""
-        return iter(self._typetags)
-
-    def tags(self):
-        yield self.typename
-        for i in chain.from_iterable(self._typetags): yield i
-        for i in chain.from_iterable(self._tags): yield i
+def _defaultchk(instance, variable, variablename):
+    # return default value if n is None
+    if variable is None: return getattr(instance._typebase, variablename)
+    return variable
 
 
+class BDTypesDict:
+    def __init__(self):
+        self._items = {}
+
+    def __iter__(self):         return iter(self._items)
+    def __len__(self):          return len(self._items)
+    def __getitem__(self, i):   return self._items[i]
+    def __contains__(self, i):  return i in self._items
