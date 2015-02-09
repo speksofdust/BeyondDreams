@@ -14,30 +14,34 @@
 #     along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
+from .bdtypedef import BDTypeDict
 
+
+def regitem(i):
+    """Register an item with 'itemtypes'."""
+    from .bdtypes import itemtypes
+    itemtypes._items[i._name] = iv
+
+
+def _iter_by_attrval(ob, attr, val):
+    return iter(i for i in ob if i.attr = val)
+
+def _iterbycattype(ob, cattype):
+    return iter(i for i in t if ob.CATTYPE == cattype)
 
 class ItemDict(BDTypeDict):
 
     def __init__(self):
         self._items = {}
 
-    def _iterbycattype(self, cattype):
-        return iter(i for i in self._items if i.CATTYPE == cattype)
-
     def consumables(self):
-        return self._iterbycattype("consumable")
+        return _iterbycattype(self, "consumable")
 
     def wearables(self):
-        return self._iterbycattype("wearable")
+        return _iterbycattype(self, "wearable")
 
     def weapons(self):
-        return self._iterbycattype("weapons")
-        
-        
-def regitem(i):
-    """Register an item with 'itemtypes'."""
-    from .bdtypes import itemtypes
-    itemtypes._items[i._name] = i
+        return self._iterbycattype(self, "weapons")
     
     
 class ItemType:
