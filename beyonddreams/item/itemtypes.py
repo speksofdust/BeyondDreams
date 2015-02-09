@@ -42,11 +42,16 @@ class ItemDict(BDTypeDict):
 
     def weapons(self):
         return self._iterbycattype(self, "weapons")
-    
+      
+      
+# some absolute maximums
+MAX_BUNDLE =    99
+MAX_SLOTSIZE =  100
+
+__slots__ = "MAX_BUNDLE", "MAX_SLOTSIZE"
     
 class ItemType:
     """Base class for all item types."""
-    MAX_BUNDLE =    99    # Absolute max allowed bundle size
     CATTYPE =       ""    # Primary catagory type (CONSUMABLE, WEAPON, etc.)
     _inc_ttags =    ()    # typetags to be inherited
     _typetags =     ()    # tags to describe this item type
