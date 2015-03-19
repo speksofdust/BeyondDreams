@@ -45,25 +45,55 @@ class Session:
     def __init__(self):
         from globvars import GlobVars
         from user import User
-        
+
         # If no globals path can be found defaults will be used
         self._globvars = GlobVars(BD_GLOBALS_PATH)
         self._user = None
-        self._screen = None # The current screen
-        
+        self._screen = ScreenNav() # The current screen
+
     @property
     def screen(self):
         """The current screen."""
         return self._screen
-        
+
     def quit(self):
         """Quit Beyond Dreams."""
         self._globvars.update
         try: self._user.logout("q")
         except: pass
-  
+ 
+ 
+class ScreenNav:
+    """Handles the navagation between 'screen objects'."""
+    def __init__(self):
+        self._last = None
+        self._current = None
+    
+    @property
+    def current(self):
+        """The current screen."""
+        return self._current
 
-# ---------------------------------------------------------------------------- #
+    @property
+    def last(self):
+        """The last screen."""
+        return self._last
+    
+    def can_go_back(self):
+        return (self._last is not None or self._current._can_go_back)
+    
+    def go_back(self):
+        if self._current._cleanup_on_go_back: # kill the current screen
+            self._current.end
+            x = self._current
+            self._current = self._last
+            self._last = None
+            x.cleanup
+        else:   # keep both screens alive
+            self._last = self._current 
+            self._current = self._last
+
+
 class BDScreen:
     """Base class for Beyond Dreams "Screen" Objects.
         This defines what will be displayed when 
@@ -71,6 +101,8 @@ class BDScreen:
     """
     _running =  False
     _name =     "dummy"
+    _can_go_back = False
+    _cleanup_on_go_back = True
     def __init__(self): pass
         
     # eq, ne -- test 'x is self', then x 'isinstance of' and so on
@@ -100,16 +132,24 @@ class BDScreen:
     def pre_run(self):
         """Called before the screen becomes active."""
         raise NotImplementedError
-        
+
     def run(self):
         raise NotImplementedError
 
+    def end(self):
+        """Called to end this screen."""
+        pass
+
+    def cleanup(self):
+        """Called to kill this screen after screen transition."""
+        pass
+    
     @property
     def name(self):
         """The name of this screen."""
         return self._name
 
     def is_running(self):
-        """True if this scene is currently running."""
+        """True if this screen is currently running."""
         return self._running
 
