@@ -34,18 +34,20 @@ class User:
         # makes a new user if filepath is None
         self._globvars = GlobVars.userglobals(filepath)
         self._data = None
-        
+        import msg
+        self._msgchans = msg._Channels()
+
     @property
     def globvars(self):
         return self._globvars
-        
+
     @property
     def data(self):
         return self._data
-        
+
     def is_saved(self):
         return (self._globvars._saved and self._data._saved) == True
-            
+
     def _update_write(self):
         try: 
             self._globvars.update
@@ -58,31 +60,33 @@ class User:
         self._data.update
         self._gvars = None
         self._data = None
+        del self._msgchans
+        self._msgchans = None
         if q: # quitting
             pass
-        
+
 
 class UserRoster:
     __slots__ = "_data"
     def __init__(self):
         self._data = {}
-        
+
     def read(self):
         pass
-        
+
     def write(self):
         pass
-        
-        
+
+
 class UserSettings:
     __slots__ = "_user", "_roster"
     def __init__(self, roster, username):
         self._roster = UserRoster()
         self._username = username
-        
+
     def change_name(self):
         pass
-        
+
     def delete(self):
         pass
         # del self._roster._data[name]
