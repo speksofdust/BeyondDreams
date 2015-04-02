@@ -20,6 +20,10 @@ class _Channels:
     def __init__(self):
         self._items = {}
 
+    def __del__(self):
+        self.clear_all
+        self._items = None
+
     def clear_all(self):
         """Clear all messages on all channels."""
         for i in self._items: i.clear
@@ -28,17 +32,38 @@ class _Channels:
         """Close all channels."""
         for i in self._items: i.close()
 
+    def chans_with_unread(self):
+        """Return an iterator of all channels with new messages."""
+        return iter(i for i in self._items if i._unread >= 1)
+
 
 class Chan:
     """Message channel class."""
     def __init__(self, name):
         self._name =  name
         self._items = items
+        self._unread = 0
 
+    def __eq__(self, x):        return x is self
+    def __ne__(self, x):        return x is not self
+    def __hash__(self, x):      return hash(id(self))
     def __len__(self):          return len(self._items)
     def __iter__(self):         return iter(self._items)
     def __getitem__(self, i):   return self._items[i]
     def __reversed__(self):     return reversed(self._items)
+    
+    def __del__(self):
+        self._items = None
+        self._name = None
+
+    @property
+    def unread(self):
+        """The number new messages since this channel was last viewed."""
+        return self._unread
+        
+    def clear_unread(self):
+        """Resets the number of unread messages to 0."""
+        self._unread = 0
 
     @property
     def last_timestamp(self):
@@ -53,10 +78,12 @@ class Chan:
     def new_message(self, msg):
         """Append a new message to this channel."""
         if msg: self._items.append(Message(msg))
+        self._unread += 1
 
     def clear_all(self):
         """Clear all messages."""
         self._items = [:]
+        self._unread = 0
 
     def dump(self, filepath, append=True):
         """Dump all messages to a text file."""
