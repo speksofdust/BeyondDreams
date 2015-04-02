@@ -29,9 +29,6 @@ class _Channels:
         for i in self._items: i.close()
 
 
-channels = _Channels()
-
-
 class Chan:
     """Message channel class."""
     def __init__(self, name):
