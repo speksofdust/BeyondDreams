@@ -21,7 +21,7 @@ def indexed_chardict(chars):
     return d
 
 
-class CharStorageBC:
+class CharStorageMixin:
     
     def __eq__(self, x):        return self._chars == x
     def __ne__(self, x):        return self._chars != x
@@ -41,61 +41,105 @@ class CharRoster(CharStorageBC):
     def __init__(self, chars=[]):
         self._chars = list(chars)
     
+    def _move_down(self, x):
+        if idx < len(self._chars):
+            self._chars[idx + 1] = self._chars[idx].pop()
+
+    def _move_up(self, x):
+        if idx > 0: self._chars[idx - 1] = self._chars[idx].pop()
+    
+    def move_down(self, x):
+        self._move_down(self.index(x))
+
+    def move_up(self, x):
+        self._move_up(self.index(x))
+    
     def idx_from_name(self, name):
         for i in self._chars:
-            if i.name == name: return i 
+            if i.name == name: return i
+    
+    def index(self, x):
+        try: return self._chars.index(char)
+        except:
+            try: return idx_from_name(char)
+            except: raise IndexError("Cannot get index from item: {}".format(x))
     
     def swap_indices(self, idx_a, idx_b):
-        tmp = self[idx_a]
-        self[idx_a] = self[idx_b] 
-        self[idx_b] = tmp
+        tmp = self._chars[idx_a]
+        self._chars[idx_a] = self._chars[idx_b]
+        self._chars[idx_b] = tmp
 
 
 class Party(CharStorageBC):
     MAX_CHARS = 8
     def __init__(self):
-        self._items = CharRoster()
+        self._chars = CharRoster()
         self._current = None    # stored as an index (int)
-        
+
     def is_full(self):
         """True if no more members can be added to this party."""
-        return len(self._items) == self.MAX_CHARS
-        
-    def next(self):
+        return len(self._chars) == self.MAX_CHARS
+
+    def next(self, available=True):
         """Set the next item as the current item."""
-        self._current = self.next_index()
-        
-    def prev(self):
+        self._current = self.next_index(available)
+
+    def prev(self, available=True):
         """Set the previous item as the current item."""
-        self._current = self._prev_index()
-        
-    def get_next(self):
+        self._current = self._prev_index(available)
+
+    def get_next(self, available=True):
         """Return the next item."""
-        return self._items[self.next_index()]
-        
-    def get_prev(self):
+        return self._chars[self.next_index(available)]
+
+    def get_prev(self, available=True):
         """Return the previous item."""
-        return self._items[self.prev_index()]
+        return self._chars[self.prev_index(available)]
     
-    def next_index(self):
+    def next_index(self, available=True):
         """Return the index of the next item."""
-        try: 
-            if self._current < len(self._items): return self._current + 1
+        try:
+            if available:
+                if self._current < len(self._chars):
+                    n = self._current
+                    while True:
+                        if n > self._current:
+                            if self.is_available(self._chars[n + 1]): return n + 1
+                        break
+                if self.is_available(self._chars[0]): return 0
+                return self._current
+            if self._current < len(self._chars): return self._current + 1
             return 0
         except: return None
 
-    def prev_index(self):
+    def prev_index(self, available=True):
         """Return the index of the previous item."""
         try:
-            if self._current == 0: return len(self._items)
+            if available:
+                n = self._current
+                while True:
+                    if n != self._current:
+                        if n == 0:
+                            if self.is_available(self._chars[n-1]): return len(self._chars)
+                            else: n = len(self._chars)
+                        else:
+                            if self.is_available(self._chars[n-1]): return n
+                            else: n -= 1
+            if self._current == 0: return len(self._chars)
             return self._current - 1
         except:
             return None
 
+    def is_available(self, i):
+        return i in self.get_available()
+
+    def get_available(self):
+        raise NotImplementedError
+
     def get_alive(self):
         """Return an iterator of all characters still alive."""
         return iter(i for i in self._items if i.is_alive())
-        
+
     def get_critical(self):
         """Return an iterator of all characters with critical health levels."""
         return iter(i for i in self._items if i.is_critical())
@@ -106,18 +150,14 @@ class Player:
     def __init__(self):
         self._party =   Party()
         self._pid =     0   # always 0 if not in online game
-        
+
     @property
     def party(self):
         """The character roster for this player."""
         return self._party
-        
-        
+
+
 class AIPlayer(Player):
     _type = "AI"
     
-    
-        
-        
-        
-        
+  
