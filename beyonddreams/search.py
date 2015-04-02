@@ -39,7 +39,7 @@ class NumParam(SearchParam):
     """Search parameter for numeric values."""
     ABSMIN = 1
     ABSMAX = 99
-    def __init__(self, min):
+    def __init__(self, min, max):
         if min < self.ABSMIN: self._min = self.ABSMIN
         else: self._min = min
         if max > self.ABSMAX: self._max = self.ABSMAX
@@ -65,8 +65,8 @@ class TagsParam(SearchParam):
         try:
             self._search_mode = self._search_mode.index(search_mode)
         except: raise ValueError("Invalid search mode: '{}'.".format(search_mode))
-        
-        
+
+
 class Search:
     _searchtype = ""
     """Base class for 'search' objects."""
