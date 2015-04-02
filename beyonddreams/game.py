@@ -20,12 +20,17 @@ from bd import BDScene
 
 class Game(BDScene):
     _name = "game"
+    _pausable = False
+    _paused = False
     def __init__(self):
-        self._player = None 
-        
+        self._player = None
+
     @property
     def player(self):
         """The player of this game (at the current machine).""" 
         return self._player
-        
-        
+
+    def _get_paused(self): return self._paused
+    def _set_paused(self, p):
+        if self._pausable: self._paused = bool(p)
+    paused = property(_get_paused, _set_paused)
