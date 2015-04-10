@@ -14,6 +14,12 @@
 #     along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
+import Title
+
+screens = {
+    "title" : Title,
+    }
+
 
 class ScreenNav:
     """Handles the navagation between 'screen objects'."""
@@ -35,15 +41,31 @@ class ScreenNav:
         return (self._last is not None or self._current._can_go_back)
     
     def go_back(self):
-        if self._current._cleanup_on_go_back: # kill the current screen
-            self._current.end
+        if self.can_go_back():
+            self._change_screen(self._last, self._current._cleanup_on_go_back)
+
+    def goto(self, screen):
+        """Goto given screen."""
+        if screen != self._current:
+            if screen == self._last: self.go_back
+            if screen in screens:
+                if isinstance(screen, str): screen = screens[screen]
+            if isinstance(screen, Screen):
+                self._change_screen(screen, self._current._cleanup_on_goto)
+            else: raise valueError("invalid screen: {}".format(screen))
+
+    def _change_screen(self, n, cleanup):
+        # helper for go_back and goto
+        if cleanup: # kill the current screen
+            self.current.end
             x = self._current
-            self._current = self._last
+            self._current = n
             self._last = None
             x.cleanup
         else:   # keep both screens alive
-            self._last = self._current 
-            self._current = self._last
+            x = self._last
+            self._last = self._current
+            self._current = x
 
 
 class BDScreen:
@@ -51,15 +73,17 @@ class BDScreen:
         This defines what will be displayed when 
         'session.screen' = a given screen object.
     """
-    _running =  False
-    _name =     "dummy"
-    _can_go_back = False
-    _cleanup_on_go_back = True
-    def __init__(self): pass
-        
+    def __init__(self):
+        self._name =     "dummy"
+        self._running =  False
+        self._can_go_back = False
+        self._cleanup_on_go_back = True
+        self._cleanup_on_goto = True
+
     # eq, ne -- test 'x is self', then x 'isinstance of' and so on
     def __eq__(self, x):
         if x is not self:
+            if (isinstance(x, str) and x == self._name): return True
             if (isinstance(x, BDScreen): return x._name == self._name
             raise TypeError("cannot compare type '{}' to BDScreen type.".format(
                 x.type))
@@ -67,11 +91,20 @@ class BDScreen:
 
     def __ne__(self, x):
         if x is not self:
+            if (isinstance(x, str) and x != name): return True
             if isinstance(x, BDScreen): return x._name != self._name
             raise TypeError("cannot compare type '{}' to BDScreen type.".format(
                 x.type))
         return False
 
+    @property
+    def name(self):
+        """The name of this screen."""
+        return self._name
+
+    def is_running(self):
+        """True if this screen is currently running."""
+        return self._running
 
     def start(self):
         """Start this screen."""
@@ -95,12 +128,4 @@ class BDScreen:
     def cleanup(self):
         """Called to kill this screen after screen transition."""
         pass
-    
-    @property
-    def name(self):
-        """The name of this screen."""
-        return self._name
 
-    def is_running(self):
-        """True if this screen is currently running."""
-        return self._running
