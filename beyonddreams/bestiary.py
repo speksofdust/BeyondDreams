@@ -61,11 +61,11 @@ class Bestiary:
             n += getattr(i, k)
 
     def get_statistics(self):
-        yield "Total Entries: {}".format(len(self._items))
-        yield "Total Encountered: {}".format(self.get_total("encountered"))
-        yield "Most Encountered: {}".format()
-        yield "Least Encountered: {}".format()
-        yield "Total Killed: {}".format(get_total("killed"))
-        yield "Most Killed: {}".format()
-        yield "least killed: {}".format()
+        yield "Total Entries:       {}".format(len(self._items))
+        yield "Total Encountered:   {}".format(self.get_total("encountered"))
+        yield "Most Encountered:    {}".format()
+        yield "Least Encountered:   {}".format()
+        yield "Total Killed:        {}".format(get_total("killed"))
+        yield "Most Killed:         {}".format()
+        yield "least killed:        {}".format()
 
