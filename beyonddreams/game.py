@@ -15,10 +15,10 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from bd import BDScene
+from screens import BDScreen
 
 
-class Game(BDScene):
+class Game(BDScreen):
     _name = "game"
     _pausable = False
     _paused = False
