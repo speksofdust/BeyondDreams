@@ -16,44 +16,36 @@
 # ---------------------------------------------------------------------------- #
 
 
-class _Channels:
+class _Channels(dict):
     def __init__(self):
-        self._items = {}
+        self = {}
 
     def __del__(self):
         self.clear_all
-        self._items = None
+        self = None
 
     def clear_all(self):
         """Clear all messages on all channels."""
-        for i in self._items: i.clear
+        for i in self: i.clear
 
     def close_all(self):
         """Close all channels."""
-        for i in self._items: i.close()
+        for i in self: i.close()
 
     def chans_with_unread(self):
         """Return an iterator of all channels with new messages."""
-        return iter(i for i in self._items if i._unread >= 1)
+        return iter(i for i in self if i._unread >= 1)
 
 
-class Chan:
+class Chan(list):
     """Message channel class."""
-    def __init__(self, name):
+    def __init__(self, name, items=[]):
         self._name =  name
-        self._items = items
+        self = items
         self._unread = 0
-
-    def __eq__(self, x):        return x is self
-    def __ne__(self, x):        return x is not self
-    def __hash__(self, x):      return hash(id(self))
-    def __len__(self):          return len(self._items)
-    def __iter__(self):         return iter(self._items)
-    def __getitem__(self, i):   return self._items[i]
-    def __reversed__(self):     return reversed(self._items)
     
     def __del__(self):
-        self._items = None
+        self = None
         self._name = None
 
     @property
@@ -68,16 +60,16 @@ class Chan:
     @property
     def last_timestamp(self):
         """The last timestamp."""
-        return self._items[-1].timestamp
+        return self[-1].timestamp
 
     @property
     def last_message(self):
         """The last message."""
-        return self._items[-1]
+        return self[-1]
 
     def new_message(self, msg):
         """Append a new message to this channel."""
-        if msg: self._items.append(Message(msg))
+        if msg: self.append(Message(msg))
         self._unread += 1
 
     def clear_all(self):
@@ -88,12 +80,12 @@ class Chan:
     def dump(self, filepath, append=True):
         """Dump all messages to a text file."""
         with open(filepath, 'wb') as f:
-            for i in self._items:
+            for i in self:
                 f.write(i.ts_format)
 
     def close(self):
         """Close this channel."""
-        channels._items[self._name]
+        channels[self._name]
 
 
 class Message(str):
