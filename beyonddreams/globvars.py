@@ -39,20 +39,19 @@ def read_as_dict(filepath, sep, d={}):
 def default_globalvars():
     """Return a dict with default globalvars."""
     return {
-
         }
 
 def default_userglobals():
     """Return a dict with default userglobals."""
     return {
-        'Bestiary':     set(),  # a new empty bestiary
+        'bestiary':     None,
         }
-        
-        
-class VarData:
+
+
+class VarData(dict):
     """Variable data storage class."""
     def __init__(self, items):
-        self._items = items
+        self = items
         self._saved = True
     
     def is_saved(self):
@@ -60,7 +59,7 @@ class VarData:
         return self._saved == True
     
     def update(self):
-        if self._saved == False: write(f, self._items)
+        if self._saved == False: write(f, self)
         self._saved = True
         
 
@@ -70,14 +69,14 @@ class GlobVars(VarData):
         self.get_defaults = default_globalvars
         if os.path.exists(f):
             pass # TODO
-        else:    self._items = default_globalvars()
+        else:    self = default_globalvars()
         self._saved = True
 
     @classmethod
     def userglobals(self, f=None):
         self.get_defaults = default_userglobals
         if f is None:   # New User
-            self._items = default_userglobals()
+            self = default_userglobals()
         else:           # Attempt to load users globvars file
             pass        # TODO
             
@@ -89,5 +88,5 @@ class GlobVars(VarData):
 
     def clear(self):
         """Reset all variables to the defaults."""
-        self._items = get_defaults()
+        self = get_defaults()
 
