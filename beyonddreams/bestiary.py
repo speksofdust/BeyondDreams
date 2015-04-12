@@ -39,15 +39,13 @@ class PlayerHist:
         return self._encountered
 
 
-class Bestiary:
-    def __init__(self):
-        self._items = {}
+class Bestiary(dict):
 
     def _get_entry(self, entryname):
-        try: return self._items[entryname]
+        try: return self[entryname]
         except:
-            self._items[entryname] = (PlayerHist(), get_entry(entryname))
-            return self._items[entryname]
+            self[entryname] = (PlayerHist(), get_entry(entryname))
+            return self[entryname]
 
     def add_encounter(self, entryname):
         self._get_entry[entryname][0]._encountered += 1
@@ -57,11 +55,11 @@ class Bestiary:
 
     def get_total(self, k):
         n = 0
-        for i in self._items:
+        for i in self:
             n += getattr(i, k)
 
     def get_statistics(self):
-        yield "Total Entries:       {}".format(len(self._items))
+        yield "Total Entries:       {}".format(len(self))
         yield "Total Encountered:   {}".format(self.get_total("encountered"))
         yield "Most Encountered:    {}".format()
         yield "Least Encountered:   {}".format()
