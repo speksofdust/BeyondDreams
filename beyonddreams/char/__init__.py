@@ -80,7 +80,6 @@ class Char:
                 }
         else: raise BDCharException
     
-    def __dict__(self):         return self._items.copy()
     def __iter__(self):         return iter(self._items)
     def __len__(self):          return len(self._items)
     def __str__(self):          return str(self._items)[1:-1]
