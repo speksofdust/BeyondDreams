@@ -19,6 +19,8 @@ import string
 
 from globvars import GlobVars
 
+def load_user_roster():
+    pass
 
 def valid_username_chars():
     yield '_'
@@ -30,43 +32,48 @@ def valid_charname_chars():
 
 
 class User:
-    def __init__(self, filepath=None):
+    def __init__(self):
+        self._username = username
+        self._config = UserConfig()
+        self._data = UserData()
         # makes a new user if filepath is None
-        self._globvars = GlobVars.userglobals(filepath)
-        self._data = None
+        #self._globvars = GlobVars.userglobals(filepath)
+        #self._data = None
         import msg
         self._msgchans = msg._Channels()
 
     @property
-    def globvars(self):
-        return self._globvars
+    def name(self):
+        return self._settings.name
 
     @property
     def data(self):
         return self._data
-
-    def is_saved(self):
-        return (self._globvars._saved and self._data._saved) == True
-
-    def _update_write(self):
-        try: 
-            self._globvars.update
-            self._data.update
-        except: pass
     
     def logout(self, q=False):
         """Logout the current user. (if any)"""
-        self._globvars.update
-        self._data.update
-        self._gvars = None
-        self._data = None
+        self._settings.write
         del self._msgchans
         self._msgchans = None
+        del self._settings
         if q: # quitting
             pass
 
 
+class _UserStore(dict):
+    _is_saved = True
+    
+
+class UserConfig(_UserStore):
+    pass
+
+
+class UserData(_UserStore):
+    pass
+
+
 class UserRoster:
+    """Stores userdata locations."""
     __slots__ = "_data"
     def __init__(self):
         self._data = {}
@@ -76,17 +83,3 @@ class UserRoster:
 
     def write(self):
         pass
-
-
-class UserSettings:
-    __slots__ = "_user", "_roster"
-    def __init__(self, roster, username):
-        self._roster = UserRoster()
-        self._username = username
-
-    def change_name(self):
-        pass
-
-    def delete(self):
-        pass
-        # del self._roster._data[name]
