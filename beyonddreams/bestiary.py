@@ -20,12 +20,14 @@ def get_entry(entryname):
 
 
 class BestiaryEntry:
+    __slots__ = "_name", "_fam"
     def __init__(self, name, fam[]):
         self._name = name
         self._fam = fam
 
 
 class PlayerHist:
+    __slots__ = "_encountered", "_killed"
     def __init__(self):
         self._encountered = 0
         self._killed = 0
