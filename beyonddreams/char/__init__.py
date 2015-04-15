@@ -42,23 +42,13 @@ def finalize_char(char, player):
         is done."""
     try: char._finalize(player)
     except: raise BDCharException("Character '{}' already finalized".format(char)))
-        
-        
-BODY =          "body"
-INVENTORY =     "inventory"
-EQUIP =         "equip"
-WALLET =        "wallet"
-STATS =         "stats"
-STATUSES =      "statuses"
-RESISTANCES =   "resistances"
-CHARATTRIB_NAMES = BODY, INVENTORY, EQUIP, WALLET, STATS, STATUSES, RESISTANCES
+
 
 class Char:
     _type = "normal"
-    def __init__(self, base=None, body=None, inventory=None, equip=None, 
-        wallet=None, stats=None, statuseffects=None):
+    def __init__(self, player):
         self._finalized =       False
-        self._player =          None
+        self._player =          player
         self._base =            base
         self._items = {
             BODY:   Body(self)
@@ -66,17 +56,15 @@ class Char:
     
     def _finalize(self, player):
         if not self._finalized
-            import random
-            self._seed =    random.uniform(0.0, 99999.9)
             self._player =  player
             self._items = {
-                BODY:           self._items[BODY],
-                INVENTORY:      Inventory(self),
-                EQUIP:          Equip(self),
-                WALLET:         Wallet(self),
-                STATS:          Stats(self),
-                STATUSES:       Statuses(self),
-                RESISTANCES:    None
+                "body":           None,
+                "inventory":      Inventory(self),
+                "equip":          Equip(self),
+                "wallet":         Wallet(self),
+                "stats":          Stats(self),
+                "statuses":       Statuses(self),
+                "resistances":    None
                 }
         else: raise BDCharException
     
@@ -125,7 +113,7 @@ class Char:
     def equip(self):
         """This characters equipment."""
         return self._items[EQUIP]
-        
+
     def is_player(self):
         """True if this char is controlled by the "player" object
             on the local machine."""
@@ -139,17 +127,17 @@ class Char:
     def is_critical(self):
         """True if this characters health level is in the critical range."""
         return self._items[STATS][HP].is_critical()
-        
+
     @property
     def famtypes(self):
         """Return family types for this character."""
         return ()
-        
+
     def is_undead(self):
         """True if this character is an undead type or has zombie status."""
         return ("zombie" in self._items[STATUSES]["bools"] or 
             "zombie" in self.famtypes)
-        
+
 
         
 class NPC(Char):
