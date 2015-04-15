@@ -78,10 +78,10 @@ class Chan(list):
         self._unread = 0
 
     def dump(self, filepath, append=True):
-        """Dump all messages to a text file."""
+        """Dump all messages from this channel to a text file."""
         with open(filepath, 'wb') as f:
             for i in self:
-                f.write(i.ts_format)
+                f.write(i.timestamp, i)
 
     def close(self):
         """Close this channel."""
