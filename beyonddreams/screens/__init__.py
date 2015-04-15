@@ -38,9 +38,11 @@ class ScreenNav:
         return self._last
     
     def can_go_back(self):
+        """True if can return to the previous screen."""
         return (self._last is not None or self._current._can_go_back)
     
     def go_back(self):
+        """Go back to the previous screen, if the current screen permits it."""
         if self.can_go_back():
             self._change_screen(self._last, self._current._cleanup_on_go_back)
 
