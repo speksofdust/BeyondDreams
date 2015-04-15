@@ -15,6 +15,8 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+from .screens import BDScreen
+
 
 class UndoHist:
     __slots__ = "_history", "_max"
