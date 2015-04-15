@@ -58,13 +58,13 @@ class Char:
         if not self._finalized
             self._player =  player
             self._items = {
-                "body":           None,
-                "inventory":      Inventory(self),
-                "equip":          Equip(self),
-                "wallet":         Wallet(self),
-                "stats":          Stats(self),
-                "statuses":       Statuses(self),
-                "resistances":    None
+                "body":         None,
+                "inventory":    Inventory(self),
+                "equip":        Equip(self),
+                "wallet":       Wallet(self),
+                "stats":        Stats(self),
+                "statuses":     Statuses(self),
+                "resistances":  None
                 }
         else: raise BDCharException
     
