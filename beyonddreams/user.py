@@ -19,8 +19,6 @@ import string
 
 from globvars import GlobVars
 
-def load_user_roster():
-    pass
 
 def valid_username_chars():
     yield '_'
@@ -33,9 +31,9 @@ def valid_charname_chars():
 
 class User:
     def __init__(self):
-        self._username = username
-        self._config = UserConfig()
-        self._data = UserData()
+        self._config = UserConfig(self)
+        self._data = UserData(self)
+        self._chars = UserChars(self)
         # makes a new user if filepath is None
         #self._globvars = GlobVars.userglobals(filepath)
         #self._data = None
@@ -44,42 +42,76 @@ class User:
 
     @property
     def name(self):
-        return self._settings.name
+        """The name of this user."""
+        return self._data['name']
+
+    @property
+    def config(self):
+        """The BeyondDreams configuration for this user."""
+        return self._config
 
     @property
     def data(self):
+        """User data such as username, ."""
         return self._data
-    
+
+    @property
+    def chars(self):
+        return self._chars
+
+    def _get_path(self, *p):
+        import os.path
+        # FIXME Homedir
+        return os.path.join(self.name, *p)
+
     def logout(self, q=False):
-        """Logout the current user. (if any)"""
-        self._settings.write
+        """Logout this user."""
+        self._config.write
         del self._msgchans
+        del self._config
         self._msgchans = None
-        del self._settings
+        self._config = None
         if q: # quitting
             pass
 
 
 class _UserStore(dict):
-    _is_saved = True
-    
+    def __init__(self, user, d):
+        self = d
+        self._user = user
+        self._is_saved = True
+
+
+    @property
+    def user(self):
+        return self._user
+
+    def is_saved(self):
+        return self._is_saved
+
+    #def write(self):
+    #    self.user._get_path(pathname)
+
+
 
 class UserConfig(_UserStore):
-    pass
+    pathname = "config"
+    def __init__(self, user):
+        _UserStore.__init__(user, d={
+
+            })
 
 
 class UserData(_UserStore):
-    pass
+    pathname = "data"
+    def __init__(self, user):
+        _UserStore.__init__(user, d={
+            "name": "",
+            })
 
 
-class UserRoster:
-    """Stores userdata locations."""
-    __slots__ = "_data"
-    def __init__(self):
-        self._data = {}
+class UserChars(_UserStore):
+    pathname = "charlist"
+    def __init__(self, user):
+        _UserStore.__init__(user)
 
-    def read(self):
-        pass
-
-    def write(self):
-        pass

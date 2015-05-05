@@ -60,12 +60,20 @@ class Bestiary(dict):
         for i in self:
             n += getattr(i, k)
 
+    def _fmtstat(self, x, y, a, b=""):
+        if funcb: return "{x} {y}:{spc}{a}, {b}".format(x, y,
+            spc=(24-(len(x)+len(y)+1)), a, b)
+        return "{x} {y}:{spc}{a}".format(x, y,
+            spc=(24-(len(x)+len(y)+1)), a)
+
     def get_statistics(self):
-        yield "Total Entries:       {}".format(len(self))
-        yield "Total Encountered:   {}".format(self.get_total("encountered"))
-        yield "Most Encountered:    {}".format()
-        yield "Least Encountered:   {}".format()
-        yield "Total Killed:        {}".format(get_total("killed"))
-        yield "Most Killed:         {}".format()
-        yield "least killed:        {}".format()
+        yield _fmtstat("Total", "Entries", len(self))
+        yield _fmtstat("Total", "Encountered", self.get_total("encountered"))
+        yield _fmtstat("Total", "Entries", "")
+        yield _fmtstat("Total", "Encountered", self.get_total("encountered"))
+        yield _fmtstat("Most", "Encountered", "", "")
+        yield _fmtstat("Least", "Encountered", "", "")
+        yield _fmtstat("Total", "Killed", get_total("killed"))
+        yield _fmtstat("Most", "Killed", "", "")
+        yield _fmtstat("least", "killed" "", "")
 
