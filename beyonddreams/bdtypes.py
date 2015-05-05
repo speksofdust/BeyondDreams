@@ -18,7 +18,7 @@
 
 
 from items.itemtypes import ItemDict
-from realms import RealmTypes
+#from realms import RealmTypes
 
 
 itemtypes =     ItemDict()
