@@ -15,10 +15,12 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+"""Provides base classes and methods for various Beyond Dreams types."""
 
 class BDType:
+    """Primative level baseclass form most Beyond Dreams types."""
     __slots__ = "_name"
-    _desc = species_desc
+    _desc = ""
     def __init__(self, name):
         self._name = name
 
@@ -29,4 +31,5 @@ class BDType:
 
     def desc(self):
         """Return the main description about this."""
-        return self._desc[self._name]
+        try: return self._desc[self._name]
+        except: return ""
