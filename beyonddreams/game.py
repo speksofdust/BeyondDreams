@@ -20,17 +20,19 @@ from screens import BDScreen
 
 class Game(BDScreen):
     _name = "game"
-    _pausable = False
+    _pausable = False   # defaults to false is set after __init__ if otherwise
     _paused = False
     def __init__(self):
         self._player = None
 
     @property
     def player(self):
-        """The player of this game (at the current machine).""" 
+        """The player of this game (at the current machine)."""
         return self._player
 
     def _get_paused(self): return self._paused
     def _set_paused(self, p):
         if self._pausable: self._paused = bool(p)
-    paused = property(_get_paused, _set_paused)
+    paused = property(_get_paused, _set_paused,
+        doc="""Sets the 'paused' state of the current game.
+(May not be available in all game types)""")
