@@ -15,16 +15,34 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-def get_entry(entryname):
-    return
+all_entries = _BestiaryBase()
+
+__all__ = ()
+
+class BestiaryBase(dict):
+    __slots__ = ()
+
+    def __getitem__(self, i):
+        try: return self[i]
+        except:
+            for k in self:
+                if self[k]._id == i: return self[k]
+
+    def sorted_by_ids(self, reverse=False):
+        return sorted(self, key=attrgetter("_id"), reverse=reverse)
 
 
 class BestiaryEntry:
-    __slots__ = "_name", "_fam"
-    def __init__(self, name, fam[]):
+    __slots__ = "_name", "_fam", "_id"
+    def __init__(self, name, entry_id, fam[]):
         self._name = name
+        self._id =  entry_id
         self._fam = fam
+        all_entries[self._name] = self  # add to entries
 
+    @property
+    def id(self):
+        return self._id
 
 class PlayerHist:
     __slots__ = "_encountered", "_killed"
@@ -41,12 +59,14 @@ class PlayerHist:
         return self._encountered
 
 
-class Bestiary(dict):
+class Bestiary(BestiaryBase):
+    __slots__ = ()
 
-    def _get_entry(self, entryname):
+
+    def _get_entry(self, name):
         try: return self[entryname]
         except:
-            self[entryname] = (PlayerHist(), get_entry(entryname))
+            self[entryname] = (PlayerHist(), all_entries[entryname])
             return self[entryname]
 
     def add_encounter(self, entryname):
@@ -67,13 +87,14 @@ class Bestiary(dict):
             spc=(24-(len(x)+len(y)+1)), a)
 
     def get_statistics(self):
-        yield _fmtstat("Total", "Entries", len(self))
-        yield _fmtstat("Total", "Encountered", self.get_total("encountered"))
-        yield _fmtstat("Total", "Entries", "")
-        yield _fmtstat("Total", "Encountered", self.get_total("encountered"))
-        yield _fmtstat("Most", "Encountered", "", "")
-        yield _fmtstat("Least", "Encountered", "", "")
-        yield _fmtstat("Total", "Killed", get_total("killed"))
-        yield _fmtstat("Most", "Killed", "", "")
-        yield _fmtstat("least", "killed" "", "")
+        # TODO need a better way to handle this
+        yield self._fmtstat("Total", "Entries", len(self))
+        yield self._fmtstat("Total", "Encountered", self.get_total("encountered"))
+        yield self._fmtstat("Total", "Entries", "")
+        yield self._fmtstat("Total", "Encountered", self.get_total("encountered"))
+        yield self._fmtstat("Most", "Encountered", "", "")
+        yield self._fmtstat("Least", "Encountered", "", "")
+        yield self._fmtstat("Total", "Killed", get_total("killed"))
+        yield self._fmtstat("Most", "Killed", "", "")
+        yield self._fmtstat("least", "killed" "", "")
 
