@@ -17,6 +17,22 @@
 
 """Provides base classes and methods for various Beyond Dreams types."""
 
+
+def overwrite_dictupdate(d, [e,], **kwargs):
+    for i in e:
+        try:
+            for k in i.keys():
+                if k in d:
+                    d[k] = d[k]
+        except:
+            for k, v in i:
+                if k in d:
+                    d[k] = v
+    for k in kwargs:
+        if k in self:
+            d[k] = kwargs[k]
+
+
 class BDType:
     """Primative level baseclass form most Beyond Dreams types."""
     __slots__ = "_name"
@@ -33,3 +49,17 @@ class BDType:
         """Return the main description about this."""
         try: return self._desc[self._name]
         except: return ""
+
+
+class BDBaseValueDict(dict):
+    """Dictionary for storing (usually static) base values."""
+    __slots__ = dict.__slots__
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            if k in self: self[k] = kwargs[k]
+
+
+from xsquare.utils import NumDict
+
+class BDValueDict(NumDict):
+    __slots__ = NumDict.__slots__
