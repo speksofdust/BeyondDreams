@@ -24,7 +24,7 @@ class _Channels(dict):
         self.clear_all
         self = None
 
-    def clear_all(self):
+    def clear(self):
         """Clear all messages on all channels."""
         for i in self: i.clear
 
@@ -36,6 +36,10 @@ class _Channels(dict):
         """Return an iterator of all channels with new messages."""
         return iter(i for i in self if i._unread >= 1)
 
+    def clear_unread(self):
+        """Reset the number of unread messages to 0 on all channels."""
+        for i in self: i._unread = 0
+
 
 class Chan(list):
     """Message channel class."""
@@ -43,16 +47,21 @@ class Chan(list):
         self._name =  name
         self = items
         self._unread = 0
-    
+
     def __del__(self):
         self = None
         self._name = None
+
+    def clear(self):
+        """Clear all messages."""
+        self._items = [:]
+        self._unread = 0
 
     @property
     def unread(self):
         """The number new messages since this channel was last viewed."""
         return self._unread
-        
+
     def clear_unread(self):
         """Resets the number of unread messages to 0."""
         self._unread = 0
@@ -71,11 +80,6 @@ class Chan(list):
         """Append a new message to this channel."""
         if msg: self.append(Message(msg))
         self._unread += 1
-
-    def clear_all(self):
-        """Clear all messages."""
-        self._items = [:]
-        self._unread = 0
 
     def dump(self, filepath, append=True):
         """Dump all messages from this channel to a text file."""
