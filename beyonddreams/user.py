@@ -95,6 +95,8 @@ class _UserStore(dict):
 
 
 class UserConfig(_UserStore):
+    """Storage class for user local configuration settings, such as
+    graphics, audio, etc."""
     pathname = "config"
     def __init__(self, user):
         _UserStore.__init__(user, d={
@@ -103,6 +105,7 @@ class UserConfig(_UserStore):
 
 
 class UserData(_UserStore):
+    """Storage class for user data, such as user statitistics."""
     pathname = "data"
     def __init__(self, user):
         _UserStore.__init__(user, d={
