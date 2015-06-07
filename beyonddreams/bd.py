@@ -15,31 +15,32 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-VERSION =           "0.1.1"
-BD_GLOBALS_PATH =   ""
-
+VERSION =   "0.1.1"
+cfgpath =   None
 session =   None
 
+def version():
+    """Return the version number.."""
+    global VERSION
+    def major(): return VERSION.split(".")[0]
+    def minor(): return VERSION.split(".")[1]
+    def revision(): return VERSION.split(".")[2]
+    return VERSION
 
-def datapath(*args):
-    """Returns the absolute path of "beyonddreams/data/" joined with args."""
-    import os.path
-    return os.path.join(os.path.split(os.path.abspath(__file__)),
-        "data", *args)
 
-__all__ = "datapath", "session"
+__all__ = "version", "session"
 
 
 def _start():
     global session
     import xsquare
-    
+
     # TODO set BD_GLOBALS_PATH by operating system
-    
+
     # init session then run xsquare app
     session = _Session()
     xsquare.app.run()
-    
+
 
 class Session:
     def __init__(self):
@@ -62,4 +63,4 @@ class Session:
         self._globvars.update
         try: self._user.logout("q")
         except: pass
-    
+
