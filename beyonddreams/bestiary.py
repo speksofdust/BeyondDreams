@@ -44,6 +44,7 @@ class BestiaryEntry:
     def id(self):
         return self._id
 
+
 class PlayerHist:
     __slots__ = "_encountered", "_killed"
     def __init__(self):
@@ -79,22 +80,24 @@ class Bestiary(BestiaryBase):
         n = 0
         for i in self:
             n += getattr(i, k)
+        return n
 
-    def _fmtstat(self, x, y, a, b=""):
+    def _fmtstat(x, y, a, b=""):
         if funcb: return "{x} {y}:{spc}{a}, {b}".format(x, y,
             spc=(24-(len(x)+len(y)+1)), a, b)
         return "{x} {y}:{spc}{a}".format(x, y,
             spc=(24-(len(x)+len(y)+1)), a)
 
     def get_statistics(self):
-        # TODO need a better way to handle this
-        yield self._fmtstat("Total", "Entries", len(self))
-        yield self._fmtstat("Total", "Encountered", self.get_total("encountered"))
-        yield self._fmtstat("Total", "Entries", "")
-        yield self._fmtstat("Total", "Encountered", self.get_total("encountered"))
-        yield self._fmtstat("Most", "Encountered", "", "")
-        yield self._fmtstat("Least", "Encountered", "", "")
-        yield self._fmtstat("Total", "Killed", get_total("killed"))
-        yield self._fmtstat("Most", "Killed", "", "")
-        yield self._fmtstat("least", "killed" "", "")
+         for i in (
+            ("Total", "Entries", len(self)),
+            ("Total", "Encountered", self.get_total("encountered")),
+            ("Most", "Encountered", "", ""),
+            ("Least", "Encountered", "", ""),
+            ("Total", "Killed", get_total("killed")),
+            ("Most", "Killed", "", ""),
+            ("least", "killed" "", ""),
+            ):
+                yield self._fmstat(*i)
+
 
