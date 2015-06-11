@@ -26,9 +26,15 @@ class Game(BDScreen):
     def __init__(self):
         self._player = None
         self._data = None
+        self._ended = False
 
-    def _create_gamedata(self):
-        self._data = GameData(self)
+    def _start_game(self):
+        if self._player:
+            self._data = GameData(self) # create initial game data
+
+    def is_ended(self):
+        """True if the current game has ended."""
+        return self._ended
 
     @property
     def player(self):
