@@ -22,7 +22,7 @@ def indexed_chardict(chars):
 
 
 class CharStorageMixin:
-    
+
     def __eq__(self, x):        return self._chars == x
     def __ne__(self, x):        return self._chars != x
     def __str__(self):          return str(self._chars)[1:-1]
@@ -32,38 +32,38 @@ class CharStorageMixin:
     def __len__(self):          return len(self._chars)
     def __iter__(self):         return iter(self._chars)
     def __reversed__(self):     return reversed(self._chars)
-    
+
     def index(self, n):
         return self._chars.index(n)
-        
+
 
 class CharRoster(CharStorageBC):
     def __init__(self, chars=[]):
         self._chars = list(chars)
-    
+
     def _move_down(self, x):
         if idx < len(self._chars):
             self._chars[idx + 1] = self._chars[idx].pop()
 
     def _move_up(self, x):
         if idx > 0: self._chars[idx - 1] = self._chars[idx].pop()
-    
+
     def move_down(self, x):
         self._move_down(self.index(x))
 
     def move_up(self, x):
         self._move_up(self.index(x))
-    
+
     def idx_from_name(self, name):
         for i in self._chars:
             if i.name == name: return i
-    
+
     def index(self, x):
         try: return self._chars.index(char)
         except:
             try: return idx_from_name(char)
             except: raise IndexError("Cannot get index from item: {}".format(x))
-    
+
     def swap_indices(self, idx_a, idx_b):
         tmp = self._chars[idx_a]
         self._chars[idx_a] = self._chars[idx_b]
@@ -95,7 +95,7 @@ class Party(CharStorageBC):
     def get_prev(self, available=True):
         """Return the previous item."""
         return self._chars[self.prev_index(available)]
-    
+
     def next_index(self, available=True):
         """Return the index of the next item."""
         try:
@@ -131,22 +131,27 @@ class Party(CharStorageBC):
             return None
 
     def is_available(self, i):
+        """True if a given character is currently available for play."""
         return i in self.get_available()
 
     def get_available(self):
-        raise NotImplementedError
+        """Return an iterator of characters that are currently alive and available
+        for play, sorted by highest health to lowest."""
+        from operator import methodcaller
+        for i in sorted(self._chars, key=methodcaller(i.health))
+            if i.is_alive(): yield i
 
     def get_alive(self):
         """Return an iterator of all characters still alive."""
-        return iter(i for i in self._items if i.is_alive())
+        return iter(i for i in self._chars if i.is_alive())
 
     def get_critical(self):
         """Return an iterator of all characters with critical health levels."""
-        return iter(i for i in self._items if i.is_critical())
+        return iter(i for i in self._chars if i.is_critical())
 
 
 class Player:
-    _type = ""
+    _is_ai = False
     def __init__(self):
         self._party =   Party()
         self._pid =     0   # always 0 if not in online game
@@ -156,8 +161,12 @@ class Player:
         """The character roster for this player."""
         return self._party
 
+    def is_ai(self):
+        """True is this player is AI controlled. (Non-Human)."""
+        return self._is_ai
+
 
 class AIPlayer(Player):
-    _type = "AI"
-    
-  
+    _is_ai = True
+
+
