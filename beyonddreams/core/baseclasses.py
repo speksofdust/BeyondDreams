@@ -32,6 +32,39 @@ def overwrite_dictupdate(d, [e,], **kwargs):
         if k in self:
             d[k] = kwargs[k]
 
+def pop(x, i):
+    yield x[i]
+    del x[i]
+
+
+class BDList(list):
+    __slots__ = ()
+    def __init__(self, items=[]):
+        self = list(items)
+
+    def append(self): raise NotImplementedError
+    pop = extend = extend = append
+    __imul__ = __iadd__ = append
+
+    def swap_indices(self, x, y):
+        if 0 <= x <= y <= len(self):
+            tmp = self[y]
+            self[x] = self[y]
+            self[y] = self[x]
+
+    def move_down_by_index(self, i):
+        if idx < len(self):
+            self[idx + 1] = self[idx].pop()
+
+    def move_up_by_index(self, i):
+        if idx > 0: self[idx - 1] = self[idx].pop()
+
+    def move_down(self, x):
+        self._move_down_by_index(self.index(x))
+
+    def move_up(self, x):
+        self._move_up_by_index(self.index(x))
+
 
 class BDType:
     """Primative level baseclass form most Beyond Dreams types."""
