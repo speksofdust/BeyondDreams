@@ -87,7 +87,6 @@ class BDTags:
         if exact: return any(i == i for i in self.tags())
         return any(i.lower().startswith(tag.lower()) for i in self.tags())
 
-
     def find_tags(self, tags, exact=False):
         """Return an iterator of any tags that start with a tag in 'tags'.
         if exact is True, returns only tags that are an exact match."""
@@ -99,6 +98,7 @@ class BDTags:
             for i in self.tags():
                 for t in tags:
                     if i.lower().startswith(t.lower()): yield i
+
 
 class BDType:
     """Primative level baseclass form most Beyond Dreams types."""
