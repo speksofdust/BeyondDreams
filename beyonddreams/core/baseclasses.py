@@ -68,7 +68,7 @@ class BDList(list):
 
 class BDTags:
     _sc = ()    # tuple of super classes to this -- shared by all instances
-    def __init__(self, tags):
+    def __init__(self, tags=()):
         self._tags = set(tags).difference(self._sc_tags())
 
     def _sc_tags(self):
@@ -100,6 +100,12 @@ class BDType:
         """Return the main description about this."""
         try: return self._desc[self._name]
         except: return ""
+
+
+class BDTaggedType(BDType, BDTags):
+    def __init__(self, name, tags=()):
+        BDTags.__init__(tags=tags)
+        self._name = name
 
 
 class BDBaseValueDict(dict):
