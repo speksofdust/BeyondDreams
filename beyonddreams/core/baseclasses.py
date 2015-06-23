@@ -66,6 +66,24 @@ class BDList(list):
         self._move_up_by_index(self.index(x))
 
 
+class BDTags:
+    _sc = ()    # tuple of super classes to this -- shared by all instances
+    def __init__(self, tags):
+        self._tags = set(tags).difference(self._sc_tags())
+
+    def _sc_tags(self):
+        """Return tags from this objects super class."""
+        for i in self._inctags: yield i         # yield own include tags
+        for i in self._sc: yield _sc._sc_tags() # include tags from super classes
+
+    def tags(self):
+        for i in self._tags: yield i
+        for i in self._sc_tags(): yield i
+
+    def has_tag(self, tag):
+        return any(i.startswith(tag) for i in self.tags())
+
+
 class BDType:
     """Primative level baseclass form most Beyond Dreams types."""
     __slots__ = "_name"
