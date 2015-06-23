@@ -29,6 +29,7 @@ def _iter_by_attrval(ob, attr, val):
 def _iterbycattype(ob, cattype):
     return iter(i for i in t if ob.CATTYPE == cattype)
 
+
 class ItemDict(BDTypeDict):
 
     def __init__(self):
@@ -42,41 +43,47 @@ class ItemDict(BDTypeDict):
 
     def weapons(self):
         return self._iterbycattype(self, "weapons")
-      
-      
+
+
 # some absolute maximums
 MAX_BUNDLE =    99
 MAX_SLOTSIZE =  100
 
 __slots__ = "MAX_BUNDLE", "MAX_SLOTSIZE"
-    
-class ItemType:
+
+
+from .baseclasses import BDTaggedType
+
+class ItemType(BDTaggedType):
     """Base class for all item types."""
     CATTYPE =       ""    # Primary catagory type (CONSUMABLE, WEAPON, etc.)
-    _inc_ttags =    ()    # typetags to be inherited
-    _typetags =     ()    # tags to describe this item type
-    _typename =     ""    # name for this item type
-    typedesc =      ""
+    _typename =     ""    # name for this item type -- not for primary types
+    _typedesc =      ""
     BUNDLESIZE =    1
     ATTRIBS =       ()    # attribs for items when in inventory
     ALL_TYPE_ATTRIBS = () # all possible attribs for this type
     SLOTSIZE =      1     # base num slots taken in inventory
-    _desc =         ""
     _bwt =          1.0   # base weight must be (float)
 
-    @property
-    def name(self):
-        """The name of this item."""
-        return self._name
 
+    @property
     def typename(self):
         """The name of this item type."""
-        if not self._typename: return self.__class__.__name__.lower()
-        return self._typename
+        if self._typename: return self._typename
+        return self.__class__.__name__.lower() # only for primary types
+
+    def _get_typetags(self):
+        yield i for i in self._sc_tags()
+        yield self.typename
+        yield self.CATTYPE
 
     def typetags(self):
         """Yield all type tags for this."""
-        for i in self._inc_ttags: yield i
-        for i in self._typetags: yield i
-        yield self.TYPENAME
-        yield self.CATTYPE
+        return iter(self._get_typetags())
+
+    def tags(self):
+        for i in self._tags: yield i
+        for i in self.typetags(): yield i
+
+
+

@@ -21,18 +21,22 @@ from itemtypes import regitem
 
 class WeaponType(ItemType):
     """Base class for weapon types."""
-    CATTYPE =      "weapon"
-    BUNDLESIZE =   1
-    
-    
+    _sc =           (ItemType,)
+    CATTYPE =       "weapon"
+    BUNDLESIZE =    1
+
+
 class Ammo(WeaponType):
-    BUNDLESIZE =  25
-    weapontypes = () # weapontypes usable in
-    
-    
+    _sc =           (WeaponType,)
+    BUNDLESIZE =    25
+    weapontypes =   () # weapontypes usable in
+
+
 class DefensiveType(WeaponType):
-    pass
-    
+    _sc =           (WeaponType,)
+
+
 
 class WeaponAccessories(WeaponType):
-    pass
+    _sc =           (WeaponType,)
+

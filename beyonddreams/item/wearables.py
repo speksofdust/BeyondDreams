@@ -23,31 +23,37 @@ from itemtypes import regitem
 class WearableType(ItemType):
     """Base class for wearable item types."""
     CATTYPE =       "wearable"
+    _sc =           (ItemType, )
     equipslots =    _typename
-    
-    
+
+
 class Jewelry(WearableType):
-    _inc_ttags =      "jewelry"
-    
-    
+    _sc =           (WearableType, )
+    _inc_ttags =    "jewelry"
+
+
 class Clothing(WearableType):
-    _inc_ttags =    "clothing"
+    _sc =           (WearableType, )
+    _inctags =      "clothing"
     baseres =       BaseRes()
     basestats =     BaseStats()
 
 #define some different base types
 class Tops(Clothing):
-    _inc_ttags = "clothing", "tops"
+    _sc =           (Clothing, )
+    _inctags =      "tops"
 
 class Bottoms(Clothing):
-    _inc_ttags = "clothing", "bottoms"
+    _sc =           (Clothing, )
+    _inc_ttags =    "bottoms"
 
 class Undies(Clothing):
-    _inc_ttags = "clothing", "undies"
-    _bwt =      0.2
+    _sc =           (Clothing, )
+    _inc_ttags =    "undies"
+    _bwt =          0.2
 
 class UndiesBottoms(Undies):
-    _inc_ttags = "clothing", "undies", "bottoms"
+    _sc =           Undies, Bottoms
 
 class UndiesTops(Undies):
-    _inc_ttags = "clothing", "undies", "tops"
+    _sc =           Undies, Tops
