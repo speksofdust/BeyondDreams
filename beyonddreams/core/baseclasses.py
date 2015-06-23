@@ -77,12 +77,28 @@ class BDTags:
         for i in self._sc: yield _sc._sc_tags() # include tags from super classes
 
     def tags(self):
+        """Return an iterator of all tags for this."""
         for i in self._tags: yield i
         for i in self._sc_tags(): yield i
 
-    def has_tag(self, tag):
-        return any(i.startswith(tag) for i in self.tags())
+    def has_tag(self, tag, exact=False):
+        """True if any tags for this start with the given tag.
+        If exact is true returns True only if any tag is an exact match."""
+        if exact: return any(i == i for i in self.tags())
+        return any(i.lower().startswith(tag.lower()) for i in self.tags())
 
+
+    def find_tags(self, tags, exact=False):
+        """Return an iterator of any tags that start with a tag in 'tags'.
+        if exact is True, returns only tags that are an exact match."""
+        if exact:
+            for i in self.tags():
+                for t in tags:
+                    if i == t: yield t
+        else:
+            for i in self.tags():
+                for t in tags:
+                    if i.lower().startswith(t.lower()): yield i
 
 class BDType:
     """Primative level baseclass form most Beyond Dreams types."""
