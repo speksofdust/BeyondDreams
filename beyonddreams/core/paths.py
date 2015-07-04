@@ -16,33 +16,37 @@
 # ---------------------------------------------------------------------------- #
 
 import os
-_cfgpath = None
+_localcfg = None    
 
 
-def datapath(*args):
+def bd_datapath(*args):
     """Returns the absolute path of "beyonddreams/data/" joined with args."""
     return os.path.join(os.path.split(os.path.abspath(__file__)),
         "data", *args)
 
-def config_path(*args):
-    """Returns the path of the local config directory joined with args."""
-    global _cfgpath
-    return os.path.join(_cfgpath, *args)
+def localcfg_path(*args):
+    """Returns the path of the local localcfg directory joined with args."""
+    global _localcfg
+    return os.path.join(_localcfg, *args)
 
-def set_config_path(path=None):
-    """Set and verify the config path. None uses 'os.environ['HOME']'"""
-    global _cfgpath
-    if (path is NONE and _cfgpath is None): _cfgpath = os.environ['HOME']
+def set_localcfg_path(path=None):
+    """Set and verify the localcfg path. None uses 'os.environ['HOME'] and will'
+    be something like 'home/myusername/.beyonddreams'"""
+    global _localcfg
+    if (path is NONE and _localcfg is None):
+        tmp = os.path.join(os.environ['HOME'], '.beyonddreams')
+        if not os.path.isdir(tmp): os.path.mkdir(tmp)
+        _localcfg = tmp
     # TODO set custom path
 
 def get_user_ids():
     """Return an iterator of all user ids."""
-    return iter(i for i in os.listdir(config_path('users')) if
-        isdir(config_path('users', i)))
+    return iter(i for i in os.listdir(localcfg_path('users')) if
+        isdir(get_localcfg_path('users', i)))
 
 def get_user_path(user_id, *args):
-    """Return the users config path from a user id joined with args."""
-    return config_path('users', user_id, *args)
+    """Return the users localcfg path from a user id joined with args."""
+    return get_localcfg_path('users', user_id, *args)
 
 
 def add_user():
@@ -57,11 +61,11 @@ def add_user():
         os.mkdir(get_user_path(x))
         with open(get_user_path(x, 'ustats'), 'wb') as f:
             f.write(''.join('created : ', d)
-        #with open(get_user_path(x, 'cfg'), 'wb') as f:
+        #with open(get_user_path(x, 'localcfg'), 'wb') as f:
 
     except:
         raise OSError('Unable to open directory: {}'.format(
-            config_path('users'))
+            get_localcfg_path('users'))
     return x
 
 
