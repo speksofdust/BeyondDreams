@@ -16,7 +16,7 @@
 # ---------------------------------------------------------------------------- #
 
 import os
-from bd import cfgpath
+from .bd import cfgpath
 
 
 def datapath(*args):
