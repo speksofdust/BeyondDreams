@@ -16,7 +16,6 @@
 # ---------------------------------------------------------------------------- #
 
 VERSION =   "0.1.1"
-cfgpath =   None
 session =   None
 
 def version():
@@ -34,8 +33,8 @@ __all__ = "version", "session"
 def _start():
     global session
     import xsquare
-
-    # TODO set BD_GLOBALS_PATH by operating system
+    from core.paths import set_localcfg_path
+    set_localcfg_path()
 
     # init session then run xsquare app
     session = _Session()
