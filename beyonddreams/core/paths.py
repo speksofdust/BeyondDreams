@@ -16,7 +16,7 @@
 # ---------------------------------------------------------------------------- #
 
 import os
-from .bd import cfgpath
+_cfgpath = None
 
 
 def datapath(*args):
@@ -26,11 +26,13 @@ def datapath(*args):
 
 def config_path(*args):
     """Returns the path of the local config directory joined with args."""
-    return os.path.join(cfgpath, *args)
+    global _cfgpath
+    return os.path.join(_cfgpath, *args)
 
 def set_config_path(path=None):
     """Set and verify the config path. None uses 'os.environ['HOME']'"""
-    if (path is NONE and cfgpath is None): cfgpath = os.environ['HOME']
+    global _cfgpath
+    if (path is NONE and _cfgpath is None): _cfgpath = os.environ['HOME']
     # TODO set custom path
 
 def get_user_ids():
