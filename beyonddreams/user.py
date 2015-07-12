@@ -29,6 +29,16 @@ def valid_charname_chars():
     yield string.ascii_letters
 
 
+def _get_username_input():
+    global valid_username_chars
+    #while True:
+    return x
+
+def _get_charname_input():
+    global valid_charname_chars
+    #while True:
+    return x
+
 class User:
     def __init__(self):
         self._config = UserConfig(self)
@@ -99,9 +109,8 @@ class UserConfig(_UserStore):
     graphics, audio, etc."""
     pathname = "config"
     def __init__(self, user):
-        _UserStore.__init__(user, d={
-
-            })
+        from defaultconfig import DEFAULT_USER_CONFIG
+        _UserStore.__init__(user, d=DEFAULT_USER_CONFIG)
 
 
 class UserData(_UserStore):

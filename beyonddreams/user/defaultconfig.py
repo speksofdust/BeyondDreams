@@ -15,6 +15,52 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-DEFAULTS = {
-    "chareditor_undohist"   :   64,
+DEFAULT_USER_CONFIG = {
+    "chareditor-undohist":      64,
+    #"chareditor-undo-maxmem":   "auto",
+
+
+    "sidepanel-defaultorder-game":     (0,1,2),
+    }
+
+
+DEFAULT_KEY_SET = {
+    # Movement
+    "strafe-left":              "Q",
+    "strafe-right":             "E",
+    "move-fowrard":             "W",
+    "move-back":                "S",
+    "turn-left":                "A",
+    "turn-right":               "D",
+    "action-primary":           "",     # open doors, talk, pickup/interact, etc.
+    "action-secondary":         "",     #
+    "jump":                     "SPACE",
+    "attack-primary":           "",     # attack with primary weapon/fists
+    "attack-secondary":         "",     # attack with secondary weapon
+    "throw":                    "",     # throw selected item
+    "drop":                     "",     # drop selected item
+    "kick":                     "",
+    "block":                    "",     # block with arms or shield (when holding)
+    "item-prev":                "",
+    "item-next":                "",
+    "item-prev-favs":           "",
+    "item-next-favs":           "",
+    # camera
+    "camera-rotate-left":       "",
+    "camera-rotate-right":      "",
+    "camera-zoom-in":           "",
+    "camera-zoom-out":          "",
+    "camera-center":            "",
+    "camera-tilt-up":           "",
+    "camera-tilt-down":         "",
+    "pause":                    "",
+    "target":                   "",     # target an object
+    # sidepanel
+    "sidepanel-toggle":         "",     # Show/Hide the sidepanel
+    "sidepanel-page-next":      "",
+    "sidepanel-page-prev":      "",
+    # go to or open given page
+    "sidepanel-page-inventory": "",
+    "sidepanel-page-config":    "",
+    "sidepanel-page-stats":     "",
     }
