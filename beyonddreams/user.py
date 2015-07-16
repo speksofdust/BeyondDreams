@@ -41,14 +41,17 @@ def _get_charname_input():
 
 class User:
     def __init__(self):
+        from keyset import CurrentKeySet
         self._config = UserConfig(self)
         self._data = UserData(self)
+        self._keyset = CurrentKeySet()
         self._chars = UserChars(self)
         # makes a new user if filepath is None
         #self._globvars = GlobVars.userglobals(filepath)
         #self._data = None
         import msg
         self._msgchans = msg._Channels()
+
 
     @property
     def name(self):

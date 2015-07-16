@@ -46,13 +46,13 @@ DEFAULT_KEY_SET = {
     "item-prev-favs":           "",
     "item-next-favs":           "",
     # camera
-    "camera-rotate-left":       "",
-    "camera-rotate-right":      "",
-    "camera-zoom-in":           "",
-    "camera-zoom-out":          "",
-    "camera-center":            "",
-    "camera-tilt-up":           "",
-    "camera-tilt-down":         "",
+    "camera-rotate-left":       "NUM_4",
+    "camera-rotate-right":      "NUM_6",
+    "camera-zoom-in":           "NUM_PLUS",
+    "camera-zoom-out":          "NUM_MINUS",
+    "camera-center":            "NUM_5",
+    "camera-tilt-up":           "NUM_8",
+    "camera-tilt-down":         "NUM_2",
     "pause":                    "",
     "target":                   "",     # target an object
     # sidepanel
