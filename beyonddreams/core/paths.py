@@ -16,7 +16,7 @@
 # ---------------------------------------------------------------------------- #
 
 import os
-_localcfg = None    
+_localcfg = None
 
 
 def bd_datapath(*args):
@@ -33,7 +33,7 @@ def set_localcfg_path(path=None):
     """Set and verify the localcfg path. None uses 'os.environ['HOME'] and will'
     be something like 'home/myusername/.beyonddreams'"""
     global _localcfg
-    if (path is NONE and _localcfg is None):
+    if (path is None and _localcfg is None):
         tmp = os.path.join(os.environ['HOME'], '.beyonddreams')
         if not os.path.isdir(tmp): os.path.mkdir(tmp)
         _localcfg = tmp
@@ -44,31 +44,30 @@ def get_user_ids():
     return iter(i for i in os.listdir(localcfg_path('users')) if
         isdir(get_localcfg_path('users', i)))
 
-def get_user_path(user_id, *args):
-    """Return the users localcfg path from a user id joined with args."""
-    return get_localcfg_path('users', user_id, *args)
+def _user_mkdir(user, *args):
+    if args:
+        if not os.path.exists(user.datapath(*args):
+            os.mkdir(user.datapath(*args)
 
 
 def add_user():
     import datetime
     d = datetime.datetime.now()
-    x = None
     import random
+    from .user import User
+    user = User()
     while True:
-        x = random.randint(100000000, 99999999999999)
-        if x not in get_user_ids(): break
-    try:
-        os.mkdir(get_user_path(x))
-        with open(get_user_path(x, 'ustats'), 'wb') as f:
-            f.write(''.join('created : ', d)
-        #with open(get_user_path(x, 'localcfg'), 'wb') as f:
-
+        user._uid = str(random.randint(100000000, 99999999999999))
+        if user._uid not in get_user_ids(): break
+    try: os.mkdir(user.datapath())
     except:
-        raise OSError('Unable to open directory: {}'.format(
-            get_localcfg_path('users'))
-    return x
+        raise OSError('Unable to create directory: {}'.format(user.datapath())
+    with open(user.datapath('ustats'), 'wb') as f:
+        f.write(''.join('created : ', d)
+    #with open(user.datapath('localcfg'), 'wb') as f:
+    return user
 
 
-def add_char(user_id):
-    if not os.path.exists(user_id, 'chardata'):
-        os.mkdir(get_user_path(user_id, 'chardata')
+def add_char(user):
+    _user_mkdir('chardata')
+

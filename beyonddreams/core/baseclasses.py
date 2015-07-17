@@ -138,3 +138,11 @@ from xsquare.utils import NumDict
 
 class BDValueDict(NumDict):
     __slots__ = NumDict.__slots__
+
+
+class BDDataDict(dict):
+    """Base level dictionary for storing various types of writable data including
+    other dictionary types."""
+    path_suffix = ""
+    def __init__(self):
+        self = {}

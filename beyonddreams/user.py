@@ -39,8 +39,15 @@ def _get_charname_input():
     #while True:
     return x
 
+
+class BDUserException(Exception):
+    """Generic user exception for Beyond Dreams User objects."""
+    pass
+
+
 class User:
     def __init__(self):
+        self._uid = ""
         from keyset import CurrentKeySet
         self._config = UserConfig(self)
         self._data = UserData(self)
@@ -72,10 +79,13 @@ class User:
     def chars(self):
         return self._chars
 
-    def _get_path(self, *p):
-        import os.path
-        # FIXME Homedir
-        return os.path.join(self.name, *p)
+    def datapath(self, *args):
+        """Return the users localcfg path from a user id joined with args.
+        A ValueError is raised if user_id is an empty string."""
+        if self._uid: return get_localcfg_path('users', user._uid, *args)
+        raise ValueError("Invalid 'user_id'")
+        import core.paths
+        core.paths.get_user_path(self, *args)
 
     def logout(self, q=False):
         """Logout this user."""
@@ -110,7 +120,7 @@ class _UserStore(dict):
 class UserConfig(_UserStore):
     """Storage class for user local configuration settings, such as
     graphics, audio, etc."""
-    pathname = "config"
+    path_suffix = "config"
     def __init__(self, user):
         from defaultconfig import DEFAULT_USER_CONFIG
         _UserStore.__init__(user, d=DEFAULT_USER_CONFIG)
@@ -118,7 +128,7 @@ class UserConfig(_UserStore):
 
 class UserData(_UserStore):
     """Storage class for user data, such as user statitistics."""
-    pathname = "data"
+    path_suffix = "data"
     def __init__(self, user):
         _UserStore.__init__(user, d={
             "name": "",
@@ -126,7 +136,7 @@ class UserData(_UserStore):
 
 
 class UserChars(_UserStore):
-    pathname = "charlist"
+    path_suffix = "charlist"
     def __init__(self, user):
         _UserStore.__init__(user)
 

@@ -16,6 +16,7 @@
 # ---------------------------------------------------------------------------- #
 
 from screens import BDScreen
+from core.baseclasses import BDDataDict
 
 
 class Game(BDScreen):
@@ -49,9 +50,9 @@ class Game(BDScreen):
 (May not be available in all game types)""")
 
 
-class GamaData:
+class GamaData(BDDataDict):
     """Storage class for game data."""
-    default_dirname = 'savedgames'
+    path_suffix = 'savedgames'
 
     def fmt_filename(name, number):
         return '{}_{}'.format(name, number)
