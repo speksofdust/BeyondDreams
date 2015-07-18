@@ -21,25 +21,25 @@ from .. import bd
 class CharAttrib:
     __slots__ = ("_char",)
     """Base class for all character attributes."""
-    def __init__(self, char):
-        self._char = char
-        
+    def __init__(self, chardata):
+        self._chardata = chardata
+
     @property
     def char(self):
         """The char this attribute belongs to."""
-        return self._char
-        
+        return self._chardata._char
+
     @property
     def base(self):
         """Defaults for the char which this attribute belongs to."""
-        return self._char.base
-        
-        
+        return self._chardata._base
+
+
 class CharAttribDict(CharAttrib):
     __slots__ = CharAttrib.__slots__ + "_items"
-    def __init__(self, char):
-        self._char = char
-        self._items = {}
+    def __init__(self, chardata):
+        self._char = chardata
+        self = {}
 
     def __getitem__(self, i):       return self._items[i]
     def __len__(self):              return len(self._items)
@@ -49,13 +49,13 @@ class CharAttribDict(CharAttrib):
     def __repr__(self):             return repr(self._items)
 
     def _getiter(self, n):          return iter(self._items[i] for i in n)
-        
-        
+
+
 class StatAttrib(CharAttribDict):
     __slots__ = CharAttribDict.__slots__
-    
+
     def __setitem__(self, i, v):    self._items[i].value = v
-        
+
 class CharAttribSubAttrib:
     """Subattribute class for use within a CharAttrib class."""
     __slots__ = ()
@@ -71,50 +71,25 @@ class CharAttribSubAttrib:
     def char(self):
         """The character which this belongs to."""
         return self._charattrib._char
-    
-    
-class Coupons:
-    __slots__ = "_wallet", "_items"
-    def __init__(self, wallet, items=[]): 
-        self._wallet = wallet
-        self._items = list(items)
-    
-
-class Wallet(CharAttrib):
-    __slots__ = CharAttrib.__slots__ + "_cash", "_coupons"
-    def __init__(self, char, zil=0, coupons=[]):
-        self._char = char
-        self._cash = (zil,)
-        self._coupons = Coupons(self, coupons)
-        
-    @classmethod
-    def default(self):
-        self._cash = (0,)
-        self._coupons = Coupons(self) 
-
-    @property
-    def zil(self):
-        """The primary form of currency in bd."""
-        return self._cash[0]
 
 
 class Equip(CharAttrib):
     __slots__ = CharAttrib.__slots__ + "_slots"
-    def __init__(self, char, slots):
-        self._char = char
+    def __init__(self, chardata, slots):
+        self._chardata = chardata
         self._slots = {}
-        
+
     def __bool__(self):         return len(self._slots) > 0
     def __len__(self):          return len(self._slots)
     def __iter__(self):         return iter(self._slots)
     def __contains__(self, i):  return i in self._slots
     def __getitem__(self, i):   return self._slots[i]
-    
+
 
 class Body(CharAttrib):
     __slots__ = CharAttrib.__slots__ + "_subparts", "_attribs", "_mesh"
-    def __init__(self, char):
-        self._char = char
+    def __init__(self, chardata):
+        self._chardata = chardata
         self._subparts = {}
         self._attribs = {}
         self._mesh = None
@@ -127,23 +102,23 @@ class Body(CharAttrib):
     @property
     def attribs(self):
         return self._attribs
-    
-        
+
+
 class Stats(CharAttrib):
     __slots__ = CharAttrib.__slots__
-    def __init__(self, char):
-        self._char = char
+    def __init__(self, chardata):
+        self._chardata = chardata
 
     def base_stats(self):
         """The base stats."""
-        return self._char._base._stats
+        return self._chardata._base._stats
 
 
 class StatusEffects(CharAttrib):
     __slots__ = CharAttrib.__slots__
-    def __init__(self, char):
-        self._char = char
+    def __init__(self, chardata):
+        self._chardata = chardata
 
     def base_statuseffects(self):
         """The base status effects."""
-        return self._char._base._statuseffects
+        return self._chardata._base._statuseffects
