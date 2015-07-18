@@ -17,5 +17,13 @@
 
 from .screens import BDScreen
 
-class Title(BDScreen):
-    pass
+class TitleScreen(BDScreen):
+    _name = "Title"
+    def __init__(self):
+        pass
+
+    def run(self):
+        pass
+
+    def exit_to_title(self):
+        raise NotImplementedError

@@ -14,10 +14,14 @@
 #     along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
-import Title
+from chareditor import CharEditorScreen
+from Title import Title
+
 
 screens = {
-    "title" : Title,
+    "title" :               TitleScreen,
+    "character editor" :    CharEditorScreen,
+
     }
 
 
@@ -56,6 +60,11 @@ class ScreenNav:
                 self._change_screen(screen, self._current._cleanup_on_goto)
             else: raise valueError("invalid screen: {}".format(screen))
 
+    def exit_to_title(self):
+        """Exit from the current screen and go back to the title screen."""
+        try: self._current.exit_to_title
+        except AttributeError
+
     def _change_screen(self, n, cleanup):
         # helper for go_back and goto
         if cleanup: # kill the current screen
@@ -75,12 +84,13 @@ class BDScreen:
         This defines what will be displayed when
         'session.screen' = a given screen object.
     """
+    _name = "" # Name must match key in 'screens'
     def __init__(self):
-        self._name =     "dummy"
-        self._running =  False
-        self._can_go_back = False
-        self._cleanup_on_go_back = True
-        self._cleanup_on_goto = True
+        # Bool States
+        self._running =             False
+        self._can_go_back =         False
+        self._cleanup_on_go_back =  True
+        self._cleanup_on_goto =     True
 
     # eq, ne -- test 'x is self', then x 'isinstance of' and so on
     def __eq__(self, x):
@@ -116,9 +126,14 @@ class BDScreen:
             session._screen = self
             self.run
 
+    # Screen Subclasses must override these as needed
     def pre_run(self):
         """Called before the screen becomes active."""
         raise NotImplementedError
+
+    def has_unsaved_data(self):
+        """Return True if there is unsaved data."""
+        return False
 
     def run(self):
         raise NotImplementedError
@@ -126,6 +141,10 @@ class BDScreen:
     def end(self):
         """Called to end this screen."""
         pass
+
+    def exit_to_title(self):
+        """Exit this screen and return to the title screen."""
+        raise NotImplementedError
 
     def cleanup(self):
         """Called to kill this screen after screen transition."""

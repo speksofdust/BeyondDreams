@@ -24,21 +24,34 @@ class UndoHist:
         self._history = []
         self._max = int(max)
         if max < 1: max = 1
-        
+
     def update(self, action):
         self._history.append(action)
         if len(self._history) < self._max:
             self._history.remove(self._history[-1])
-        
+
     def clear(self):
         self._history = []
-        
+
     def undo(self):
         pass
-    
+
     def redo(self):
         pass
-        
+
+
+class CharEditorScreen(BDScreen):
+    _name = "character editor"
+    def __init__(self):
+        self._editor = CharEditor()
+
+
+    def run(self):
+        pass
+
+    def has_unsaved_data(self):
+        return self._editor._saved
+
 
 class CharEditor:
     def __init__(self, char=None):
@@ -47,39 +60,44 @@ class CharEditor:
         self._original = char
         if self._original is None:  self._editing = None
         else:                       self._editing = char.copy()
-        
+
+    def load_char(self, char, as_copy=False):
+        pass
+
     def cleanup(self):
         self._undohist.clear
-        
+
     def new_char(self):
         if self._saved == False:
             # save prompt stuff
             # p = GetPrompt("Don't Save", "Save", "Cancel"):
             # if p == 1: self.save
-            # elif p == 2: return 
+            # elif p == 2: return
             return
-        
+
         self._undohist.clear
         self._original = None
         from .char import _get_new_char
         self._editing = _get_new_char()
-        
+
     def revert(self):
         """Revert changes to this char."""
         if self._original != None:
             self._undohist.clear
             self._editing = self._original.copy()
-        
+
     def save(self, as_copy=False):
         if as_copy:
             pass
         else:
             self._original = self._editing
-        
+
         self._saved = True
-    
-    
-    
-    
+
+
+
+
+
+
 
 
