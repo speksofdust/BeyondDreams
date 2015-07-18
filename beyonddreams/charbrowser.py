@@ -16,21 +16,35 @@
 # ---------------------------------------------------------------------------- #
 
 
-from core import obbrowser
+from core.obbrowser import BDObjectBrowserSearch
+from core.obbrowser import BDObjectBrowserSelection
+from core.obbrowser import BDObjectBrowser
+from core.obbrowser import BDObjectBrowserItem
 
 
-class CharBrowserSelection(obbrowser.BDObBrowserSelection):
+class CharBrowserSearch(BDObjectBrowserSearch):
+    def __init__(self, browser):
+        BDObjectBrowserSearch.__init__(browser=browser)
+
+
+class CharBrowserSelection(BDObjectBrowserSelection):
     _browsertype = "char"
-    __slots__ = obbrowser.BDObBrowserSelection
+    __slots__ = BDObjectBrowserSelection.__slots__
     def __init__(self):
-        self = []
+        BDObjectBrowserSelection.__init__(self, browser=charbrowser):
 
 
-class CharBrowserOB(obbrowser.BDBrowserOb):
+class CharBrowserItem(BDObjectBrowserItem):
     _browsertype = "char"
-    __slots__ = obbrowser.BDBrowserOb
+    __slots__ = BDObjectBrowserItem.__slots__
 
 
-class CharBrowser(obbrowser.BDObBrowser):
+class CharBrowser(BDObjectBrowser):
     _browsertype = "char"
-    __slots__ = obbrowser.BDObBrowser
+    __slots__ = BDObjectBrowser.__slots__
+    def __init__(self):
+        BDObjectBrowser.__init__(self, SelectedCls=CharBrowserSelection,
+            SearchFuncCls=CharBrowserSearch)
+
+
+charbrowser = None

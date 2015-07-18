@@ -15,15 +15,24 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-class BDObBrowserCommon:
+__all__ = ()
+
+
+class BDObjectBrowserCommon:
     _browsertype = ""
     __slots__ = ()
 
 
-class BDObBrowserSelection(list, BDObBrowserCommon):
+class BDObjectBrowserSearch(BDObjectBrowserCommon):
+    _browsertype = ""
+    def __init__(self, browser):
+        self._browser = browser
+
+
+class BDObjectBrowserSelection(list, BDObjectBrowserCommon):
     __slots__ = ("_browser")
     def __init__(self, browser):
-        self._browser
+        self._browser = browser
         self = []
 
     def hide(self):
@@ -38,15 +47,17 @@ class BDObBrowserSelection(list, BDObBrowserCommon):
             t.update(i.tags)
 
 
-def _nullsearch(): raise NotImplementedError
+def _null(): raise NotImplementedError
 
 
-class BDObBrowser(list, BDObBrowserCommon):
+class BDObjectBrowser(list, BDObjectBrowserCommon):
     __slots__ = ("_selected", "_searchfunc")
-    def __init__(self):
+    def __init__(self, SelectedCls=None, SearchFuncCls=None):
         self = []
-        self._selected = None
-        self._searchfunc = _nullsearch
+        if SelectedCls is None: self._selected = _null
+        else: self._selected = SelectedCls
+        if SearchFuncCls is None: self._searchfunc = _null
+        else: self._searchfunc = SearchFunCls
 
     @property
     def selected(self):
@@ -64,10 +75,16 @@ class BDObBrowser(list, BDObBrowserCommon):
         return self._searchfunc
 
 
-class BDBrowserOb(BDObBrowserCommon):
+class BDBrowserItem(BDObjectBrowserCommon):
     __slots__ = "_visible"
-    def __init__(self):
+    def __init__(self, obj):
+        self._obj = obj
         self._visible = False
+
+
+    @property
+    def tags(self):
+        return self._obj.tags
 
     def _get_visible(self): return self._visible
     def _set_visible(self, x): self._visible = bool(x)
