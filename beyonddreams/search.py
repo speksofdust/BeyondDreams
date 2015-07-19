@@ -19,52 +19,56 @@
 
 
 class SearchParam:
-    """Base class for search params.
-      Note all param class names must end in 'Param'
-    """
-    _enabled = True
-    def __init__(self, value):
-        self._value = value
-
-    @property
-    def name(self):
-        return self.__class__.__name__.lower()[:-5]
+    _paramtype = ""
+    __slots__ = ("_enabled")
+    def __init__(self):
+        self._enabled = True
 
     def _get_enabled(self): return self._enabled
     def _set_enabled(self, s): self._enabled = bool(s)
     enabled = property(_get_enabled, _set_enabled)
-    
-    
-class NumParam(SearchParam):
-    """Search parameter for numeric values."""
-    ABSMIN = 1
-    ABSMAX = 99
-    def __init__(self, min, max):
-        if min < self.ABSMIN: self._min = self.ABSMIN
-        else: self._min = min
-        if max > self.ABSMAX: self._max = self.ABSMAX
-        else: self._max = max
+
+
+class ValueSearch(SearchParam):
+    _paramtype = "value"
+    __slots__ = SearchParam.__slots__ + "_name", "_min", "_max", "_absrange"
+    def __init__(self, name, absmin, absmax):
+        self._name =    name
+        self._enabled = True
+        self._min =     absmin
+        self._max =     absmax
+        self._absrange = (absmin, absmax)
 
     def _get_min(self): return self._min
     def _set_min(self, x):
-        if min < self.ABSMIN: self._min = self.ABSMIN
+        if min < self._absrange[0]: self._min = self._absrange[0]
         else: self._min = min
     min = property(_get_min, _set_min)
 
     def _get_max(self): return self._max
     def _set_max(self, x):
-        if max < self.ABSMAX: self._max = self.ABSMAX
+        if max < self._absrange[1]: self._max = self._absrange[1]
         else: self._max = max
     max = property(_get_max, _set_max)
 
 
 class TagsParam(SearchParam):
-    """Search parameter for tags."""
-    SEARCH_MODES = "include", "exclude"
-    def __init__(self, tags, search_mode="include"):
-        try:
-            self._search_mode = self._search_mode.index(search_mode)
-        except: raise ValueError("Invalid search mode: '{}'.".format(search_mode))
+    _paramtype = "tags"
+    __slots__ = SearchParam.__slots__ + "_req_all", "_req_any", "_exclude"
+    def __init__(self):
+        self._enabled = True    # priority
+        self._req_all = set()   # 1
+        self._req_any = set()   # 3
+        self._exclude = set()   # 2
+
+    def _tag_sets(self):
+        return iter(self._req_all, self._req_any, self._exclude)
+
+    def _add_tags(self, dest, tags):
+        dest.update(tags)
+        for i in self._tag_sets():
+            if i != dest:
+                i.difference_update(tags)
 
 
 class Search:

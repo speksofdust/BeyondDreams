@@ -26,7 +26,7 @@ class BDObjectBrowserCommon:
 class BDObjectBrowserSearch(BDObjectBrowserCommon):
     _browsertype = ""
     def __init__(self, browser):
-        self._browser = browser
+        self._browser =         browser
 
 
 class BDObjectBrowserSelection(list, BDObjectBrowserCommon):
@@ -34,6 +34,9 @@ class BDObjectBrowserSelection(list, BDObjectBrowserCommon):
     def __init__(self, browser):
         self._browser = browser
         self = []
+
+    def is_multiple(self):
+        return len(self) > 1
 
     def hide(self):
         """Hide the current selection."""
@@ -80,7 +83,6 @@ class BDBrowserItem(BDObjectBrowserCommon):
     def __init__(self, obj):
         self._obj = obj
         self._visible = False
-
 
     @property
     def tags(self):
