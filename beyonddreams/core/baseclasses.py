@@ -102,30 +102,6 @@ class BDTags:
                     if i.lower().startswith(t.lower()): yield i
 
 
-class BDType:
-    """Primative level baseclass form most Beyond Dreams types."""
-    __slots__ = "_name"
-    _desc = ""
-    def __init__(self, name):
-        self._name = name
-
-    @property
-    def name(self):
-        """The name of this."""
-        return self._name
-
-    def desc(self):
-        """Return the main description about this."""
-        try: return self._desc[self._name]
-        except: return ""
-
-
-class BDTaggedType(BDType, BDTags):
-    def __init__(self, name, tags=()):
-        BDTags.__init__(tags=tags)
-        self._name = name
-
-
 class BDBaseValueDict(dict):
     """Dictionary for storing (usually static) base values."""
     __slots__ = dict.__slots__
@@ -144,6 +120,7 @@ class BDDataDict(dict):
     """Base level dictionary for storing various types of writable data including
     other dictionary types."""
     path_suffix = ""
+    __slots__ = dict.__slots__
     def __init__(self):
         self = {}
 
