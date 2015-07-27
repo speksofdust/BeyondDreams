@@ -15,8 +15,14 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from itemtypes import ItemType
-from itemtypes import regitem
+from item import ItemType
+from item import regitem
+from item import ItemDict
+
+
+class ConsumableTypeDict(ItemDict):
+    CATTYPE = "consumable"
+    __slots__ = ItemDict.__slots__
 
 
 class ConsumableType(ItemType):
@@ -24,7 +30,7 @@ class ConsumableType(ItemType):
     _sc =           (WeaponType,)
     CATTYPE =       "consumable"
     edible =        0   # 0-False 1-True 2-Drinkable ('can' be eaten/drunk)
-    _perishable =   0   # 0=False or time as 3 ints (min, hours, days)
+    _perishable =   0   # 0=False or max time as 3 ints (min, hours, days)
     _ingredient =   0   # 0=False, 1=Dry, 2=Wet
 
     def is_ingredient(self):

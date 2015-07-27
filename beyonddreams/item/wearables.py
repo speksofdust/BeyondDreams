@@ -15,9 +15,14 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+from item import ItemType
+from item import regitem
+from item import ItemDict
 
-from itemtypes import ItemType
-from itemtypes import regitem
+
+class WearableTypeDict(ItemDict):
+    CATTYPE = "wearable"
+    __slots__ = ItemDict.__slots__
 
 
 class WearableType(ItemType):
@@ -37,6 +42,7 @@ class Clothing(WearableType):
     _inctags =      "clothing"
     baseres =       BaseRes()
     basestats =     BaseStats()
+
 
 #define some different base types
 class Tops(Clothing):

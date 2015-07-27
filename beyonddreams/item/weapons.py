@@ -15,8 +15,14 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from itemtypes import ItemType
-from itemtypes import regitem
+from item import ItemType
+from item import regitem
+from item import ItemDict
+
+
+class WeaponTypeDict(ItemDict):
+    CATTYPE = "weapon"
+    __slots__ = ItemDict.__slots__
 
 
 class WeaponType(ItemType):
@@ -24,6 +30,7 @@ class WeaponType(ItemType):
     _sc =           (ItemType,)
     CATTYPE =       "weapon"
     BUNDLESIZE =    1
+    _ammotypes =    ()  # compatable ammo types -- empty if uses no ammo
 
 
 class Ammo(WeaponType):
