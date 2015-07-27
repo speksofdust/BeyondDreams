@@ -127,3 +127,7 @@ class Char:
         return ("zombie" in self._items["statuses"]["bools"] or
             "zombie" in self.famtypes)
 
+    def hp(self):
+        return self._items["stats"]["HP"]
+
+
