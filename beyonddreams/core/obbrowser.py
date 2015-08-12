@@ -89,9 +89,6 @@ class BDObjectBrowser(list, BDObjectBrowserCommon):
         return self._searchfunc
 
 
-
-
-
 class BDBrowserItem(BDObjectBrowserCommon):
     __slots__ = "_visible"
     def __init__(self, obj):
