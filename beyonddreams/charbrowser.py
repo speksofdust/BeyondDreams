@@ -20,6 +20,7 @@ from core.obbrowser import BDObjectBrowserSearch
 from core.obbrowser import BDObjectBrowserSelection
 from core.obbrowser import BDObjectBrowser
 from core.obbrowser import BDObjectBrowserItem
+from core.obbrowser import BDObjectBrowserAutoHide
 
 
 class CharBrowserSearch(BDObjectBrowserSearch):
@@ -37,6 +38,10 @@ class CharBrowserSelection(BDObjectBrowserSelection):
 class CharBrowserItem(BDObjectBrowserItem):
     _browsertype = "char"
     __slots__ = BDObjectBrowserItem.__slots__
+
+
+class CharBrowserAutoHide(BDObjectBrowserAutoHide):
+    pass
 
 
 class CharBrowser(BDObjectBrowser):

@@ -53,6 +53,11 @@ class BDObjectBrowserSelection(list, BDObjectBrowserCommon):
 def _null(): raise NotImplementedError
 
 
+class BDObjectBrowserAutoHide:
+    def __init__(self):
+        self = {}
+
+
 class BDObjectBrowser(list, BDObjectBrowserCommon):
     __slots__ = ("_selected", "_searchfunc")
     def __init__(self, SelectedCls=None, SearchFuncCls=None):
@@ -61,6 +66,12 @@ class BDObjectBrowser(list, BDObjectBrowserCommon):
         else: self._selected = SelectedCls
         if SearchFuncCls is None: self._searchfunc = _null
         else: self._searchfunc = SearchFunCls
+
+        self._autohide = None
+
+    @property
+    def autohide_types(self):
+        return self._autohide
 
     @property
     def selected(self):
@@ -76,6 +87,9 @@ class BDObjectBrowser(list, BDObjectBrowserCommon):
 
     def search(self):
         return self._searchfunc
+
+
+
 
 
 class BDBrowserItem(BDObjectBrowserCommon):
