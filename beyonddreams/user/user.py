@@ -87,8 +87,24 @@ class User:
         import core.paths
         core.paths.get_user_path(self, *args)
 
+    def delete(self):
+        # confirm(title="Delete User?",
+        #    "You are about to delete your user profile, "
+        #   "are you sure you wish to continue?")
+        pass
+
     def logout(self, q=False):
         """Logout this user."""
+        from .bd import session
+        # check if we need to confirm before logout
+        if (self._config["session-confirm-logout"] == 1 or
+            (self._config["session_confirm_logout"] == 2 and
+                session.screen.current.name != "title"):
+                    pass    # TODO
+                #   confirm(title="Confirm Logout",
+                #       "You are about to logout of your user profile, "
+                #       "are you sure you wish to continue?")
+
         self._config.write
         del self._msgchans
         del self._config
@@ -116,7 +132,6 @@ class _UserStore(dict):
     #    self.user._get_path(pathname)
 
 
-
 class UserConfig(_UserStore):
     """Storage class for user local configuration settings, such as
     graphics, audio, etc."""
@@ -139,4 +154,12 @@ class UserChars(_UserStore):
     path_suffix = "charlist"
     def __init__(self, user):
         _UserStore.__init__(user)
+
+    def new_char(self, preset=None):
+        if preset is not None: pass
+        pass
+
+    def del_char(self, char):
+        pass
+
 

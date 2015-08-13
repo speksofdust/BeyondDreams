@@ -32,6 +32,7 @@ class ConsumableType(ItemType):
     edible =        0   # 0-False 1-True 2-Drinkable ('can' be eaten/drunk)
     _perishable =   0   # 0=False or max time as 3 ints (min, hours, days)
     _ingredient =   0   # 0=False, 1=Dry, 2=Wet
+    itemeffects =   None
 
     def is_ingredient(self):
         """True if this item can be used as an ingredient."""
@@ -66,4 +67,17 @@ class DryIngredient(Ingredient):
 class WetIngredient(Ingredient):
     _sc =       (Ingredient,)
     edible =    2
+
+
+class Dust(DryIngredient):
+    pass
+
+
+class Powder(Dust):
+    pass
+
+
+class Potion(WetIngredient):
+    pass
+
 

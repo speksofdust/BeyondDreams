@@ -71,3 +71,7 @@ def add_user():
 def add_char(user):
     _user_mkdir('chardata')
 
+
+def del_char(user):
+    pass
+

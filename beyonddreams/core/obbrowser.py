@@ -88,6 +88,20 @@ class BDObjectBrowser(list, BDObjectBrowserCommon):
     def search(self):
         return self._searchfunc
 
+    def get_menuitems(self):
+        if len(self._selection) == 0:   return self._menuitems_nonesel
+        elif len(self._selection) == 1: return self._menuitems_onesel
+        else: return self._menuitems_multsel
+
+    def _menuitems_nonsel(self):
+        yield
+
+    def _menuitems_onesel(self):
+        yield
+
+    def _menuitems_mulsel(self):
+        yield
+
 
 class BDBrowserItem(BDObjectBrowserCommon):
     __slots__ = "_visible"

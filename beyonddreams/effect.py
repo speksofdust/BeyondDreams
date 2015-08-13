@@ -16,50 +16,17 @@
 # ---------------------------------------------------------------------------- #
 
 
-from core.obbrowser import BDObjectBrowserSearch
-from core.obbrowser import BDObjectBrowserSelection
-from core.obbrowser import BDObjectBrowser
-from core.obbrowser import BDObjectBrowserItem
-from core.obbrowser import BDObjectBrowserAutoHide
+class Effects:
+    prevents =  ()
+    causes =    ()
+    cures =     ()
 
-
-class CharBrowserSearch(BDObjectBrowserSearch):
-    def __init__(self, browser):
-        BDObjectBrowserSearch.__init__(browser=browser)
-
-
-class CharBrowserSelection(BDObjectBrowserSelection):
-    _browsertype = "char"
-    __slots__ = BDObjectBrowserSelection.__slots__
-    def __init__(self):
-        BDObjectBrowserSelection.__init__(self, browser=charbrowser):
-
-
-class CharBrowserItem(BDObjectBrowserItem):
-    _browsertype = "char"
-    __slots__ = BDObjectBrowserItem.__slots__
-
-
-class CharBrowserAutoHide(BDObjectBrowserAutoHide):
-    pass
-
-
-class CharBrowser(BDObjectBrowser):
-    _browsertype = "char"
-    __slots__ = BDObjectBrowser.__slots__
-    def __init__(self):
-        BDObjectBrowser.__init__(self, SelectedCls=CharBrowserSelection,
-            SearchFuncCls=CharBrowserSearch)
-
-    def _menuitems_nonsel(self):
-        yield
-
-    def _menuitems_onesel(self):
-        yield
-
-    def _menuitems_mulsel(self):
-        yield
-
-
-
-charbrowser = None
+    stun =      0
+    poison =    0
+    zombie =    0
+    drunk =     0
+    burn =      0
+    frostbite = 0
+    numb =      0
+    blind =     0
+    dumb =      0

@@ -21,6 +21,7 @@ DEFAULT_USER_CONFIG = {
 
 
     "sidepanel-defaultorder-game":     (0,1,2),
+    "session-confirm-logout":           1,  # 0-False, 1-True, 2-InMainMenuOnly
     }
 
 

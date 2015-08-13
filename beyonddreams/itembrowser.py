@@ -51,5 +51,13 @@ class ItemBrowser(BDObjectBrowser):
         BDObjectBrowser.__init__(self, SelectedCls=ItemBrowserSelection,
             SearchFuncCls=ItemBrowserSearch)
 
+    def _menuitems_nonsel(self):
+        yield
+
+    def _menuitems_onesel(self):
+        yield
+
+    def _menuitems_mulsel(self):
+        yield
 
 itembrowser = None
