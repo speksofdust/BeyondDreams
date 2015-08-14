@@ -27,7 +27,7 @@ class ConsumableTypeDict(ItemDict):
 
 class ConsumableType(ItemType):
     """Base class for all consumable item types."""
-    _sc =           (WeaponType,)
+    _sc =           (ItemType,)
     CATTYPE =       "consumable"
     edible =        0   # 0-False 1-True 2-Drinkable ('can' be eaten/drunk)
     _perishable =   0   # 0=False or max time as 3 ints (min, hours, days)
@@ -60,6 +60,7 @@ class Ingredient(ConsumableType):
     """Consumable types that can always be used as an ingredient."""
     _sc =       (ConsumableType,)
 
+
 class DryIngredient(Ingredient):
     _sc =       (Ingredient,)
 
@@ -70,7 +71,7 @@ class WetIngredient(Ingredient):
 
 
 class Dust(DryIngredient):
-    pass
+    _sc =       (DryIngredient,)
 
 
 class Powder(Dust):
@@ -78,6 +79,56 @@ class Powder(Dust):
 
 
 class Potion(WetIngredient):
-    pass
+    _sc =       (WetIngredient,)
 
 
+class Shell(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class Tooth(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class String(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class Gel(WetIngredient):
+    _sc =       (WetIngredient,)
+
+
+class Oil(WetIngredient):
+    _sc =       (WetIngredient,)
+
+
+class Flower(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class Perfume(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class Bark(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class Root(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class Leaf(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class Rock(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class Gem(ConsumableType):
+    _sc =       (ConsumableType,)
+
+
+class Mushroom(ConsumableType):
+    _sc =       (ConsumableType,)
