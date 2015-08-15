@@ -21,12 +21,18 @@ class Effects:
     causes =    ()
     cures =     ()
 
-    stun =      0
-    poison =    0
-    zombie =    0
-    drunk =     0
-    burn =      0
     frostbite = 0
+    burn =      0
     numb =      0
+    stun =      0
+    poisoned =  0
+    bleed =     0
     blind =     0
+    drunk =     0
     dumb =      0
+    confusion = 0
+    zombie =    0
+
+    transformative = 0
+
+
