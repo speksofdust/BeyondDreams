@@ -15,9 +15,11 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-
-TRANSFORMATIVE =    ("undead",)
-NON_ELEMENTAL =     "acid", "psychic", "spirit"
-ELEMENTAL =         "dark", "light", "fire", "ice", "wind", "water", "electric"
-NON_PHYSICAL =      "dark", "light", "psychic", "spirit"
-PHYSICAL =          "acid", "fire", "ice", "wind", "water", "electric"
+statgroups = {
+        "transformative":   ("undead",),
+        "non-elemental":    ("acid", "psychic", "spirit"),
+        "elemental":        ("dark", "light", "fire", "ice", "wind", "water",
+            "electric"),
+        "non-physical":      ("dark", "light", "psychic", "spirit"),
+        "physical":          ("acid", "fire", "ice", "wind", "water", "electric"),
+        }
