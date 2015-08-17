@@ -25,15 +25,16 @@ class Effects:
     burn =      0
     numb =      0
     stun =      0
-    poisoned =  0
+    poisoning = 0
     bleed =     0
     blind =     0
     drunk =     0
     dumb =      0
     confusion = 0
     zombie =    0
+    mutagen =   0
 
-    transformative = 0
+    transformation = 0
 
 
 
