@@ -15,28 +15,111 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+__all__ = ()
+ZERO = 0 # cache 0 to reduce ram usage a here a bit (Effects gets used alot)
 
-class Effects:
-    prevents =  ()
-    causes =    ()
-    cures =     ()
+class _B:
+    typename = ""
+    def __init__(self):
+        pass
 
-    frostbite = 0
-    burn =      0
-    numb =      0
-    stun =      0
-    poisoning = 0
-    bleed =     0
-    blind =     0
-    drunk =     0
-    dumb =      0
-    confusion = 0
-    zombie =    0
-    mutagen =   0
+    # HACK -- Allow cross referencing when using dict keys with "-" chars
+    def __getattr__(self, i):
+        if "-" in i: return getattr(self, i.replace("-", "_")
+        else: return getattr(i)
 
-    transformation = 0
+    def __setattr__(self, i, v):
+        if "-" in i: setattr(self, i.replace("-", "_"), v)
+        else: setattr(self, i, v)
 
+    def _iteritems(self):
+        return
 
 
+class StatusEffects(_B):
+    typename = "statuseffects"
+    # StatusEffects
+    prevents =          ()
+    causes =            ()
+    cures =             ()
+
+    physical_status =   ZERO
+    frostbite =         ZERO
+    burn =              ZERO
+    numb =              ZERO
+    stun =              ZERO
+    poisoning =         ZERO
+    bleed =             ZERO
+
+    mental_status =     ZERO
+    blind =             ZERO
+    drunk =             ZERO
+    dumb =              ZERO
+    confusion =         ZERO
+
+    transform_status =  ZERO
+    zombie =            ZERO
+    mutagen =           ZERO
+
+    def __bool__(self):
+        return any(i for i in self.prevents, self.causes, self.cures)
+
+    def __eq__(self, x):
+        if isinstance(x, StatusEffects):
+            if self._iteritems != x._iteritems: return False
+            for i in self._iteritems:
+                if any(getattr(self, j) != getattr(x, j) for j in i):
+                    return False
+
+    def __ne__(self, x):
+        if isinstance(x, StatusEffects):
+            if self._iteritems != x._iteritems: return True
+            for i in self._iteritems:
+                if any(getattr(self, j) != getattr(x, j) for j in i):
+                    return True
+
+    def _iteritems(self):
+        return iter((self.prevents, self.causes, self.cures))
 
 
+class PEffects(_B):
+    typename = "peffects"
+    # Physical/Non-Physical
+    reduces =           ()  # reduces dmg from
+    increases =         ()
+
+    dark =              ZERO
+    light =             ZERO
+    psychic =           ZERO
+    spirit =            ZERO
+    acid =              ZERO
+    fire =              ZERO
+    ice =               ZERO
+    wind =              ZERO
+    water =             ZERO
+    electric =          ZERO
+
+    physical =          ZERO
+    non_physical =      ZERO
+    non_elemental =     ZERO
+    elemental =         ZERO
+
+    def __bool__(self):
+        return any(i for i in self.reduces, self.increases)
+
+    def __eq__(self, x):
+        if isinstance(x, PEffects):
+            if self._iteritems != x._iteritems: return False
+            for i in self._iteritems:
+                if any(getattr(self, j) != getattr(x, j) for j in i):
+                    return False
+
+    def __ne__(self, x):
+        if isinstance(x, PEffects):
+            if self._iteritems != x._iteritems: return True
+            for i in self._iteritems:
+                if any(getattr(self, j) != getattr(x, j) for j in i):
+                    return True
+
+    def _iteritems(self):
+        return iter((self.reduces, self.increases))

@@ -15,11 +15,32 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-statgroups = {
-        "transformative":   ("undead",),
+
+class _StatGroups(dict):
+    def __init__(self):
+        self = {
+        "physical-statuses":  ("frostbite", "burn", "numb", "stun", "poisioning",
+            "bleed")
+        "mental-statuses":    ("blind", "drunk", "dumb", "confusion"),
+        "transform-statuses":   ("undead", "mutagen"),
         "non-elemental":    ("acid", "psychic", "spirit"),
         "elemental":        ("dark", "light", "fire", "ice", "wind", "water",
             "electric"),
         "non-physical":      ("dark", "light", "psychic", "spirit"),
-        "physical":          ("acid", "fire", "ice", "wind", "water", "electric"),
+        "physical":          ("acid", "fire", "ice", "wind", "water",
+            "electric"),
         }
+
+    def statuseffect_groupnames(self):
+        return iter(i for i in self if i.endswith("statuses"))
+
+    def other_groupnames(self):
+        return iter(i for i in self if not i.endswith("statuses"))
+
+    def all_statuses(self):
+        return iter(self[i] for i in self if i.endswith("statuses"))
+
+
+statgroups = _Statgroups()
+
+__all__ = "statgroups"
