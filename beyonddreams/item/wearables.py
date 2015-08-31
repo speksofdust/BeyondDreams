@@ -34,7 +34,13 @@ class WearableType(ItemType):
 
 class Jewelry(WearableType):
     _sc =           (WearableType, )
-    _inc_ttags =    "jewelry"
+    _inctags =      "jewelry"
+
+
+class _WTJ(Jewelry):
+    # wearable type jewelry
+    # Helper class for Jewlery
+    _sc =           (Jewelry, )
 
 
 class Clothing(WearableType):
@@ -44,22 +50,76 @@ class Clothing(WearableType):
     basestats =     BaseStats()
 
 
-#define some different base types
-class Tops(Clothing):
+class _WTC(Clothing):
+    # wearable type clothing
+    # Helper class for Clothing
     _sc =           (Clothing, )
+
+
+# ---- Clothing Base Types --------------------------------------------------- #
+class Tops(_WTC):
     _inctags =      "tops"
 
-class Bottoms(Clothing):
-    _sc =           (Clothing, )
-    _inc_ttags =    "bottoms"
 
-class Undies(Clothing):
-    _sc =           (Clothing, )
-    _inc_ttags =    "undies"
+class Bottoms(_WTC):
+    _inctags =    "bottoms"
+
+
+class Undies(_WTC):
+    _inctags =    "undies"
     _bwt =          0.2
+
 
 class UndiesBottoms(Undies):
     _sc =           Undies, Bottoms
 
+
 class UndiesTops(Undies):
     _sc =           Undies, Tops
+
+
+class Footwear(_WTC):
+    _surface_grip_mult =    1   # slick surface grip multiplier
+    #_kick_dmg_mult =        1   # kick damage multiplier
+
+
+class Shoe(Footwear):
+    _sc =       (Footwear, )
+    _bwt =      0.5
+
+
+class Boot(Footwear):
+    _sc =       (Footwear, )
+    _bwt =      0.7
+
+
+# ---- Clothing Sub Types ---------------------------------------------------- #
+class Glove(_WTC):
+    # increases punch damage
+    # may increase weapon grip
+    _typename =         "glove"
+    _weapon_grip =      0   # vs barehanded
+    #_punch_dmg_mult =   1   # punch damage multplier
+
+
+class Sock(_WTC):
+    _typename =     "sock"
+
+
+class Shirt(Tops):
+    _typename =     "shirt"
+
+
+class Dress(Tops):
+    _typename =     "dress"
+
+
+class Skirt(Bottoms):
+    _typename =     "skirt"
+
+
+class Pants(Bottoms):
+    _typename =     "pants"
+
+
+

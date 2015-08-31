@@ -16,6 +16,7 @@
 # ---------------------------------------------------------------------------- #
 
 from item import ItemType
+from item import BundableItemType
 from item import regitem
 from item import ItemDict
 
@@ -67,8 +68,8 @@ class WeaponFamDict():
 
 
 # ---- Ammo ------------------------------------------------------------------ #
-class Ammo(ItemType):
-    _sc =           (ItemType,)
+class Ammo(BundableItemType):
+    _sc =           (BundableItemType,)
     BUNDLESIZE =    25
     weapontypes =   () # weapontypes usable in
 
@@ -85,7 +86,6 @@ class Arrow(Ammo):
 
 class DefensiveType(WeaponType):
     _sc =           (WeaponType,)
-
 
 
 class WeaponAccessories(WeaponType):

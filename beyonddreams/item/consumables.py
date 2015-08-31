@@ -15,9 +15,10 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from item import ItemType
+from item import BundableItemType
 from item import regitem
 from item import ItemDict
+
 
 
 class ConsumableTypeDict(ItemDict):
@@ -25,14 +26,17 @@ class ConsumableTypeDict(ItemDict):
     __slots__ = ItemDict.__slots__
 
 
-class ConsumableType(ItemType):
+class ConsumableType(BundableItemType):
     """Base class for all consumable item types."""
-    _sc =           (ItemType,)
+    _sc =           (BundableItemType,)
     CATTYPE =       "consumable"
     edible =        0   # 0-False 1-True 2-Drinkable ('can' be eaten/drunk)
     _perishable =   0   # 0=False or max time as 3 ints (min, hours, days)
     _ingredient =   0   # 0=False, 1=Dry, 2=Wet
     itemeffects =   None
+
+    def _edible_tagname(self):
+        return ("", "edible", "drinkable")self.edible
 
     def is_ingredient(self):
         """True if this item can be used as an ingredient."""
@@ -64,71 +68,94 @@ class Ingredient(ConsumableType):
 class DryIngredient(Ingredient):
     _sc =       (Ingredient,)
 
+class _DIng(DryIngredient):
+    _sc =       (DryIngredient,)
+
+class _EDing(_DIng):
+    edible =    1
 
 class WetIngredient(Ingredient):
     _sc =       (Ingredient,)
     edible =    2
 
-
-class Dust(DryIngredient):
-    _sc =       (DryIngredient,)
-
-
-class Powder(Dust):
-    pass
+class _WIng(WetIngredient):
+    _sc =       (WetIngredient)
 
 
-class Potion(WetIngredient):
-    _sc =       (WetIngredient,)
+# ---- Dry Ingredient -------------------------------------------------------- #
+class Dust(_DIng):
+    _typename = "dust"
+
+
+class Powder(_DIng):
+    _typname =  "powder"
+
+
+class Flower(_EDIng):
+    _typename = "flower"
+
+
+class Bark(_EDIng):
+    _typename = "bark"
+
+
+class Root(_EDIng):
+    _typename = "root"
+
+
+class Leaf(_EDIng):
+    _typename = "leaf"
+
+
+class Mushroom(_EDIng):
+    _typename = "mushroom"
+
+
+# ---- Wet Ingredient -------------------------------------------------------- #
+class Gel(_WIng):
+    edible =    1
+
+
+class Oil(_WIng):
+    _typename = "oil"
+
+
+class Potion(_WIng):
+    _typename = "potion"
+
+
+class Perfume(_WIng):
+    _typename = "perfume"
+
+
+# ---- Consumable ------------------------------------------------------------ #
+class Feather(ConsumableType):
+    _sc =       (ConsumableType,)
+    _typename = "feather"
 
 
 class Shell(ConsumableType):
     _sc =       (ConsumableType,)
+    _typename = "shell"
 
 
 class Tooth(ConsumableType):
     _sc =       (ConsumableType,)
+    _typename = "tooth"
 
 
 class String(ConsumableType):
     _sc =       (ConsumableType,)
-
-
-class Gel(WetIngredient):
-    _sc =       (WetIngredient,)
-
-
-class Oil(WetIngredient):
-    _sc =       (WetIngredient,)
-
-
-class Flower(ConsumableType):
-    _sc =       (ConsumableType,)
-
-
-class Perfume(ConsumableType):
-    _sc =       (ConsumableType,)
-
-
-class Bark(ConsumableType):
-    _sc =       (ConsumableType,)
-
-
-class Root(ConsumableType):
-    _sc =       (ConsumableType,)
-
-
-class Leaf(ConsumableType):
-    _sc =       (ConsumableType,)
+    _typename = "string"
 
 
 class Rock(ConsumableType):
     _sc =       (ConsumableType,)
+    _typename = "rock"
 
 
 class Gem(ConsumableType):
     _sc =       (ConsumableType,)
+    _typename = "gem"
 
 
-class Mushroom(ConsumableType):
-    _sc =       (ConsumableType,)

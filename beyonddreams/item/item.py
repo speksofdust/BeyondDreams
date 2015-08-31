@@ -50,13 +50,6 @@ class Items:
         self.wearables =    WearableTypeDict()
 
 
-# some absolute maximums
-MAX_BUNDLE =    99
-MAX_SLOTSIZE =  100
-
-__slots__ = "MAX_BUNDLE", "MAX_SLOTSIZE"
-
-
 from .baseclasses import BDTaggedType
 
 class ItemType(BDTaggedType):
@@ -64,8 +57,6 @@ class ItemType(BDTaggedType):
     CATTYPE =       ""    # Primary catagory type (CONSUMABLE, WEAPON, etc.)
     _typename =     ""    # name for this item type -- not for primary types
     _typedesc =      ""
-    _bundlesize =    1    # num items grouped per bundle
-    _slotsize =      1    # base num slots used in inventory per bundlesize
     ATTRIBS =       ()    # attribs for items when in inventory
     ALL_TYPE_ATTRIBS = () # all possible attribs for this type
     _bwt =          1.0   # base weight must be (float)
@@ -81,9 +72,9 @@ class ItemType(BDTaggedType):
         return self.__class__.__name__.lower() # only for primary types
 
     def _get_typetags(self):
-        yield i for i in self._sc_tags()
-        yield self.typename
         yield self.CATTYPE
+        yield self.typename
+        yield i for i in self._sc_tags()
 
     def typetags(self):
         """Yield all type tags for this."""
@@ -92,6 +83,16 @@ class ItemType(BDTaggedType):
     def tags(self):
         for i in self._tags: yield i
         for i in self.typetags(): yield i
+
+
+class BundableItemType(ItemType):
+    """Item type with support for bundling."""
+    # some absolute maximums
+    ABS_MAX_BUNDLE =    99
+    ABS_MAX_SLOTSIZE =  100
+    _bundlesize =    1    # max num items grouped per bundle
+    _slotsize =      1    # base num slots used in inventory per bundlesize
+
 
 
 class ItemSet(BDTaggedType):
