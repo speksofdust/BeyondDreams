@@ -16,8 +16,6 @@
 # ---------------------------------------------------------------------------- #
 
 from screen import BDScreen
-from .core.baseclasses import BDDataDict
-
 
 class Game(BDScreen):
     _name = "game"
@@ -29,9 +27,25 @@ class Game(BDScreen):
         self._data = None
         self._ended = False
 
+    #@classmethod
+    #def load_game(self, fp, player):
+        #self._init_game(player)
+        # do loading stuff
+        #self._start_game
+
+    @classmethod
+    def new_game(self, player):
+        self._init_game(player)
+        self._start_game
+
+    def _init_game(self, player):
+        self._player = player
+        from game.data import GameData
+        self._data = GameData(self) # create initial game data
+
     def _start_game(self):
-        if self._player:
-            self._data = GameData(self) # create initial game data
+        if (self._player and self._data) is not None:
+            pass
 
     def is_ended(self):
         """True if the current game has ended."""
@@ -48,32 +62,3 @@ class Game(BDScreen):
     paused = property(_get_paused, _set_paused,
         doc="""Sets the 'paused' state of the current game.
 (May not be available in all game types)""")
-
-
-class GamaData(BDDataDict):
-    """Storage class for game data."""
-    path_suffix = 'savedgames'
-
-    def fmt_filename(name, number):
-        return '{}_{}'.format(name, number)
-
-    def __init__(self, game):
-        self._game = game
-        self._last_save_num = 0
-        self = {
-            }
-
-    def quick_save(self):
-        if self._game._writable:
-            self.write(self.default_dirname, fmt_filename(
-                ''.join(self._name, '_', 'quicksave'), self._last_save_num += 1))
-
-    def write(self, filename, dirname, comment=''):
-        if self._game._writable:
-            import os.path
-            if os.path.isdir(dirname):
-            # TODO
-            #import datetime
-            #f.write(created = datetime.datetime.now())
-            #f.write(comment = comment)
-            pass
