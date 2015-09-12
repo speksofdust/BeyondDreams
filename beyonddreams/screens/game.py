@@ -15,8 +15,8 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from screens import BDScreen
-from core.baseclasses import BDDataDict
+from screen import BDScreen
+from .core.baseclasses import BDDataDict
 
 
 class Game(BDScreen):
