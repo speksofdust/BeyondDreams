@@ -15,6 +15,7 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+
 class Regions(dict):
     def __init__(self):
         self = {}
@@ -41,11 +42,41 @@ class Region(dict):
 
 
 class Location:
-    def __init__(self, name="", region, sublocations=(), parent_location=None):
+    def __init__(self, name="", region, sublocations=(), parentloc=None):
         self._name =  name
         self._region = region
-        self._parent_location = parent_location
+        self._parentloc = parentloc
         self._sublocations = sublocations
+
+    # ---- read/write ---- #
+    # str to obj
+    def _str_to_subloc(self, *s):
+        # returns a location object from separated strings
+        # can go multiple layers deep (subloc --> subsubloc, etc.)
+        if len(s) > 1: return self._get_subloc_from_str(self._sublocations[s[0]])
+        return self._sublocations[s[0]]
+
+    # obj to str
+    def _fullparentloc(self):
+        if self._parentloc is None: return ""
+        elif self._parentloc._parentloc is None:
+            return self._parentloc._name
+        else:
+            return "-".join(self._parentloc._fullparentloc(),
+                self._parentloc._name)
+
+    def _keyname(self):
+        return "-".join(self._region, self._fullparentloc())
+
+    @property
+    def _fullkeyname(self):
+        """The full key name as a string. Used when writing data to disk."""
+        return "".join("loc.", self._keyname())
+    # -------------------------------------------------------------------- #
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def sublocations(self):
@@ -63,11 +94,11 @@ class Location:
 
     def is_sublocation(self):
         """True if this location is located within a parent location."""
-        return self._parent_location is not None
+        return self._parentloc is not None
 
     def times_visited(self, char):
         """The number of times a given char has visited this location."""
-        try: return char.location[self.name].visited
+        try: return char.location[self._keyname].visited
         except: return 0    # never visited
 
 
@@ -86,10 +117,7 @@ class Location:
     def _on_first_visit(self, *chars):
         if chars:
             for i in chars:
-                try:    i.location[self.name].update_visit_data
-                except: i.location[self.name] = LocationData(1)
-                # Note: visited regions data is stored as a set
-                c.data["regions.visited"].add(self._region._region_id
+                i.location.update_loc_data(self)
             self.on_first_visit(chars)
 
     def on_first_visit(self, *chars):
@@ -125,6 +153,23 @@ class _CharLocDataBase:
     def __init__(self, char):
         self._current = CurrentLocation()
 
+    def update_loc_data(self, loc):
+        self._current.location = loc._fullkeyname
+
+    def _curloc_to_str(self):
+        # string from loc obj -- writing
+        return self._current._fullkeyname
+
+    def _curloc_from_str(s):
+        # loc obj from string loc -- reading
+        n = iter(s[3:].split("-"))
+
+        if len(n) >= 3:
+            # region --> location --> subloc --> (subsubloc --> etc. as needed)
+            return regions[next(n)][next(n)]._str_to_subloc
+        # region --> location
+        return regions[next(n)][next(n)]
+
 
 class CharLocData(dict):
     def __init__(self, char):
@@ -133,6 +178,12 @@ class CharLocData(dict):
         self = {
             "regions.visited":  set()
             }
+
+    def update_loc_data(self, loc):
+        try: self[loc.name].update_visit_data
+        except:
+            self[loc.name] = LocationData(1)
+        self["regions.visited"].add(self._region._region_id
 
 
 class NPCCharLocData(_CharLocDataBase):
