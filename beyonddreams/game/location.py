@@ -15,15 +15,59 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+class Regions(dict):
+    def __init__(self):
+        self = {}
+
+    def visited_regions(self, char):
+        return iter(i for i in self if i._region_id in
+            char.data["regions.visited."])
+
+
+class Region(dict):
+    def __init__(self, name, region_id):
+        self._name = name
+        self._region_id = region_id
+        self = {}
+
+    @property
+    def name(self):
+        """The name of this region."""
+        return self._name
+
+    def has_visited(self, char):
+        """True if given character has visited this region at least once."""
+        return self._region_id in char.data["regions.visited"]
+
 
 class Location:
-    def __init__(self, name="", sublocations):
+    def __init__(self, name="", region, sublocations=(), parent_location=None):
         self._name =  name
-        self._sublocations = ()
+        self._region = region
+        self._parent_location = parent_location
+        self._sublocations = sublocations
 
     @property
     def _locdata(self):
-        return ".".join("locdata", self._name) 
+        return ".".join("locdata", self._name)
+
+    @property
+    def sublocations(self):
+        return self._sublocations
+
+    def visited_sublocations(self, char):
+        """Return an iterator of sublocations of this location (if any) that have
+        been visited by the given character at least once."""
+        return iter(i for i in self._sublocations if self.times_visited(char) >= 1)
+
+    def unvisited_sublocations(self, char):
+        """Return an iterator of sublocations of this location (if any) that have
+        never been visited by the given character."""
+        return iter(i for i in self._sublocations if self.times_visited(char) == 0)
+
+    def is_sublocation(self):
+        """True if this location is located within a parent location."""
+        return self._parent_location is not None
 
     def times_visited(self, char):
         """The number of times a given char has visited this location."""
@@ -46,8 +90,10 @@ class Location:
     def _on_first_visit(self, *chars):
         if chars:
             for i in chars:
-                try:    c.data[_locdata]update_visit_data
+                try:    c.data[_locdata].update_visit_data
                 except: c.data[_locdata] = LocationData(1)
+                # Note: visited regions data is stored as a set
+                c.data["regions.visited"].add(self._region._region_id
             self.on_first_visit(chars)
 
     def on_first_visit(self, *chars):
@@ -55,7 +101,7 @@ class Location:
 
     def on_visit(self, chars):
         return
-    
+
 
 class LocationData:
     def __init__(self, times_visited=0, timeout=0):
@@ -65,3 +111,15 @@ class LocationData:
 
     def update_visit_data(self):
         if self._timeout <= 0: self._visited += 1
+
+
+class CurrentLocation:
+    def __init__(self, location):
+        self._location = location
+
+    def __str__(self): return self.name
+
+    @property
+    def region(self):
+        """The Region of the current location."""
+        return self._location._region
