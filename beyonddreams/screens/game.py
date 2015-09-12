@@ -17,6 +17,7 @@
 
 from screen import BDScreen
 
+
 class Game(BDScreen):
     _name = "game"
     _writable = False
