@@ -54,6 +54,7 @@ class StatusEffects(_B):
     mental_status =     ZERO
     blind =             ZERO
     drunk =             ZERO
+    hallucinate =       ZERO
     dumb =              ZERO
     confusion =         ZERO
 
@@ -88,16 +89,19 @@ class PEffects(_B):
     reduces =           ()  # reduces dmg from
     increases =         ()
 
+    # Elem
     dark =              ZERO
     light =             ZERO
-    psychic =           ZERO
-    spirit =            ZERO
-    acid =              ZERO
     fire =              ZERO
     ice =               ZERO
     wind =              ZERO
     water =             ZERO
     electric =          ZERO
+    
+    # Non-Elem
+    psychic =           ZERO
+    spirit =            ZERO
+    acid =              ZERO
 
     physical =          ZERO
     non_physical =      ZERO
