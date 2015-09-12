@@ -46,6 +46,7 @@ class CharName(tuple):
     nick = property(_get_nick, _set_nick)
 
 
+
 class CharData(BDDataDict):
     __slots__ = "_char", "_base"
     def __init__(self, char, base=""):
@@ -60,16 +61,28 @@ class CharData(BDDataDict):
             "wallet":       None,
             "stats":        Stats(self),
             "resistances":  None,
+            "location":     None,
             }
+        if self._char.is_npc:
+            from .game.location import NPCCharLocData
+            self["location"] = NPCCharLocData
+        else:
+            from .game.location import CharLocData
+            self["location" = CharLocData
 
 
 class Char:
     """Base class for character objects."""
     _ident = CHAR_VIDENT
+    _is_npc = False
     _type = ""
     __slots__ = "_chardata"
     def __init__(self, base):
         self._chardata =    CharData(self, base)
+
+    @property
+    def location(self):
+        return self._chardata["location"]
 
     @property
     def name(self):

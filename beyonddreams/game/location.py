@@ -48,10 +48,6 @@ class Location:
         self._sublocations = sublocations
 
     @property
-    def _locdata(self):
-        return ".".join("locdata", self._name)
-
-    @property
     def sublocations(self):
         return self._sublocations
 
@@ -71,7 +67,7 @@ class Location:
 
     def times_visited(self, char):
         """The number of times a given char has visited this location."""
-        try: return char.data[self._locdata].visited
+        try: return char.location[self.name].visited
         except: return 0    # never visited
 
 
@@ -90,8 +86,8 @@ class Location:
     def _on_first_visit(self, *chars):
         if chars:
             for i in chars:
-                try:    c.data[_locdata].update_visit_data
-                except: c.data[_locdata] = LocationData(1)
+                try:    i.location[self.name].update_visit_data
+                except: i.location[self.name] = LocationData(1)
                 # Note: visited regions data is stored as a set
                 c.data["regions.visited"].add(self._region._region_id
             self.on_first_visit(chars)
@@ -123,3 +119,22 @@ class CurrentLocation:
     def region(self):
         """The Region of the current location."""
         return self._location._region
+
+
+class _CharLocDataBase:
+    def __init__(self, char):
+        self._current = CurrentLocation()
+
+
+class CharLocData(dict):
+    def __init__(self, char):
+        self._char = char
+        self._current = CurrentLocation()
+        self = {
+            "regions.visited":  set()
+            }
+
+
+class NPCCharLocData(_CharLocDataBase):
+    pass
+
