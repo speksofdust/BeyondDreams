@@ -42,59 +42,57 @@ class Region(dict):
 
 
 class Location:
-    def __init__(self, name="", region, sublocations=(), parentloc=None):
+    def __init__(self, name="", region, sublocs=(), parentloc=None):
         self._name =  name
         self._region = region
-        self._parentloc = parentloc
-        self._sublocations = sublocations
+        self._parent = parentloc
+        self._sublocs = sublocs
 
     # ---- read/write ---- #
     # str to obj
     def _str_to_subloc(self, *s):
         # returns a location object from separated strings
         # can go multiple layers deep (subloc --> subsubloc, etc.)
-        if len(s) > 1: return self._get_subloc_from_str(self._sublocations[s[0]])
-        return self._sublocations[s[0]]
+        if len(s) > 1: return self._get_subloc_from_str(self._sublocs[s[0]])
+        return self._sublocs[s[0]]
 
     # obj to str
-    def _fullparentloc(self):
-        if self._parentloc is None: return ""
-        elif self._parentloc._parentloc is None:
-            return self._parentloc._name
+    def _parent_path(self):
+        if self._parent is None: return ""
+        elif self._parent._parent is None:
+            return self._parent._name
         else:
-            return "-".join(self._parentloc._fullparentloc(),
-                self._parentloc._name)
-
-    def _keyname(self):
-        return "-".join(self._region, self._fullparentloc())
+            return "-".join(self._parent._parent_path(),
+                self._parent._name)
 
     @property
-    def _fullkeyname(self):
+    def _full_parent_path(self):
         """The full key name as a string. Used when writing data to disk."""
-        return "".join("loc.", self._keyname())
+        return "loc-{}-{}".format(self._region, self._parent_path)
     # -------------------------------------------------------------------- #
 
     @property
     def name(self):
+        """The name of this location."""
         return self._name
 
     @property
     def sublocations(self):
-        return self._sublocations
+        return self._sublocs
 
     def visited_sublocations(self, char):
-        """Return an iterator of sublocations of this location (if any) that have
+        """Return an iterator of sublocs of this location (if any) that have
         been visited by the given character at least once."""
-        return iter(i for i in self._sublocations if self.times_visited(char) >= 1)
+        return iter(i for i in self._sublocs if self.times_visited(char) >= 1)
 
     def unvisited_sublocations(self, char):
-        """Return an iterator of sublocations of this location (if any) that have
+        """Return an iterator of sublocs of this location (if any) that have
         never been visited by the given character."""
-        return iter(i for i in self._sublocations if self.times_visited(char) == 0)
+        return iter(i for i in self._sublocs if self.times_visited(char) == 0)
 
     def is_sublocation(self):
         """True if this location is located within a parent location."""
-        return self._parentloc is not None
+        return self._parent is not None
 
     def times_visited(self, char):
         """The number of times a given char has visited this location."""
@@ -158,12 +156,11 @@ class _CharLocDataBase:
 
     def _curloc_to_str(self):
         # string from loc obj -- writing
-        return self._current._fullkeyname
+        return self._current._full_parent_path
 
     def _curloc_from_str(s):
         # loc obj from string loc -- reading
         n = iter(s[3:].split("-"))
-
         if len(n) >= 3:
             # region --> location --> subloc --> (subsubloc --> etc. as needed)
             return regions[next(n)][next(n)]._str_to_subloc
