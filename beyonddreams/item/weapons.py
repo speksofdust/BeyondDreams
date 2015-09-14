@@ -151,6 +151,8 @@ class WeaponTypeDict(ItemDict):
             "axe":              0,
             "spear":            0,
             "javelin":          0,
+            "halberd":          0,
+            "pike":             0,
             }
 
     def bludgeon(self):
