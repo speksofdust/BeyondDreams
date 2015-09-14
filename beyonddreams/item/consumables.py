@@ -20,7 +20,6 @@ from item import regitem
 from item import ItemDict
 
 
-
 class ConsumableTypeDict(ItemDict):
     CATTYPE = "consumable"
     __slots__ = ItemDict.__slots__
@@ -91,6 +90,10 @@ class Powder(_DIng):
     _typname =  "powder"
 
 
+class Seed(_EDing):
+    _typename = "seed"
+
+
 class Flower(_EDIng):
     _typename = "flower"
 
@@ -111,8 +114,13 @@ class Mushroom(_EDIng):
     _typename = "mushroom"
 
 
+class Fruit(_EDIng):
+    _typename = "fruit"
+
+
 # ---- Wet Ingredient -------------------------------------------------------- #
 class Gel(_WIng):
+    _typename = "gel"
     edible =    1
 
 
@@ -144,9 +152,24 @@ class Tooth(ConsumableType):
     _typename = "tooth"
 
 
+class Bone(ConsumableType):
+    _sc =       (ConsumableType,)
+    _typename = "bone"
+
+
 class String(ConsumableType):
     _sc =       (ConsumableType,)
     _typename = "string"
+
+
+class Button(ConsumableType):
+    _sc =       (ConsumableType,)
+    _typename = "button"
+
+
+class Ribbon(ConsumableType):
+    _sc =       (ConsumableType,)
+    _typename = "ribbon"
 
 
 class Rock(ConsumableType):
@@ -157,5 +180,16 @@ class Rock(ConsumableType):
 class Gem(ConsumableType):
     _sc =       (ConsumableType,)
     _typename = "gem"
+
+
+class Ingot(ConsumableType):
+    _sc =       (ConsumableType,)
+    _typename = "ingot"
+
+
+class Cloth(ConsumableType):
+    _sc =       (ConsumableType,)
+    _typename = "cloth"
+
 
 

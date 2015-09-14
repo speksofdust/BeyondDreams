@@ -20,6 +20,7 @@ from item import regitem
 from item import ItemDict
 
 
+
 class WearableTypeDict(ItemDict):
     CATTYPE = "wearable"
     __slots__ = ItemDict.__slots__
@@ -28,44 +29,69 @@ class WearableTypeDict(ItemDict):
 class WearableType(ItemType):
     """Base class for wearable item types."""
     CATTYPE =       "wearable"
+    _classifiers =  ()
     _sc =           (ItemType, )
     equipslots =    _typename
 
 
-class Jewelry(WearableType):
-    _sc =           (WearableType, )
-    _inctags =      "jewelry"
 
-
-class _WTJ(Jewelry):
-    # wearable type jewelry
-    # Helper class for Jewlery
-    _sc =           (Jewelry, )
-
-
-class Clothing(WearableType):
+class _Clothing(WearableType):
     _sc =           (WearableType, )
     _inctags =      "clothing"
     baseres =       BaseRes()
     basestats =     BaseStats()
 
 
-class _WTC(Clothing):
-    # wearable type clothing
-    # Helper class for Clothing
+class _Accessories(WearableType):
+    _sc =           (WearableType,)
+    _inctags =      "accessories"
+
+
+class _Jewelry(Accessories):
+    _sc =           (_Accessories,)
+    _inctags =      "jewelry"
+
+
+# Transitional *helper* classes -- subclasses inherit from these so we dont
+#   have to enter _sc values on every subclass
+class Clothing(_Clothing):
     _sc =           (Clothing, )
+
+class Accessories(_Accessories):
+    _sc =           (Accessories,)
+
+class Jewelry(_Jewelry):
+    _sc =           (Jewelry,)
+
+
+# ---- Jewelry Base Types ---------------------------------------------------- #
+
 
 
 # ---- Clothing Base Types --------------------------------------------------- #
-class Tops(_WTC):
+class HeadWear(Clothing):
+    _inctags =      "headwear"
+
+
+class Footwear(Clothing):
+    _surface_grip_mult =    1   # slick surface grip multiplier
+    #_kick_dmg_mult =        1   # kick damage multiplier
+
+
+class Tops(Clothing):
     _inctags =      "tops"
 
 
-class Bottoms(_WTC):
+class Bottoms(Clothing):
     _inctags =    "bottoms"
 
 
-class Undies(_WTC):
+class BodySuit(Clothing):
+    _inctags =  "bodysuit"
+
+
+# ---- Undies Base Types ---- #
+class Undies(Clothing):
     _inctags =    "undies"
     _bwt =          0.2
 
@@ -78,11 +104,34 @@ class UndiesTops(Undies):
     _sc =           Undies, Tops
 
 
-class Footwear(_WTC):
-    _surface_grip_mult =    1   # slick surface grip multiplier
-    #_kick_dmg_mult =        1   # kick damage multiplier
+# ---- Swimwear Base Types ---- #
+class Swimwear(Clothing):
+    _inctags =  "swimwear"
+    _bwt =      0.2
 
 
+class SwimTop(Tops):
+    _sc = Swimwear, Tops
+
+
+class SwimBottom(Bottoms):
+    _sc = Swimwear, Bottoms
+
+
+# ---- Armor Base Types ---- #
+class Armor(Clothing):
+    _inctags = "armor"
+
+
+class ArmorTop(Tops):
+    _sc =   Armor, Tops
+
+
+class ArmorBottoms(Bottoms):
+    _sc =   Armor, Bottoms
+
+
+# ---- Clothing Sub Types ---------------------------------------------------- #
 class Shoe(Footwear):
     _sc =       (Footwear, )
     _bwt =      0.5
@@ -93,8 +142,7 @@ class Boot(Footwear):
     _bwt =      0.7
 
 
-# ---- Clothing Sub Types ---------------------------------------------------- #
-class Glove(_WTC):
+class Glove(Clothing):
     # increases punch damage
     # may increase weapon grip
     _typename =         "glove"
@@ -102,12 +150,16 @@ class Glove(_WTC):
     #_punch_dmg_mult =   1   # punch damage multplier
 
 
-class Sock(_WTC):
+class Sock(Clothing):
     _typename =     "sock"
 
 
 class Shirt(Tops):
     _typename =     "shirt"
+
+
+class Bustier(Tops):
+    _typename =     "bustier"
 
 
 class Dress(Tops):
@@ -118,8 +170,85 @@ class Skirt(Bottoms):
     _typename =     "skirt"
 
 
+class Loincloth(Bottoms):
+    _typename =     "loincloth"
+
+
 class Pants(Bottoms):
     _typename =     "pants"
 
 
+class CatSuit(BodySuit):
+    _sc =       BodySuit
 
+
+# ---- Swimwear -------------------------------------------------------------- #
+class _Bikini:
+    _inctags = "bikini"
+
+
+class BikiniTop(SwimwearTop, _Bikini):
+    _typename = "bikini top"
+
+
+class BikiniBottom(SwimwearBottom, _Bikini):
+    _typename = "bikini bottom"
+
+
+class BikiniThong(SwimwearBottoms, _Bikini):
+    _typename = "bikini thong"
+
+
+# ---- Armor (min +1 def) ---------------------------------------------------- #
+class Gauntlet(Armor, Glove):
+    _typename = "gauntlet"
+
+
+class Curiass(ArmorTop):
+    _typename = "curiass"
+
+
+class Breastplate(ArmorTop):
+    _typename = "curaiss"
+
+
+class Helm(Armor, Headwear):
+    _typename = "helm"
+
+
+# ---- Jewelry --------------------------------------------------------------- #
+class Hairpin(Jewelry):
+    _typename = "hairpin"
+
+
+class Bangle(Jewelry):
+    _typename = "bangle"
+    equipslots = "ankle", "wrist"
+
+
+class Bracelet(Jewelry):
+    _typename = "bracelet"
+    equipslots = "ankle", "wrist"
+
+
+class Necklace(Jewelry):
+    _typename = "necklace"
+    _inctags =  "neckwear"
+
+
+class Choker(Jewelry):
+    _typename = "choker"
+    _inctags =  "neckwear"
+
+
+class Ring(Jewelry):
+    _typename = "ring"
+
+
+# ---- Accessories ----------------------------------------------------------- #
+class Glasses(Accessory):
+    _typename = "glasses"
+
+
+class Belt(Accessory):
+    _typename = "belt"
