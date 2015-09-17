@@ -15,11 +15,10 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+
 from item import ItemType
-from item import regitem
 from item import ItemDict
-
-
+#from item import regitem
 
 class WearableTypeDict(ItemDict):
     CATTYPE = "wearable"
@@ -32,7 +31,6 @@ class WearableType(ItemType):
     _classifiers =  ()
     _sc =           (ItemType, )
     equipslots =    _typename
-
 
 
 class _Clothing(WearableType):
@@ -202,6 +200,7 @@ class BikiniThong(SwimwearBottoms, _Bikini):
 # ---- Armor (min +1 def) ---------------------------------------------------- #
 class Gauntlet(Armor, Glove):
     _typename = "gauntlet"
+    _typedesc = """An armored glove."""
 
 
 class Curiass(ArmorTop):
@@ -209,7 +208,7 @@ class Curiass(ArmorTop):
 
 
 class Breastplate(ArmorTop):
-    _typename = "curaiss"
+    _typename = "breastplate"
 
 
 class Helm(Armor, Headwear):
@@ -239,10 +238,12 @@ class Necklace(Jewelry):
 class Choker(Jewelry):
     _typename = "choker"
     _inctags =  "neckwear"
+    _typedesc = """Tight fitting jewelry warn around the neck."""
 
 
 class Ring(Jewelry):
     _typename = "ring"
+    _typedesc = """A piece of jewelry to be worn on a finger or toe."""
 
 
 # ---- Accessories ----------------------------------------------------------- #
@@ -252,3 +253,9 @@ class Glasses(Accessory):
 
 class Belt(Accessory):
     _typename = "belt"
+
+
+class Collar(Accessory):
+    _typename = "collar"
+    _inctags =  "neckwear"
+
