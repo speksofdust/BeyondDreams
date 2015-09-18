@@ -15,115 +15,125 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-__all__ = ()
-ZERO = 0 # cache 0 to reduce ram usage a here a bit (Effects gets used alot)
+ZERO = 0 # cache 0 to reduce ram usage a here a bit
 
-class _B:
+class _B(dict)
     typename = ""
-    def __init__(self):
+    def __init__(self, **kwargs):
         pass
 
-    # HACK -- Allow cross referencing when using dict keys with "-" chars
-    def __getattr__(self, i):
-        if "-" in i: return getattr(self, i.replace("-", "_")
-        else: return getattr(i)
+    def immunities(self):
+        """Return an iterator of immunities."""
+        return iter(i for i in self.keys() if self[i] == "immune")
 
-    def __setattr__(self, i, v):
-        if "-" in i: setattr(self, i.replace("-", "_"), v)
-        else: setattr(self, i, v)
+    def altered(self):
+        """Return an iterator of altered items where each item is a tuple as
+        (name, value). Includes immunities"""
+        for i in self.keys():
+            if self[i] != 0: yield (i, self[i])
 
-    def _iteritems(self):
-        return
+    def increases(self):
+        """Return an iterator of items which have an increase where each item
+        is a tuple as (name, value)."""
+        for i in self.keys():
+            if self[i] > 0: yield (i, self[i])
+
+    def decreases(self):
+        """Return an iterator of items which have a decrease where each item
+        is a tuple as (name, value)."""
+        for i in self.keys():
+            if self[i] < 0: yield (i, self[i])
+
+
+class _Dummy:
+    def immunities(self):   return
+    def altered(self):      return
+    def increases(self):    return
+    def decreases(self):    return
 
 
 class StatusEffects(_B):
     typename = "statuseffects"
     # StatusEffects
-    prevents =          ()
-    causes =            ()
-    cures =             ()
+    def __init__(self, **kwargs):
+        self = {
+            # physical types
+            "frostbite" =         ZERO,
+            "burn" =              ZERO,
+            "numb" =              ZERO,
+            "stun" =              ZERO,
+            "poisoning" =         ZERO,
+            "bleed" =             ZERO,
 
-    physical_status =   ZERO
-    frostbite =         ZERO
-    burn =              ZERO
-    numb =              ZERO
-    stun =              ZERO
-    poisoning =         ZERO
-    bleed =             ZERO
+            # mental types
+            "blind" =             ZERO,
+            "drunk" =             ZERO,
+            "dumb" =              ZERO,
+            "confusion" =         ZERO,
 
-    mental_status =     ZERO
-    blind =             ZERO
-    drunk =             ZERO
-    hallucinate =       ZERO
-    dumb =              ZERO
-    confusion =         ZERO
+            # transform types
+            "zombie" =            ZERO,
+            "mutagen" =           ZERO,
 
-    transform_status =  ZERO
-    zombie =            ZERO
-    mutagen =           ZERO
-
-    def __bool__(self):
-        return any(i for i in self.prevents, self.causes, self.cures)
-
-    def __eq__(self, x):
-        if isinstance(x, StatusEffects):
-            if self._iteritems != x._iteritems: return False
-            for i in self._iteritems:
-                if any(getattr(self, j) != getattr(x, j) for j in i):
-                    return False
-
-    def __ne__(self, x):
-        if isinstance(x, StatusEffects):
-            if self._iteritems != x._iteritems: return True
-            for i in self._iteritems:
-                if any(getattr(self, j) != getattr(x, j) for j in i):
-                    return True
-
-    def _iteritems(self):
-        return iter((self.prevents, self.causes, self.cures))
+            # Bonuses -- Added to all qualifing type
+            #   eg: mental_status adds to any mental_status type
+            "physical_status" =   ZERO,
+            "mental_status" =     ZERO,
+            "transform_status" =  ZERO,
+            }
+        for i in kwargs:    self[i] = kwargs[i]
 
 
-class PEffects(_B):
-    typename = "peffects"
+class AddedEffects(_B):
+    typename = "addedeffects"
     # Physical/Non-Physical
     reduces =           ()  # reduces dmg from
-    increases =         ()
+    def __init__(self, **kwargs):
+        self = {
+            "dark" =              ZERO,
+            "light" =             ZERO,
+            "psychic" =           ZERO,
+            "spirit" =            ZERO,
+            "acid" =              ZERO,
+            "fire" =              ZERO,
+            "ice" =               ZERO,
+            "wind" =              ZERO,
+            "water" =             ZERO,
+            "electric" =          ZERO,
 
-    # Elem
-    dark =              ZERO
-    light =             ZERO
-    fire =              ZERO
-    ice =               ZERO
-    wind =              ZERO
-    water =             ZERO
-    electric =          ZERO
-    
-    # Non-Elem
-    psychic =           ZERO
-    spirit =            ZERO
-    acid =              ZERO
+            # Bonuses -- Added to all qualifing type
+            #   eg: physical adds to all physical types
+            "physical" =          ZERO,
+            "non-physical" =      ZERO,
+            "non-elemental" =     ZERO,
+            "elemental" =         ZERO,
+            }
+        for i in kwargs:    self[i] = kwargs[i]
 
-    physical =          ZERO
-    non_physical =      ZERO
-    non_elemental =     ZERO
-    elemental =         ZERO
 
-    def __bool__(self):
-        return any(i for i in self.reduces, self.increases)
+class DummySE(StatusEffects, _Dummy):
+    pass
 
-    def __eq__(self, x):
-        if isinstance(x, PEffects):
-            if self._iteritems != x._iteritems: return False
-            for i in self._iteritems:
-                if any(getattr(self, j) != getattr(x, j) for j in i):
-                    return False
+class DummyAE(AddedEffects, _Dummy):
+    pass
 
-    def __ne__(self, x):
-        if isinstance(x, PEffects):
-            if self._iteritems != x._iteritems: return True
-            for i in self._iteritems:
-                if any(getattr(self, j) != getattr(x, j) for j in i):
-                    return True
+# cache dummy objects for items, etc. that don't alter any values
+DUMMY_SE = DummySE()
+DUMMY_AE = DummyAE()
 
-    def _iteritems(self):
-        return iter((self.reduces, self.increases))
+
+# handlers to choose whether or not the dummy should be used
+def get_seffects(cls, **kwargs):
+    if kwargs: return AddedEffects(kwargs)
+    else:
+        global DUMMY_SE
+        return DUMMY_SE
+
+def get_aeffects(cls, **kwargs):
+    if kwargs: return AddedEffects(kwargs)
+    else:
+        global DUMMY_AE
+        return DUMMY_AE
+
+
+__all__ = ("DUMMYSE", "DUMMYAE", "get_aeffects", "get_seffects")
