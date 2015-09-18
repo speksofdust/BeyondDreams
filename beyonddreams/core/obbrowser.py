@@ -89,18 +89,21 @@ class BDOBrowser(list, BDOBrowserCommon):
         return self._searchfunc
 
     def get_menuitems(self):
-        if len(self._selection) == 0:   return self._menuitems_nonesel
-        elif len(self._selection) == 1: return self._menuitems_onesel
-        else: return self._menuitems_multsel
+        from itertools import chain
+        if len(self._selection) == 0:
+            return iter(self._menuitems_nonesel())
+        elif len(self._selection) == 1:
+            return chain.from_iterable(self._menuitems_onesel(),
+                self._selected[0]._menuitems_onesel())
+        else:
+            return chain.from_iterable(self._menuitems_mulsel(),
+                self._selected[0]._menuitems_mulsel())
 
-    def _menuitems_nonsel(self):
-        yield
+    def _menuitems_nonsel(self): yield
 
-    def _menuitems_onesel(self):
-        yield
+    def _menuitems_onesel(self): yield
 
-    def _menuitems_mulsel(self):
-        yield
+    def _menuitems_mulsel(self): yield
 
 
 class BDOBrowserItem(BDOBrowserCommon):
@@ -116,3 +119,6 @@ class BDOBrowserItem(BDOBrowserCommon):
     def _get_visible(self): return self._visible
     def _set_visible(self, x): self._visible = bool(x)
     visible = property(_get_visible, _set_visible)
+
+    def _menuitems_onesel(self): yield
+    def _menuitems_mulsel(self): yield
