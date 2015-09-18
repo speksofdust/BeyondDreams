@@ -16,10 +16,11 @@
 # ---------------------------------------------------------------------------- #
 
 
-__all__ = 'base_def_stats_mult', 'base_stats_mult'
+__all__ = ('stat_def_basemult', 'status_basemult', 'stats_basemult',
+    'stats_abs_range')
 
 # Multipliers
-base_stat_def_mult = {
+stat_def_basemult = {
     # Elemental
     'water':    1,
     'wind':     1,
@@ -38,7 +39,7 @@ base_stat_def_mult = {
     'acid':     1,
 }
 
-base_status_mult = {
+status_basemult = {
     'burn':         1,
     'frostbite':    1,
     'poisoned':     1,
@@ -46,38 +47,66 @@ base_status_mult = {
     'blind':        1,
     'numb':         1,
     'zombie':       1,
-
 }
 
-
-base_stats_mult = {
+stats_basemult = {
     'intellect':    1,
     'stamina':      1,
     'strength':     1,
     'willpower':    1,
     'luck':         1,
-
     'focus':        1,
 }
 
+class StatsAbsRange(dict):
+    def __init__(self, items):
+        self = items
+
+    def get_clamped(self, name, val):
+        if self[name][0] <= val: return self[name][0]
+        elif self[name][1] >= val: return self[name][1]
+        else: return val
+
+
 # Absolute minimum and maximum for stats
-stats_abs_range = {
+stats_abs_range = StatsAbsRange(
+    {
     # Levels change with equip, skill, etc. changes.
-    'intellect':    (1, 200),
-    'stamina':      (0, 200),
-    'strength':     (1, 200),
-    'willpower':    (0, 200),
-    'agility':      (1, 100),
-    'luck':         (-1000, 1000),
-    'karma':        (-1000, 1000),
+    'phys-stamina':     (0, 200),
+    'mental-stamina':   (0, 200),
+    'intellect':        (1, 200),
+    'strength':         (1, 200),
+    'willpower':        (0, 200),
+    'agility':          (1, 100),
+    'luck':             (-1000, 1000),
+
+    # hidden stats
+    'karma':            (-1000, 1000),
+    'adrenaline':       (0, 100),
+    'rage':             (-100, 100),
 
     # Frequently Varying Levels
     'focus':            (0, 200),
     'phys-energy':      (0, 200),
     'mental-energy':    (0, 200),
     'health':           (0, 200),
-}
+    })
 
-# stamina - determines phy-energy loss rate
-# strength - maximum current strength value possible (real is calculated with
-#   current physical energy)
+
+# rage - > 0 increases strength but uses more phys-energy < 0 does the opposite
+
+def calc_energy(c, energy):
+    # energy + (adrenaline * 0.02) + (rage * 0.02)
+    return  (c[stats][energy] + (c[stats]['adrenaline'] * 0.02) +
+        (c[stats]['rage'] * 0.02))
+
+def calc_focus(c):
+    # focus * (mental-energy + (adrenaline * 0.02) + (rage * 0.02))
+    return stats_abs_range.clamped('focus',
+        c[stats]['focus'] * calc_energy(c, 'mental-energy'))
+
+def calc_strength(c):
+    # strength * (phys-energy + (adrenaline * 0.02) + (rage * 0.02))
+    return stats_abs_range.clamped('strength',
+        c[stats]["strength"] * calc_energy(c, "phys-energy"))
+
