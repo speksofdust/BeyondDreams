@@ -16,39 +16,39 @@
 # ---------------------------------------------------------------------------- #
 
 
-from core.obbrowser import BDObjectBrowserSearch
-from core.obbrowser import BDObjectBrowserSelection
-from core.obbrowser import BDObjectBrowser
-from core.obbrowser import BDObjectBrowserItem
-from core.obbrowser import BDObjectBrowserAutoHide
+from core.obbrowser import BDOBrowserSearch
+from core.obbrowser import BDOBrowserSelection
+from core.obbrowser import BDOBrowser
+from core.obbrowser import BDOBrowserItem
+from core.obbrowser import BDOBrowserAutoHide
 
 
-class ItemBrowserSearch(BDObjectBrowserSearch):
+class ItemBrowserSearch(BDOBrowserSearch):
     def __init__(self, browser):
-        BDObjectBrowserSearch.__init__(browser=browser)
+        BDOBrowserSearch.__init__(browser=browser)
 
 
-class ItemBrowserSelection(BDObjectBrowserSelection):
+class ItemBrowserSelection(BDOBrowserSelection):
     _browsertype = "item"
-    __slots__ = BDObjectBrowserSelection.__slots__
+    __slots__ = BDOBrowserSelection.__slots__
     def __init__(self):
-        BDObjectBrowserSelection.__init__(self, browser=itembrowser):
+        BDOBrowserSelection.__init__(self, browser=itembrowser):
 
 
-class ItemBrowserItem(BDObjectBrowserItem):
+class ItemBrowserItem(BDOBrowserItem):
     _browsertype = "item"
-    __slots__ = BDObjectBrowserItem.__slots__
+    __slots__ = BDOBrowserItem.__slots__
 
 
-class ItemBrowserAutoHide(BDObjectBrowserAutoHide):
+class ItemBrowserAutoHide(BDOBrowserAutoHide):
     pass
 
 
-class ItemBrowser(BDObjectBrowser):
+class ItemBrowser(BDOBrowser):
     _browsertype = "item"
-    __slots__ = BDObjectBrowser.__slots__
+    __slots__ = BDOBrowser.__slots__
     def __init__(self):
-        BDObjectBrowser.__init__(self, SelectedCls=ItemBrowserSelection,
+        BDOBrowser.__init__(self, SelectedCls=ItemBrowserSelection,
             SearchFuncCls=ItemBrowserSearch)
 
     def _menuitems_nonsel(self):

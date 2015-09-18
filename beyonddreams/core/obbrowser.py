@@ -18,18 +18,18 @@
 __all__ = ()
 
 
-class BDObjectBrowserCommon:
+class BDOBrowserCommon:
     _browsertype = ""
     __slots__ = ()
 
 
-class BDObjectBrowserSearch(BDObjectBrowserCommon):
+class BDOBrowserSearch(BDBrowserCommon):
     _browsertype = ""
     def __init__(self, browser):
         self._browser =         browser
 
 
-class BDObjectBrowserSelection(list, BDObjectBrowserCommon):
+class BDOBrowserSelection(list, BDOBrowserCommon):
     __slots__ = ("_browser")
     def __init__(self, browser):
         self._browser = browser
@@ -53,12 +53,12 @@ class BDObjectBrowserSelection(list, BDObjectBrowserCommon):
 def _null(): raise NotImplementedError
 
 
-class BDObjectBrowserAutoHide:
+class BDOBrowserAutoHide:
     def __init__(self):
         self = {}
 
 
-class BDObjectBrowser(list, BDObjectBrowserCommon):
+class BDOBrowser(list, BDOBrowserCommon):
     __slots__ = ("_selected", "_searchfunc")
     def __init__(self, SelectedCls=None, SearchFuncCls=None):
         self = []
@@ -103,7 +103,7 @@ class BDObjectBrowser(list, BDObjectBrowserCommon):
         yield
 
 
-class BDBrowserItem(BDObjectBrowserCommon):
+class BDOBrowserItem(BDOBrowserCommon):
     __slots__ = "_visible"
     def __init__(self, obj):
         self._obj = obj
