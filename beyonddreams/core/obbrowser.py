@@ -70,8 +70,10 @@ def _null(): raise NotImplementedError
 
 
 class BDOBrowserAutoHide:
+    __slots__ = ("_inctags", "_exctags")
     def __init__(self):
-        self = {}
+        self._inctags = set()
+        self._exctags = set()
 
 
 class BDOBrowser(_BFuncs, BDOBrowserCommon):

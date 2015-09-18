@@ -47,7 +47,7 @@ class ItemBrowserItem(BDOBrowserItem):
 
 
 class ItemBrowserAutoHide(BDOBrowserAutoHide):
-    pass
+    __slots__ = BDOBrowserAutoHide.__slots__
 
 
 class ItemBrowser(BDOBrowser):
