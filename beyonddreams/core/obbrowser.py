@@ -29,7 +29,23 @@ class BDOBrowserSearch(BDBrowserCommon):
         self._browser =         browser
 
 
-class BDOBrowserSelection(list, BDOBrowserCommon):
+class _BFuncs(list):
+    # Shared by BDOBrowser and BDOBrowserSelection
+    __slots__ = ()
+
+    # invalidate some list methods
+    def __imul__(self): raise NotImplementedError
+
+    def hidden(self):
+        """Return an iterator of all hidden items."""
+        return iter(i for i in self if i._visible == False)
+
+    def visible(self):
+        """Return an iterator of all visible items."""
+        return iter(i for i in self if i._visible)
+
+
+class BDOBrowserSelection(_BFuncs, BDOBrowserCommon):
     __slots__ = ("_browser")
     def __init__(self, browser):
         self._browser = browser
@@ -58,7 +74,7 @@ class BDOBrowserAutoHide:
         self = {}
 
 
-class BDOBrowser(list, BDOBrowserCommon):
+class BDOBrowser(_BFuncs, BDOBrowserCommon):
     __slots__ = ("_selected", "_searchfunc")
     def __init__(self, SelectedCls=None, SearchFuncCls=None):
         self = []
@@ -69,6 +85,9 @@ class BDOBrowser(list, BDOBrowserCommon):
 
         self._autohide = None
 
+    # Invalidate some list methods (inherited by _BFuncs)
+    def clear(self): raise NotImplementedError
+
     @property
     def autohide_types(self):
         return self._autohide
@@ -77,27 +96,23 @@ class BDOBrowser(list, BDOBrowserCommon):
     def selected(self):
         return self._selection
 
-    def hidden(self):
-        """Return an iterator of all hidden items."""
-        return iter(i for i in self if i._visible == False)
-
-    def visible(self):
-        """Return an iterator of all visible items."""
-        return iter(i for i in self if i._visible)
-
     def search(self):
         return self._searchfunc
 
     def get_menuitems(self):
-        from itertools import chain
+        if any(i for i in self.hidden()): yield "unhide all"
+        for i in self._menuitems_anysel(): yield i
         if len(self._selection) == 0:
-            return iter(self._menuitems_nonesel())
+            for i in self._menuitems_nonesel(): yield i
         elif len(self._selection) == 1:
-            return chain.from_iterable(self._menuitems_onesel(),
-                self._selected[0]._menuitems_onesel())
+            for i in self._menuitems_onesel(): yield i
+            for i in self._selected.visible()[0]_menuitems_onesel(): yield i
         else:
-            return chain.from_iterable(self._menuitems_mulsel(),
-                self._selected[0]._menuitems_mulsel())
+            for i in self._menuitems_mulsel(): yield i
+            for i in self._selected[0].visible()[0]_menuitems_mulsel()): yield i
+
+
+    def _menuitems_anysel(self): yield
 
     def _menuitems_nonsel(self): yield
 

@@ -39,6 +39,12 @@ class CharBrowserItem(BDOBrowserItem):
     _browsertype = "char"
     __slots__ = BDOBrowserItem.__slots__
 
+    def _menuitems_onesel(self):
+        yield
+
+    def _menuitems_mulsel(self):
+        yield
+
 
 class CharBrowserAutoHide(BDOBrowserAutoHide):
     pass
@@ -59,7 +65,6 @@ class CharBrowser(BDOBrowser):
 
     def _menuitems_mulsel(self):
         yield
-
 
 
 charbrowser = None
