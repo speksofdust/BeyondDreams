@@ -126,9 +126,10 @@ class Location:
 
 
 class LocationData:
+    __slots__ = "_timeout", "_visited"
     def __init__(self, times_visited=0, timeout=0):
         self._timeout = timeout
-        if times_visited < 0: self._visited = 0
+        if times_visited <= 0: self._visited = 0
         else: self._visited = int(times_visited)
 
     def update_visit_data(self):
@@ -147,7 +148,7 @@ class CurrentLocation:
         return self._location._region
 
 
-class _CharLocDataBase:
+class _CharLocData:
     def __init__(self, char):
         self._current = CurrentLocation()
 
@@ -168,7 +169,7 @@ class _CharLocDataBase:
         return regions[next(n)][next(n)]
 
 
-class CharLocData(dict):
+class CharLocData(_CharLocData, dict):
     def __init__(self, char):
         self._char = char
         self._current = CurrentLocation()
@@ -182,7 +183,12 @@ class CharLocData(dict):
             self[loc.name] = LocationData(1)
         self["regions.visited"].add(self._region._region_id
 
+    def _update_loc_timeout(self, dt):
+        for i in self.values:
+            try: i._timeout - dt
+            except: AttributeError
 
-class NPCCharLocData(_CharLocDataBase):
+
+class NPCCharLocData(_CharLocData):
     pass
 
