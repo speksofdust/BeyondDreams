@@ -16,47 +16,9 @@
 # ---------------------------------------------------------------------------- #
 
 
-__all__ = ('stat_def_basemult', 'status_basemult', 'stats_basemult',
-    'stats_abs_range')
+__all__ = ()
 
-# Multipliers
-stat_def_basemult = {
-    # Elemental
-    'water':    1,
-    'wind':     1,
-    'ice':      1,
-    'elec':     1,
-    'fire':     1,
-    'dark':     1,
-    'light':    1,
 
-    # Non-Elemental
-    'psychic':  1,
-    'spirit':   1,
-    'undead':   1,
-    'radia':    1,
-    'mag':      1,
-    'acid':     1,
-}
-
-status_basemult = {
-    'burn':         1,
-    'frostbite':    1,
-    'poisoned':     1,
-    'drunk':        1,
-    'blind':        1,
-    'numb':         1,
-    'zombie':       1,
-}
-
-stats_basemult = {
-    'intellect':    1,
-    'stamina':      1,
-    'strength':     1,
-    'willpower':    1,
-    'luck':         1,
-    'focus':        1,
-}
 
 class StatsAbsRange(dict):
     def __init__(self, items):
