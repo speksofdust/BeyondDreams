@@ -18,11 +18,37 @@
 """Classes and and functions for reading, writing and storing various types of
 Beyond Dreams data."""
 
+__all__ = ()
+
+def _wd(obj, filename, dirname, comment=""):
+    if obj:
+        import os.path
+        if os.path.isdir(dirname):
+            if os.path.exists(os.path.join(filename, dirname):
+                # TODO
+                raise OSError("File overwriting options are not yet supported.")
+            with open(os.path.join(dirname, filename), 'wb') as f:
+                import datetime
+                lw = datetime.datetime.now()
+                f.write("data-created:{}".format(lw))
+                f.write("data-bdfiletype:{}".format(obj.datatype)
+                if comment: f.write("data-comment:{}".format(comment))
+                return
+    raise TypeError("'obj' contains no writable data or is an invalid Type.")
+
 
 class BDDataDict(dict):
     """Base level dictionary for storing various types of writable data including
     other dictionary types."""
     path_suffix = ""
-    __slots__ = dict.__slots__
+    datatype = ""
+    __slots__ = dict.__slots__ + "_comment"
     def __init__(self):
+        self._comment = ""
         self = {}
+
+    def _get_comment(self): return self._comment
+    def _set_comment(self, c): self._comment = c
+    comment = property(_get_comment, _set_comment,
+        doc="An optional user comment for this data.")
+

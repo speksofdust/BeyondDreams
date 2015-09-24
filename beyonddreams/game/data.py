@@ -15,12 +15,14 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from .core.bddata import BDDataDict
+from .core import bddata
+from bddata import BDDataDict
 
 
 class GamaData(BDDataDict):
     """Storage class for game data."""
     path_suffix = 'savedgames'
+    datatype = "gamedata"
 
     def fmt_filename(name, number):
         return '{}_{}'.format(name, number)
@@ -38,10 +40,5 @@ class GamaData(BDDataDict):
 
     def write(self, filename, dirname, comment=''):
         if self._game._writable:
-            import os.path
-            if os.path.isdir(dirname):
-            # TODO
-            #import datetime
-            #f.write(created = datetime.datetime.now())
-            #f.write(comment = comment)
-            pass
+            bddata._wd(self, filename, dirname, comment)
+
