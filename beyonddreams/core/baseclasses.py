@@ -116,12 +116,3 @@ class BDValueDict(NumDict):
     __slots__ = NumDict.__slots__
 
 
-class BDDataDict(dict):
-    """Base level dictionary for storing various types of writable data including
-    other dictionary types."""
-    path_suffix = ""
-    __slots__ = dict.__slots__
-    def __init__(self):
-        self = {}
-
-

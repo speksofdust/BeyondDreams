@@ -15,7 +15,7 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from .core.baseclasses import BDDataDict
+from .core.bddata import BDDataDict
 
 
 class GamaData(BDDataDict):
