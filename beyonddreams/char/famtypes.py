@@ -76,20 +76,28 @@ class _FamType(FamType, dict):
             "electric":     0,
 
             # Groups
-            "physical":     0,  # any physical
-            "non-physical"  0,  # any non-physical (spirit, psychic, etc.)
-            "elemental":    0,  # any elemental
-            "non-elemental": 0,
-            "transform":    0,
-            "animal-transform": 0,
+            "physical":         0,  # any physical
+            "non-physical"      0,  # any non-physical (spirit, psychic, etc.)
+            "elemental":        0,  # any elemental
+            "non-elemental":    0,  # any non-elemental
+            "transform":        0,  # any transform
+            "animal-transform": 0,  # transform into any animal
             }
-            
+
+    def altered(self):
+        for i in self._immunities: yield i
+        for i in self:
+            if self[i] != 0: yield i
+
+    def unaltered(self):
+        return iter(i for i in self if self[i] == 0)
+
     def immunities(self):
         return iter(self._immunities)
-        
+
     def strengths(self):
         return iter(i for i in self if self[i] > 0)
-        
+
     def weaknesses(self):
         return iter(i for i in self if self[i] < 0)
 
