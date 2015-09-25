@@ -95,13 +95,16 @@ class Wallet(CharAttrib):
 
     @property
     def cash(self):
+        """Access the cash pocket."""
         return self[0]
 
     @property
     def coupons(self):
+        """Access the coupons pocket."""
         return self[1]
 
     @property
     def cards(self):
+        """Access the cards pocket."""
         return self[2]
 
