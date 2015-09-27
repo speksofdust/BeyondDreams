@@ -15,12 +15,12 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from itembrowser import ItemBrowserSearch
-from itembrowser import ItemBrowserSelection
-from itembrowser import ItemBrowserItem
-from itembrowser import ItemBrowser
-from itembrowser import ItemBrowserAutoHide
-
+#from itembrowser import ItemBrowserSearch
+#from itembrowser import ItemBrowserSelection
+#from itembrowser import ItemBrowserItem
+#from itembrowser import ItemBrowser
+#from itembrowser import ItemBrowserAutoHide
+from .char.attribs import CharAttrib
 
 
 class ItemStorage(list):
@@ -32,13 +32,13 @@ class ItemStorage(list):
 
 class ItemStorageChar(ItemStorage, CharAttrib):
     __slots__ = "_char", "_pockets"
-    def __init__(self):
-        self._char = None
+    def __init__(self, char):
+        self._char = char
         self._pockets = ()
 
 
 # ---- Storage Pocket Stuff -------------------------------------------------- #
-class StoragePocket:
+class ItemStoragePocket:
     _pockettype = ""
     def __init__(self, owner):
         self._owner = owner
@@ -55,7 +55,7 @@ class DictTypeStoragePocket(dict, StoragePocket):
 
 class ListTypeStoragePocket(list, StoragePocket):
     pass
-        
+
 
 # ---- Stored Item ----------------------------------------------------------- #
 class StoredItem:

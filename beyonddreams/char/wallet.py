@@ -15,6 +15,9 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+from .item import ItemStorageChar
+from .item import ItemStoragePocket
+
 
 class CardType:
     _typename = "card"
@@ -39,24 +42,6 @@ class Zil(CashType):
     __slots__ = ()
 
 
-class Pocket:
-    _name = ""
-
-
-    @property
-    def name(self):
-        """The name of this pocket."""
-        return self._name
-
-
-class InventoryPocket(Pocket):
-    """Pocket class for inventory objects."""
-
-
-class WalletPocket(Pocket):
-    """Pocket class for wallet objects."""
-
-
 class CashPocketItem:
     _typename = ""
     def __init__(self, value=0):
@@ -68,25 +53,29 @@ class CashPocketItem:
         return self >= sum(needed)
 
 
+class WalletPocket(StoragePocket):
+    """Pocket class for wallet objects."""
+
+
 class CashPocket(WalletPocket):
-    _name = "cash"
+    _pockettype = "cash"
     def __init__(self, zil):
         self = [zil]
 
 
 class CouponPocket(WalletPocket):
-    _name = "coupons"
+    _pockettype = "coupons"
 
 
 class CardPocket(WalletPocket):
-    _name = "cards"
+    _pockettype = "cards"
 
 
-class Wallet(CharAttrib):
+class Wallet(ItemStorageChar):
     _name = "wallet"
     __slots__ = CharAttrib.__slots__ + "_coupons"
-    def __init__(self, chardata, zil=0):
-        self._chardata = chardata
+    def __init__(self, char, zil=0):
+        self._char = char
         self = (
             CashPocket((zil)),
             CouponPocket(),
