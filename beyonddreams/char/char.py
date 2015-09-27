@@ -76,10 +76,33 @@ class Char:
     _ident = CHAR_VIDENT
     _is_npc = False
     _type = ""
-    __slots__ = "_chardata"
-    def __init__(self, base):
+    __slots__ = "_chardata", "_controller", "_owner"
+    def __init__(self, player, base):
+        self._owner =       owner
+        self._player =      owner
         self._chardata =    CharData(self, base)
 
+    @property
+    def owner(self):
+        """The player who owns this character."""
+        return self._owner
+
+    @property
+    def player(self):
+        """The player currently controlling this character."""
+        return self._player
+
+    def owner_is_player(self):
+        """True if the owner of this character is also the one controlling it."""
+        return self._owner == self._player
+
+    def is_local_player(self):
+        """True if this char is controlled by the "player" object
+            on the local machine."""
+        return self._player == session.screen.player
+
+
+    # ---- Chardata access ---- #
     @property
     def location(self):
         return self._chardata["location"]
@@ -112,11 +135,6 @@ class Char:
     def equip(self):
         """This characters equipment."""
         return self._chardata["equip"]
-
-    def is_local_player(self):
-        """True if this char is controlled by the "player" object
-            on the local machine."""
-        return self._player == session.screen.player
 
     # ---- Query ---- #
     @property

@@ -33,10 +33,7 @@ class Pocket(list):
         self._pockettype =  pockettype
         self = list(items)
 
-    def append(self): raise NotImplementedError
-    extend = insert = pop = append
 
-    def __contains__(self, x):  return any(x == (i or i.name) for i in self)
 
     # Note: Pocket x Pocket comparison must compare pockettype
     def __eq__(self, x):
@@ -105,10 +102,31 @@ class Weapons(ListTypeStoragePocket):
     _pockettype = "weapons"
 
 
-class Inventory(ItemStorageChar):
+class StorageType:
+    _storagetype = "storage"
     __slots__ = "_char"
     def __init__(self):
-        self._char = None
+        self = ()
+
+    def _get_autobundle(self):
+        try:
+            return self._char.player.gamedata[
+                "{}-autobundle".format(self._storagetype)]
+        except: return False
+    def _set_autobundle(self, x):
+        self._char.player.gamedata[
+            "{}-autobundle".format(self._storagetype)] = bool(x)
+    autobundle = property(_get_autobundle, _set_autobundle)
+
+    def use_autobundle(self):
+        if self._char._is_npc: return True
+        return self.autobundle
+
+
+class Inventory(ItemStorageChar):
+    _storagetype = "inventory"
+    __slots__ = "_char"
+    def __init__(self):
         self = (
             Pocket(self, CONSUMABLES),
             Pocket(self, WEARABLES),
@@ -136,3 +154,7 @@ class Inventory(ItemStorageChar):
         """Return the total number of items in the inventory."""
         return sum(len(i) for i in iter(self)):
 
+
+
+class Storage()
+    _storagetype = "storage"

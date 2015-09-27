@@ -133,6 +133,8 @@ class Player:
     def __init__(self):
         self._party =   Party()
         self._pid =     0   # always 0 if not in online game
+        self._gamedata = None
+
 
     @property
     def party(self):

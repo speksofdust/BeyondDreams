@@ -54,8 +54,47 @@ class DictTypeStoragePocket(dict, StoragePocket):
     pass
 
 
+def _popped(cls, i):
+    yield cls[i]
+    del cls[i]
+
+def _poppedinsert(cls, i, p):
+    if cls.index(p) <= 0 <= len(cls): cls[p:p] = [_popped(cls, i)]
+
+
 class ListTypeStoragePocket(list, StoragePocket):
-    pass
+
+    def __contains__(self, x):  return any(x == (i.name or i) for i in self)
+
+    def append(self): raise NotImplementedError
+    extend = insert = clear = pop = remove = __delitem__ = __setitem__
+
+
+    def _add_item(item, qty=1):
+        if qty > 0: # prevent negative/0 quantities and other weird stuff
+            if item.is_bundleable:
+                if owner.use_autobundle
+                else:
+                    if qty == 1: self[i] = StoredItemBundled()
+                    else:
+            for i in range(qty): # multiple non-bundable items
+                self[i] = StoredItem()
+
+
+    def move_item(self, item, pos):
+        """Move one item to a new index. (works the same as list.insert"""
+        _poppedinsert(self, item, pos)
+        def down(self):     _poppedinsert(self, item, self.index(i+1))
+        def up(self):       _poppedinsert(self, i, self.index(i-1))
+        def to_end(self):   self[len(self):len(self)] = [_popped(self, i)]
+        def to_top(self):   self[0:0] = self[[_popped(self, i)]
+
+    def swap_item_index(self, a, b):
+        """Swap the indexes of two items."""
+        if isinstance(a, int): a = self.index(a)
+        if isinstance(b, int): tb = b = self.index(b)
+        self[b] = a
+        self[a] = tb
 
 
 # ---- Stored Item ----------------------------------------------------------- #
