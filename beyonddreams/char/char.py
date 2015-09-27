@@ -17,7 +17,7 @@
 
 from .bd import session
 from beyonddreams.core.baseclasses import BDDataDict
-from .vident import CHAR_VIDENT
+from .vident import VIDENT_TYPES
 
 
 class CharName(tuple):
@@ -46,7 +46,6 @@ class CharName(tuple):
     nick = property(_get_nick, _set_nick)
 
 
-
 class CharData(BDDataDict):
     __slots__ = "_char", "_base"
     def __init__(self, char, base=""):
@@ -73,7 +72,7 @@ class CharData(BDDataDict):
 
 class Char:
     """Base class for character objects."""
-    _ident = CHAR_VIDENT
+    _ident = VIDENT_TYPES["char"]
     _is_npc = False
     _type = ""
     __slots__ = "_chardata", "_controller", "_owner"

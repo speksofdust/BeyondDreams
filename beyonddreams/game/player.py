@@ -23,8 +23,7 @@ def indexed_chardict(chars):
 
 from core.baseclasses import BDList
 from core.baseclasses import BBSelectedItemList
-from vident import PARTY_VIDENT
-from vident import PLAYER_VIDENT
+from vident import VIDENT_TYPES
 
 
 class CharRoster(BDList):
@@ -47,7 +46,7 @@ class CharRoster(BDList):
 
 
 class Party(BDSelectedItemList, CharRoster):
-    _ident = PARTY_VIDENT
+    _ident = VIDENT_TYPES["party"]
     MAX_CHARS = 8
     def __init__(self):
         self = []
@@ -128,7 +127,7 @@ class Party(BDSelectedItemList, CharRoster):
 
 
 class Player:
-    _ident = PLAYER_VIDENT
+    _ident = VIDENT_TYPES["player"]
     _is_ai = False
     def __init__(self):
         self._party =   Party()
