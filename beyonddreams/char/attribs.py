@@ -21,24 +21,24 @@ from .. import bd
 class CharAttrib:
     __slots__ = ("_char",)
     """Base class for all character attributes."""
-    def __init__(self, chardata):
-        self._chardata = chardata
+    def __init__(self, char):
+        self._char = char
 
     @property
     def char(self):
         """The char this attribute belongs to."""
-        return self._chardata._char
+        return self._char._char
 
     @property
     def base(self):
         """Defaults for the char which this attribute belongs to."""
-        return self._chardata._base
+        return self._char._base
 
 
 class CharAttribDict(CharAttrib):
     __slots__ = CharAttrib.__slots__ + "_items"
-    def __init__(self, chardata):
-        self._char = chardata
+    def __init__(self, char):
+        self._char = char
         self = {}
 
     def __getitem__(self, i):       return self._items[i]
@@ -75,8 +75,8 @@ class CharAttribSubAttrib:
 
 class Equip(CharAttrib):
     __slots__ = CharAttrib.__slots__ + "_slots"
-    def __init__(self, chardata, slots):
-        self._chardata = chardata
+    def __init__(self, char, slots):
+        self._char = char
         self._slots = {}
 
     def __bool__(self):         return len(self._slots) > 0
@@ -88,8 +88,8 @@ class Equip(CharAttrib):
 
 class Body(CharAttrib):
     __slots__ = CharAttrib.__slots__ + "_subparts", "_attribs", "_mesh"
-    def __init__(self, chardata):
-        self._chardata = chardata
+    def __init__(self, char):
+        self._char = char
         self._subparts = {}
         self._attribs = {}
         self._mesh = None
@@ -106,19 +106,19 @@ class Body(CharAttrib):
 
 class Stats(CharAttrib):
     __slots__ = CharAttrib.__slots__
-    def __init__(self, chardata):
-        self._chardata = chardata
+    def __init__(self, char):
+        self._char = char
 
     def base_stats(self):
         """The base stats."""
-        return self._chardata._base._stats
+        return self._char._base._stats
 
 
 class StatusEffects(CharAttrib):
     __slots__ = CharAttrib.__slots__
-    def __init__(self, chardata):
-        self._chardata = chardata
+    def __init__(self, char):
+        self._char = char
 
     def base_statuseffects(self):
         """The base status effects."""
-        return self._chardata._base._statuseffects
+        return self._char._base._statuseffects
