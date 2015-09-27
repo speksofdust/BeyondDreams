@@ -70,7 +70,7 @@ class WeaponFamDict():
 # ---- Ammo ------------------------------------------------------------------ #
 class Ammo(BundableItemType):
     _sc =           (BundableItemType,)
-    BUNDLESIZE =    25
+    max_bundlesize =    25
     weapontypes =   () # weapontypes usable in
 
 
@@ -97,7 +97,6 @@ class WeaponType(ItemType):
     """Base class for weapon types."""
     _sc =           (ItemType,)
     CATTYPE =       "weapon"
-    BUNDLESIZE =    1
     _ammotypes =    ()  # compatable ammo types -- empty if uses no ammo
 
 

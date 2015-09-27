@@ -54,6 +54,7 @@ from .baseclasses import BDTaggedType
 
 class ItemType(BDTaggedType):
     """Base class for all item types."""
+    _bundleable =     False
     CATTYPE =       ""    # Primary catagory type (CONSUMABLE, WEAPON, etc.)
     _typename =     ""    # name for this item type -- not for primary types
     _typedesc =      ""
@@ -84,14 +85,20 @@ class ItemType(BDTaggedType):
         for i in self._tags: yield i
         for i in self.typetags(): yield i
 
+    def is_bundable:
+        """True if this item can be bundled."""
+        if self._bundleable and self._bundlesize > 1)
+
 
 class BundableItemType(ItemType):
     """Item type with support for bundling."""
+    _bundleable = True
     # some absolute maximums
     ABS_MAX_BUNDLE =    99
     ABS_MAX_SLOTSIZE =  100
-    _bundlesize =    1    # max num items grouped per bundle
-    _slotsize =      1    # base num slots used in inventory per bundlesize
+    _max_bundlesize =   1   # max num items grouped per bundle
+    _bundle_slotsize =  1   # base num slots used in inventory per bundlesize
+
 
 
 

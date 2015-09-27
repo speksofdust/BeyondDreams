@@ -23,7 +23,7 @@
 from .char.attribs import CharAttrib
 
 
-class ItemStorage(list):
+class ItemStorage(Tuple):
     """Base class for certain item storage types."""
 
     def __str__(self):  return str(self._pockets)
@@ -34,7 +34,7 @@ class ItemStorageChar(ItemStorage, CharAttrib):
     __slots__ = "_char", "_pockets"
     def __init__(self, char):
         self._char = char
-        self._pockets = ()
+        self = ()
 
 
 # ---- Storage Pocket Stuff -------------------------------------------------- #
@@ -45,7 +45,8 @@ class ItemStoragePocket:
 
     @property
     def pockettype(self):
-        """The type of this pocket"""
+        """The type of pocket. This determines what item types get
+            stored in this pocket."""
         return self._name
 
 
@@ -99,11 +100,6 @@ class StoredItem:
             self._item.name, x._item.name)
 
     @property
-    def itemdata(self):
-        """Access item data."""
-        return self._item
-
-    @property
     def qty(self):
         """The number of this item in the inventory, reguardless of whether
         it may be used now."""
@@ -111,9 +107,18 @@ class StoredItem:
         except: return 1
 
     @property
+    def itemdata(self):
+        """Access item data."""
+        return self._item
+
+    # ---- itemdata shortcuts -- (self._item.xxx) ---- #
+    @property
     def name(self):
         """The name of this item."""
         return self._item.name
+
+    def tags(self):
+        return iter(self._item.tags()
 
 
 class StoredItemBundled(StoredItem):

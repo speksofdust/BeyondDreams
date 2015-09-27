@@ -15,91 +15,15 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from attrib import CharAttrib
+from itemstorage import ListTypeStoragePocket
+from itemstorage import ItemStorageChar
+from itemstorage import StoredItem
+from itemstorage import StoredItemBundled
 
 #pocket ids
 CONSUMABLES = 0
 WEARABLES = 1
 WEAPONS = 2
-
-
-class InventoryItem:
-    """Base class for items stored in the inventory."""
-    __slots__ = "_item"
-    def __init__(self, item):
-        self._item = item
-
-    def __del__(self):
-        self._item = None
-        try: self._qty = None
-        except: pass
-
-    def __repr__(self): return str(self._item.name, self.qty)
-
-    # Note: AttributeError will be raised if comparing an item that is not an
-    #   instance of InventoryItem (doesnt have a qty attrib)
-    #   to compare item only use the item property
-    def __eq__(self, x): return (self._item == x._item and self.qty == x.qty)
-    def __ne__(self, x): return (self._item != x._item or self.qty != x.qty)
-
-    # lt, gt, ge, le compare qty -- both items must be the same
-    def __lt__(self, x):
-        if self._item == x._item: return self.qty < self.qty
-        raise Exception("tried to compare mismatched items ({} != {})".format(
-            self._item.name, x._item.name)
-
-    def __gt__(self, x):
-        if self._item == x._item: return self.qty > self.qty
-        raise Exception("tried to compare mismatched items ({} != {})".format(
-            self._item.name, x._item.name)
-
-    def __ge__(self, x):
-        if self._item == x._item: return self.qty >= self.qty
-        raise Exception("tried to compare mismatched items ({} != {})".format(
-            self._item.name, x._item.name)
-
-    def __le__(self, x):
-        if self._item == x._item: return self.qty <= self.qty
-        raise Exception("tried to compare mismatched items ({} != {})".format(
-            self._item.name, x._item.name)
-
-    @property
-    def itemdata(self):
-        """Access item data."""
-        return self._item
-
-    @property
-    def qty(self):
-        """The number of this item in the inventory, reguardless of whether
-        it may be used now."""
-        try:    return self._qty # bundled
-        except: return 1
-
-    # for convience
-    @property
-    def name(self):
-        """The name of this item."""
-        return self._item.name
-
-
-class InvItem(InventoryItem):
-    """"""
-    __slots__ = "_item"
-
-
-class InvItemBundled(InventoryItem):
-    """Class for multiples of the same item stored as a single item with a
-    qty (quantity)
-    """
-    __slots__ = "_item", "_qty"
-    def __init__(self, item, qty):
-        self._item =    item
-        self._qty =     int(qty)
-
-    @property
-    def qty(self):
-        """The quantity of this item available."""
-        return self._qty
 
 
 class Pocket(list):
@@ -171,37 +95,44 @@ class Pocket(list):
         # TODO
 
 
-class Inventory(CharAttrib):
-    __slots__ = "_char", "_pockets"
+class Consumables(ListTypeStoragePocket):
+    _pockettype = "consumables"
+
+class Wearables(ListTypeStoragePocket):
+    _pockettype = "wearables"
+
+class Weapons(ListTypeStoragePocket):
+    _pockettype = "weapons"
+
+
+class Inventory(ItemStorageChar):
+    __slots__ = "_char"
     def __init__(self):
         self._char = None
-        self._pockets = (
+        self = (
             Pocket(self, CONSUMABLES),
             Pocket(self, WEARABLES),
             Pocket(self, WEAPONS),
             )
 
-    def __str__(self):  return str(self._pockets)
-    __repr__ = __str__
-
     def add_item(self, i):
         if isinstance(i, InventoryItem):
-            self._pockets[i.itemdata.pockettype]._additem(i)
+            self[i.itemdata.pockettype]._additem(i)
         raise TypeError("Invalid item type for inventory.")
 
     def consumables(self):
         """Consumable items."""
-        return self._pocket[0]
+        return self[0]
 
     def wearables(self):
         """Wearable items."""
-        return self._pocket[1]
+        return self[1]
 
     def weapons(self):
         """Weapon items."""
-        return self._pocket[2]
+        return self[2]
 
     def total_items(self):
         """Return the total number of items in the inventory."""
-        return sum(len(i) for i in iter(self._pockets)):
+        return sum(len(i) for i in iter(self)):
 
