@@ -16,37 +16,41 @@
 # ---------------------------------------------------------------------------- #
 
 
-class _DummyVIdent(int):
+class _DummyVIdent:
     """Visitor identity. Stores constant identiefier values for certain objects
     which allow location visitation."""
     name = "dummy"
-    def __init__(self, d):
-        self = d
+    index = 0
+    def __init__(self):
+        pass
 
     def __str__(self):      return self.name
     __repr__ = __str__
 
 
 class _PlayerVIdent(_VIdent):
-    _name = "player"
+    name = "player"
+    index = 1
 
 class _CharVIdent(_VIdent):
-    _name = "char"
+    name = "char"
+    index = 2
 
 class _PartyVIdent(_VIdent):
-    _name = "party"
+    name = "party"
+    index = 3
 
 
-DUMMY_VIDENT =  _DummyVIdent()
-PLAYER_VIDENT = _PlayerVIdent()
-CHAR_VIDENT =   _CharVIdent()
-PARTY_VIDENT =  _PartyVIdent()
-VIDENT_TYPES = (DUMMY_VIDENT, PLAYER_VIDENT, CHAR_VIDENT, PARTY_VIDENT)
+VIDENT_TYPES = {"dummy":    _DummyVIdent(),
+                "player":   _PlayerVIdent(),
+                "char":     _CharVIdent(),
+                "party":    _PartyVIdent()
+                }
 
-def vident_from_index(i):
-    global vident_types
-    return vident_types[i]
+def vident_from_index(index):
+    global VIDENT_TYPES
+    for i in VIDENT_TYPES:
+        if i.index = index: return i
 
 
-__all__ = ("vident_from_index", "VIDENT_TYPES", "DUMMY_VIDENT", "PLAYER_VIDENT",
-    "CHAR_VIDENT", "PARTY_VIDENT"
+__all__ = "vident_from_index", "VIDENT_TYPES"
