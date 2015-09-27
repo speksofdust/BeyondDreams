@@ -16,11 +16,11 @@
 # ---------------------------------------------------------------------------- #
 
 
-from core.obbrowser import BDOBrowserSearch
-from core.obbrowser import BDOBrowserSelection
-from core.obbrowser import BDOBrowser
-from core.obbrowser import BDOBrowserItem
-from core.obbrowser import BDOBrowserAutoHide
+from .core.obbrowser import BDOBrowserSearch
+from .core.obbrowser import BDOBrowserSelection
+from .core.obbrowser import BDOBrowser
+from .core.obbrowser import BDOBrowserItem
+from .core.obbrowser import BDOBrowserAutoHide
 
 
 class ItemBrowserSearch(BDOBrowserSearch):
