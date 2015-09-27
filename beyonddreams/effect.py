@@ -45,13 +45,6 @@ class _B(dict)
             if self[i] < 0: yield (i, self[i])
 
 
-class _Dummy:
-    def immunities(self):   return
-    def altered(self):      return
-    def increases(self):    return
-    def decreases(self):    return
-
-
 class StatusEffects(_B):
     typename = "statuseffects"
     # StatusEffects
@@ -111,6 +104,12 @@ class AddedEffects(_B):
         for i in kwargs:    self[i] = kwargs[i]
 
 
+class _Dummy:
+    def immunities(self):   yield
+    def altered(self):      yield
+    def increases(self):    yield
+    def decreases(self):    yield
+
 class DummySE(StatusEffects, _Dummy):
     pass
 
@@ -136,4 +135,4 @@ def get_aeffects(cls, **kwargs):
         return DUMMY_AE
 
 
-__all__ = ("DUMMYSE", "DUMMYAE", "get_aeffects", "get_seffects")
+__all__ = ("DUMMY_SE", "DUMMY_AE", "get_aeffects", "get_seffects")
