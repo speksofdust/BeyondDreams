@@ -45,6 +45,21 @@ class CharName(tuple):
     def _set_nick(self, n): self._set_tuple(self[0], self[1], self[2], n)
     nick = property(_get_nick, _set_nick)
 
+    @property
+    def full(self):
+        """The first and last name."""
+        return self[0], self[2]
+
+    @property
+    def middle_initial(self):
+        """The first letter of the middle name."""
+        return self[1][0]
+
+    @property
+    def initials(self):
+        """The first letters of the first and last name."""
+        return self[0][0], self[2][0]
+
 
 class CharData(BDDataDict):
     __slots__ = "_char", "_base"
@@ -135,19 +150,19 @@ class Char:
         """This characters equipment."""
         return self._chardata["equip"]
 
-    # ---- Query ---- #
     @property
     def party(self):
         """The party this char is in."""
         return self._chardata["party"]
 
+    # ---- Query ---- #
     def famtypes(self):
         """Return an iterator of family types for this character."""
         return ()
 
     def is_alive(self):
         """True if this character is alive."""
-        if self._items["stats"]["HP"] == 0: return False
+        if self._chardata["stats"]["HP"] == 0: return False
         return True
 
     def is_critical(self):
@@ -160,6 +175,6 @@ class Char:
             "zombie" in self.famtypes)
 
     def hp(self):
-        return self._items["stats"]["HP"]
+        return self._chardata["stats"]["HP"]
 
 
