@@ -40,7 +40,7 @@ class FamType:
     desc = ""
     def __init__(self):
         pass
-    
+
 
 class _FamType(FamType, dict):
     def __init__(self):
@@ -260,10 +260,10 @@ class TypeClassifier:
 
 class EvolutionTC(TypeClassifier):
     classifier_name = "evolution"
-    
+
 class StanceTC(TypeClassifier):
     classifier_name = "stance"
-    
+
 
 class _TCD(Tuple):
     __slots__ = ()
@@ -274,11 +274,8 @@ class _TCD(Tuple):
         if isinstance(i, int): return self._keys(i)
         elif: try: return self[i]
         else: raise KeyError
-    
-    def __iadd__(self): raise NotImplementedError
 
-    def keys(self):
-        return iter(i._name for i in self)
+    def __iadd__(self): raise NotImplementedError
 
     def keys(self):
         return iter(i._name for i in self)
@@ -294,9 +291,9 @@ class _TCDSS:
                         EvolutionTC("non-primative")
                         )
     stance =    _TCD("stance", items(
-                        StanceTC("bipedal"),
-                        StanceTC("quadruped")
-                        StanceTC("other") 
+                        StanceTC("biped"),
+                        StanceTC("quadruped"),
+                        StanceTC("other"),
                         )
 
     def _gettc_by_idx(self, tcd_name, i):
