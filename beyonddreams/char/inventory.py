@@ -16,7 +16,7 @@
 # ---------------------------------------------------------------------------- #
 
 from itemstorage import ListTypeStoragePocket
-from itemstorage import ItemStorageChar
+from itemstorage import CharItemStorage
 from itemstorage import StoredItem
 from itemstorage import StoredItemBundled
 
@@ -32,8 +32,6 @@ class Pocket(list):
         self._inventory =   inventory
         self._pockettype =  pockettype
         self = list(items)
-
-
 
     # Note: Pocket x Pocket comparison must compare pockettype
     def __eq__(self, x):
@@ -75,7 +73,7 @@ class Pocket(list):
 
     def itemnames(self):
         """Return an iterator of the names of all items in this pocket."""
-        return iter(i.name for i in self))
+        return iter(i.name for i in self)
 
     def difference(self, x):
         """Return all items in x but not in this pocket."""
@@ -102,41 +100,15 @@ class Weapons(ListTypeStoragePocket):
     _pockettype = "weapons"
 
 
-class StorageType:
-    _storagetype = "storage"
-    __slots__ = "_char"
-    def __init__(self):
-        self = ()
-
-    def _get_autobundle(self):
-        try:
-            return self._char.player.gamedata[
-                "{}-autobundle".format(self._storagetype)]
-        except: return False
-    def _set_autobundle(self, x):
-        self._char.player.gamedata[
-            "{}-autobundle".format(self._storagetype)] = bool(x)
-    autobundle = property(_get_autobundle, _set_autobundle)
-
-    def use_autobundle(self):
-        if self._char._is_npc: return True
-        return self.autobundle
-
-
-class Inventory(ItemStorageChar):
+class CharInventory(CharItemStorage):
     _storagetype = "inventory"
     __slots__ = "_char"
     def __init__(self):
         self = (
-            Pocket(self, CONSUMABLES),
-            Pocket(self, WEARABLES),
-            Pocket(self, WEAPONS),
+            ConsumablesPocket(self),
+            WearablesPocket(self),
+            WeaponsPocket(self)
             )
-
-    def add_item(self, i):
-        if isinstance(i, InventoryItem):
-            self[i.itemdata.pockettype]._additem(i)
-        raise TypeError("Invalid item type for inventory.")
 
     def consumables(self):
         """Consumable items."""
@@ -150,11 +122,7 @@ class Inventory(ItemStorageChar):
         """Weapon items."""
         return self[2]
 
-    def total_items(self):
-        """Return the total number of items in the inventory."""
-        return sum(len(i) for i in iter(self)):
 
-
-
-class Storage()
+class CharInventoryStorage(CharInventory):
     _storagetype = "storage"
+    __slots__ = "_char"

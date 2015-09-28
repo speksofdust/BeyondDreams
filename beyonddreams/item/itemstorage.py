@@ -30,11 +30,39 @@ class ItemStorage(Tuple):
     __repr__ = __str__
 
 
-class ItemStorageChar(ItemStorage, CharAttrib):
-    __slots__ = "_char", "_pockets"
+    def total_items(self):
+        """Return the total number of items in the inventory."""
+        return sum(len(i) for i in iter(self)):
+
+
+class CharItemStorage(ItemStorage, CharAttrib):
+    __slots__ = "_char"
     def __init__(self, char):
         self._char = char
         self = ()
+
+    def _get_autobundle(self):
+        try:
+            return self._char.player.gamedata[
+                "{}-autobundle".format(self._storagetype)]
+        except: return False
+    def _set_autobundle(self, x):
+        self._char.player.gamedata[
+            "{}-autobundle".format(self._storagetype)] = bool(x)
+    autobundle = property(_get_autobundle, _set_autobundle,
+        doc="True if 'autobundling' should be used.")
+
+    def use_autobundle(self):
+        """Returns True if when adding items they should be bundled with
+        existing bundles when possible."""
+        if self._char._is_npc: return True
+        return self.autobundle
+
+    def add_item(self, i):
+        """Add an item to the inventory."""
+        if isinstance(i, InventoryItem):
+            self[i.itemdata.pockettype]._additem(i)
+        raise TypeError("Invalid item type for inventory.")
 
 
 # ---- Storage Pocket Stuff -------------------------------------------------- #
@@ -49,6 +77,10 @@ class ItemStoragePocket:
             stored in this pocket."""
         return self._name
 
+    def item_names(self):
+        """Return an iterator of all item names in this pocket."""
+        return iter(i.name for i in self)
+
 
 class DictTypeStoragePocket(dict, StoragePocket):
     pass
@@ -61,6 +93,33 @@ def _popped(cls, i):
 def _poppedinsert(cls, i, p):
     if cls.index(p) <= 0 <= len(cls): cls[p:p] = [_popped(cls, i)]
 
+def _comb(o, a, b):
+    # for 'combine'
+    n = a._remaining_space()
+    if b._qty - n == 0: # moved all
+        a._qty += n
+        del o[b]
+    elif a._qty < n:    # moved some
+        t = n - b._qty
+        a._qty += t
+        b._qty -= t
+    else:               # filled
+        a._qty += n
+        b._qty -= n
+
+def _add_bundleditem(o, i, q, s):
+    if q <= i.max_bundlesize:
+        o[s:s] = [StoredItemBundled(i, q]
+    else:
+        while True:
+            if q > i.max_bundlesize:
+                o[s:s] = [StoredItemBundled(i, q)]
+                s += 1
+                q -= i.max_bundlesize
+            else:
+                o[s:s] = [StoredItemBundled(i, q)]
+                break
+
 
 class ListTypeStoragePocket(list, StoragePocket):
 
@@ -69,17 +128,43 @@ class ListTypeStoragePocket(list, StoragePocket):
     def append(self): raise NotImplementedError
     extend = insert = clear = pop = remove = __delitem__ = __setitem__
 
+    def __eq__(self, x): return (self._pockettype == x._pockettype and self = x)
+    def __ne__(self, x): return (self._pockettype != x._pockettype or self != x)
+
+    def _all_of_same_item(self, item):
+        return iter(i for i in self if self[i].name == item)
+
+    def _nonfull_bundles(self, item):
+        return iter(i for i in self._all_of_same_item(self, item) if
+            i.max_qty() ==False]
 
     def _add_item(item, qty=1):
         if qty > 0: # prevent negative/0 quantities and other weird stuff
             if item.is_bundleable:
-                if owner.use_autobundle
-                else:
-                    if qty == 1: self[i] = StoredItemBundled()
-                    else:
-            for i in range(qty): # multiple non-bundable items
-                self[i] = StoredItem()
+                if owner.use_autobundle:
+                    for i in self._nonfull_bundles(self, item):
+                        n = i._remaining_space()
+                        if qty <= i._remaining_space:
+                            i._qty += qty
+                            break
+                        else:
+                            t = item.max_bundlesize - i._qty
+                            i._qty = item.max_bundlesize
+                            qty -= t
+                    if qty: self._add_bundleditem(self, item, qty, len(self))
+                else: self._add_bundeleditem(self, item, qty, len(self))
+            else:   # multiple non-bundable items
+                s = len(self)
+                for i in range(qty):
+                    self[s:s] = [StoredItem(item)]
+                    s += 1
 
+    def combine(self, a, b):
+        """Combine two bundles into one."""
+        if (a._item.is_bundleable and (a._item == b._item) and
+            (not a.is_max() or not b.is_max())):
+            if a > b: _comb(self, a, b)
+            else: _comb(self, b, a)
 
     def move_item(self, item, pos):
         """Move one item to a new index. (works the same as list.insert"""
@@ -173,5 +258,12 @@ class StoredItemBundled(StoredItem):
     def qty(self):
         """The quantity of this item available."""
         return self._qty
+
+    def is_max(self):
+        return self._item.max_bundlesize == self._qty
+
+    def _remaining_space(self):
+        return self._item.max_bundlesize - self._qty
+
 
 
