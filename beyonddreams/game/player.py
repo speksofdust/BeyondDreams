@@ -129,11 +129,14 @@ class Party(BDSelectedItemList, CharRoster):
 class Player:
     _ident = VIDENT_TYPES["player"]
     _is_ai = False
-    def __init__(self):
+    def __init__(self, game):
+        self._game =    game
         self._party =   Party()
         self._pid =     0   # always 0 if not in online game
-        self._gamedata = None
 
+    @property
+    def game(self):
+        return self._game
 
     @property
     def party(self):

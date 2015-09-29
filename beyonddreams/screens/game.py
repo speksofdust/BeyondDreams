@@ -24,29 +24,28 @@ class Game(BDScreen):
     _pausable = False   # defaults to false is set after __init__ if otherwise
     _paused = False
     def __init__(self):
-        self._player = None
-        self._data = None
         self._ended = False
+        self._local_player = None # the main machine local player
+        from .game.data import GameData
+        self._data = GameData(self)
 
     #@classmethod
-    #def load_game(self, fp, player):
-        #self._init_game(player)
+    #def load_game(self, fp):
+        #self._init_game
         # do loading stuff
         #self._start_game
 
     @classmethod
-    def new_game(self, player):
-        self._init_game(player)
+    def new_game(self):
+        self._init_game
         self._start_game
 
-    def _init_game(self, player):
-        self._player = player
-        from game.data import GameData
-        self._data = GameData(self) # create initial game data
+    def _init_game(self):
+        from .game.player import Player
+        self._local_player = Player(self)
 
     def _start_game(self):
-        if (self._player and self._data) is not None:
-            pass
+        pass
 
     def is_ended(self):
         """True if the current game has ended."""
@@ -55,7 +54,7 @@ class Game(BDScreen):
     @property
     def player(self):
         """The player of this game (at the current machine)."""
-        return self._player
+        return self._local_player
 
     def _get_paused(self): return self._paused
     def _set_paused(self, p):
