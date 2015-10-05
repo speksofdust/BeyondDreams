@@ -104,25 +104,24 @@ class Undies(Clothing):
 
 class UndiesBottoms(Undies):
     _sc =           Undies, Bottoms
-
+    _equipslots =   'undies.bottoms'
 
 class UndiesTops(Undies):
     _sc =           Undies, Tops
-
+    _equipslots =   'undies.tops'
 
 # ---- Swimwear Base Types ---- #
 class Swimwear(Clothing):
     _inctags =  "swimwear"
     _bwt =      0.2
 
-
 class SwimTop(Tops):
     _sc = Swimwear, Tops
-
+    _equipslots = 'undies.tops'
 
 class SwimBottom(Bottoms):
     _sc = Swimwear, Bottoms
-
+    _equipslots = 'undies.bottoms'
 
 # ---- Armor Base Types ---- #
 class Armor(Clothing):
@@ -149,8 +148,7 @@ class Boot(Footwear):
 
 
 class Glove(Clothing):
-    # increases punch damage
-    # may increase weapon grip
+    # may increase punch damage & weapon grip
     _typename =         "glove"
     _weapon_grip =      0   # vs barehanded
     #_punch_dmg_mult =   1   # punch damage multplier
@@ -221,6 +219,7 @@ class Breastplate(ArmorTop):
 
 class Helm(Armor, Headwear):
     _typename = "helm"
+    _equipslots = 'head'
 
 
 # ---- Jewelry --------------------------------------------------------------- #
@@ -247,11 +246,17 @@ class Choker(Jewelry):
     _typename = "choker"
     _inctags =  "neckwear"
     _typedesc = """Tight fitting jewelry warn around the neck."""
+    _equipslots = 'neck'
 
 
 class Ring(Jewelry):
     _typename = "ring"
     _typedesc = """A piece of jewelry to be worn on a finger or toe."""
+
+
+class Crown(Jewelry):
+    _typename = "crown"
+    _equipslots = "head"
 
 
 # ---- Accessories ----------------------------------------------------------- #
@@ -266,4 +271,5 @@ class Belt(Accessory):
 class Collar(Accessory):
     _typename = "collar"
     _inctags =  "neckwear"
+    _equipslots = 'neck'
 
