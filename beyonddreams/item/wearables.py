@@ -30,7 +30,15 @@ class WearableType(ItemType):
     CATTYPE =       "wearable"
     _classifiers =  ()
     _sc =           (ItemType, )
-    equipslots =    _typename
+    _equipslots =   'default'
+
+    @property
+    def equipslots(self):
+        """Returns a tuple of equipslot names. The first (index 0) is always
+        'default' which is used to reference whatever slot name is at index 1.
+        """
+        if self._equipslots == 'default': return ('default', self._typename)
+        return ('default',) + self._equipslots
 
 
 class _Clothing(WearableType):
@@ -222,12 +230,12 @@ class Hairpin(Jewelry):
 
 class Bangle(Jewelry):
     _typename = "bangle"
-    equipslots = "ankle", "wrist"
+    _equipslots = "ankle", "wrist"
 
 
 class Bracelet(Jewelry):
     _typename = "bracelet"
-    equipslots = "ankle", "wrist"
+    _equipslots = "ankle", "wrist"
 
 
 class Necklace(Jewelry):
