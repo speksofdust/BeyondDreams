@@ -133,7 +133,7 @@ class ListTypeStoragePocket(BDList, StoragePocket):
                 if owner.autobundle:
                     for i in self._nonfull_bundles(self, item):
                         n = i._remaining_space()
-                        if qty <= i._remaining_space:
+                        if qty <= i._remaining_space():
                             i._qty += qty
                             break
                         else:
@@ -154,14 +154,6 @@ class ListTypeStoragePocket(BDList, StoragePocket):
             (not a.is_max() or not b.is_max())):
             if a > b: _comb(self, a, b)
             else: _comb(self, b, a)
-
-    def move_item(self, item, pos):
-        """Move one item to a new index. (works the same as list.insert"""
-        _poppedinsert(self, item, pos)
-        def down(self):     _poppedinsert(self, item, self.index(i+1))
-        def up(self):       _poppedinsert(self, i, self.index(i-1))
-        def to_end(self):   self[len(self):len(self)] = [_popped(self, i)]
-        def to_top(self):   self[0:0] = self[[_popped(self, i)]
 
 
 # ---- Stored Item ----------------------------------------------------------- #
@@ -213,9 +205,11 @@ class StoredItemBundled(StoredItem):
         self._qty =     int(qty)
 
     def is_max(self):
+        """True if this bundle is full."""
         return self._item.max_bundlesize == self._qty
 
     def _remaining_space(self):
+        """Space left until this bundle is full."""
         return self._item.max_bundlesize - self._qty
 
 
