@@ -27,22 +27,23 @@ class _B(dict)
         return iter(i for i in self.keys() if self[i] == "immune")
 
     def altered(self):
-        """Return an iterator of altered items where each item is a tuple as
-        (name, value). Includes immunities"""
-        for i in self.keys():
-            if self[i] != 0: yield (i, self[i])
+        """Return an iterator of altered items (value != 0)
+        where each item is a tuple as (name, value). Includes immunities"""
+        return iter((i, self[i]) for i in self.keys() if self[i] != 0)
+
+    def unaltered(self):
+        """Return an iterator of the names of all unaltered items (value = 0)."""
+        return iter(i for i in self.keys() if self[i] == 0)
 
     def increases(self):
         """Return an iterator of items which have an increase where each item
         is a tuple as (name, value)."""
-        for i in self.keys():
-            if self[i] > 0: yield (i, self[i])
+        return iter((i, self[i]) for i in self.keys() if self[i] > 0)
 
     def decreases(self):
         """Return an iterator of items which have a decrease where each item
         is a tuple as (name, value)."""
-        for i in self.keys():
-            if self[i] < 0: yield (i, self[i])
+        return iter((i, self[i]) for i in self.keys() if self[i] < 0)
 
 
 class StatusEffects(_B):
@@ -105,23 +106,23 @@ class AddedEffects(_B):
 
 
 class _Dummy:
-    def immunities(self):   yield
-    def altered(self):      yield
-    def increases(self):    yield
-    def decreases(self):    yield
+    # speed optomizations for dummy types -- since all values are guarenteed to
+    #   be ZERO
+    def immunities(self):   return iter(())
+    def altered(self):      return iter(())
+    def unaltered(self):    return iter(self.keys())
+    def increases(self):    return iter(())
+    def decreases(self):    return iter(())
 
-class DummySE(StatusEffects, _Dummy):
-    pass
 
-class DummyAE(AddedEffects, _Dummy):
-    pass
+class DummySE(StatusEffects, _Dummy): pass
+class DummyAE(AddedEffects, _Dummy): pass
 
 # cache dummy objects for items, etc. that don't alter any values
 DUMMY_SE = DummySE()
 DUMMY_AE = DummyAE()
 
-
-# handlers to choose whether or not the dummy should be used
+# handlers to choose whether or not to use the dummy
 def get_seffects(cls, **kwargs):
     if kwargs: return AddedEffects(kwargs)
     else:
