@@ -62,6 +62,10 @@ class MapMarker(MapObject):
     locked = property(_get_locked, _set_locked,
         doc="If True this map marker cannot be altered or removed.")
 
+    def _get_color(self): return self._color
+    def _set_color(self, x): self._color = x
+    color = property(_get_color, _set_color, doc="The color of this map marker.")
+
     @property
     def name(self):
         """The name of this map marker."""
@@ -79,17 +83,23 @@ class MapMarker(MapObject):
 
 class _MapMarkersBase(BDList):
     _markercls = None
-    __slots__ = "parent"
+    __slots__ = BDList.__slots__ + "parent"
     def __init__(self, parent):
         self._parent = parent
         self = []
 
     __setitem__ = __delitem__ = remove, discard, clear = append
 
+    @property
+    def map(self):
+        return self._parent
+
     def add_marker(self, pos, name, notes=()):
+        """Add a new marker to the map."""
         self._markercls(self, pos, name, notes)
 
     def delete_marker(self, x):
+        """Delete a marker from the map."""
         if not self[x]._locked: del self[x]
 
 
@@ -97,7 +107,7 @@ class _MapBase:
     _maptype = ""
     def __init__(self):
         self._zoom = 0
-        self._markers = MapMarkers()
+        self._markers = MapMarkers(self)
 
     @property
     def markers(self):
