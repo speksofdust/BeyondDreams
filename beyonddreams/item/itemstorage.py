@@ -20,6 +20,7 @@
 #from itembrowser import ItemBrowserItem
 #from itembrowser import ItemBrowser
 #from itembrowser import ItemBrowserAutoHide
+from .core.baseclasses import BDList
 from .char.attribs import CharAttrib
 
 
@@ -42,21 +43,17 @@ class CharItemStorage(ItemStorage, CharAttrib):
         self = ()
 
     def _get_autobundle(self):
+        if self._char._is_npc: return True
         try:
             return self._char.player.gamedata[
                 "{}-autobundle".format(self._storagetype)]
         except: return False
     def _set_autobundle(self, x):
-        self._char.player.gamedata[
-            "{}-autobundle".format(self._storagetype)] = bool(x)
+        if not self._char._is_npc:
+            self._char.player.gamedata[
+                "{}-autobundle".format(self._storagetype)] = bool(x)
     autobundle = property(_get_autobundle, _set_autobundle,
-        doc="True if 'autobundling' should be used.")
-
-    def use_autobundle(self):
-        """Returns True if when adding items they should be bundled with
-        existing bundles when possible."""
-        if self._char._is_npc: return True
-        return self.autobundle
+        doc="True if items should be automatically bundled (when possible).")
 
     def add_item(self, i):
         """Add an item to the inventory."""
@@ -86,13 +83,6 @@ class DictTypeStoragePocket(dict, StoragePocket):
     pass
 
 
-def _popped(cls, i):
-    yield cls[i]
-    del cls[i]
-
-def _poppedinsert(cls, i, p):
-    if cls.index(p) <= 0 <= len(cls): cls[p:p] = [_popped(cls, i)]
-
 def _comb(o, a, b):
     # for 'combine'
     n = a._remaining_space()
@@ -107,26 +97,25 @@ def _comb(o, a, b):
         a._qty += n
         b._qty -= n
 
-def _add_bundleditem(o, i, q, s):
-    if q <= i.max_bundlesize:
-        o[s:s] = [StoredItemBundled(i, q]
+def _add_bundleditem(obj, item, qty, size):
+    if qty <= item.max_bundlesize:
+        obj[size:size] = [StoredItemBundled(item, qty]
     else:
         while True:
-            if q > i.max_bundlesize:
-                o[s:s] = [StoredItemBundled(i, q)]
-                s += 1
-                q -= i.max_bundlesize
+            if qty > item.max_bundlesize:
+                obj[size:size] = [StoredItemBundled(item, qty)]
+                size += 1
+                qty -= item.max_bundlesize
             else:
-                o[s:s] = [StoredItemBundled(i, q)]
+                obj[size:size] = [StoredItemBundled(item, qty)]
                 break
 
 
-class ListTypeStoragePocket(list, StoragePocket):
+class ListTypeStoragePocket(BDList, StoragePocket):
+
+    clear = remove = __delitem__ = __setitem__ = append # NotImplemented overrides
 
     def __contains__(self, x):  return any(x == (i.name or i) for i in self)
-
-    def append(self): raise NotImplementedError
-    extend = insert = clear = pop = remove = __delitem__ = __setitem__
 
     def __eq__(self, x): return (self._pockettype == x._pockettype and self = x)
     def __ne__(self, x): return (self._pockettype != x._pockettype or self != x)
@@ -141,7 +130,7 @@ class ListTypeStoragePocket(list, StoragePocket):
     def _add_item(item, qty=1):
         if qty > 0: # prevent negative/0 quantities and other weird stuff
             if item.is_bundleable:
-                if owner.use_autobundle:
+                if owner.autobundle:
                     for i in self._nonfull_bundles(self, item):
                         n = i._remaining_space()
                         if qty <= i._remaining_space:
@@ -174,61 +163,28 @@ class ListTypeStoragePocket(list, StoragePocket):
         def to_end(self):   self[len(self):len(self)] = [_popped(self, i)]
         def to_top(self):   self[0:0] = self[[_popped(self, i)]
 
-    def swap_item_index(self, a, b):
-        """Swap the indexes of two items."""
-        if isinstance(a, int): a = self.index(a)
-        if isinstance(b, int): tb = b = self.index(b)
-        self[b] = a
-        self[a] = tb
-
 
 # ---- Stored Item ----------------------------------------------------------- #
 class StoredItem:
     """Base class for stored items."""
-    __slots__ = "_item"
+    _bundle_type = False
+    __slots__ = "_item", "_qty"
     def __init__(self, item):
         self._item = item
-
-    def __del__(self):
-        self._item = None
-        try: self._qty = None
-        except: pass
+        self._qty = 1
 
     def __repr__(self): return str(self._item.name, self.qty)
 
     # Note: AttributeError will be raised if comparing an item that is not an
     #   instance of InventoryItem (doesnt have a qty attrib)
     #   to compare item only use the item property
-    def __eq__(self, x): return (self._item == x._item and self.qty == x.qty)
-    def __ne__(self, x): return (self._item != x._item or self.qty != x.qty)
-
-    # lt, gt, ge, le compare qty -- both items must be the same
-    def __lt__(self, x):
-        if self._item == x._item: return self.qty < self.qty
-        raise Exception("tried to compare mismatched items ({} != {})".format(
-            self._item.name, x._item.name)
-
-    def __gt__(self, x):
-        if self._item == x._item: return self.qty > self.qty
-        raise Exception("tried to compare mismatched items ({} != {})".format(
-            self._item.name, x._item.name)
-
-    def __ge__(self, x):
-        if self._item == x._item: return self.qty >= self.qty
-        raise Exception("tried to compare mismatched items ({} != {})".format(
-            self._item.name, x._item.name)
-
-    def __le__(self, x):
-        if self._item == x._item: return self.qty <= self.qty
-        raise Exception("tried to compare mismatched items ({} != {})".format(
-            self._item.name, x._item.name)
+    def __eq__(self, x): return (self._item == x._item and self._qty == x._qty)
+    def __ne__(self, x): return (self._item != x._item or self._qty != x._qty)
 
     @property
     def qty(self):
-        """The number of this item in the inventory, reguardless of whether
-        it may be used now."""
-        try:    return self._qty # bundled
-        except: return 1
+        """The number of this item. (in this specific bundle)"""
+        return self._qty
 
     @property
     def itemdata(self):
@@ -242,6 +198,7 @@ class StoredItem:
         return self._item.name
 
     def tags(self):
+        """Tags for this item."""
         return iter(self._item.tags()
 
 
@@ -249,15 +206,11 @@ class StoredItemBundled(StoredItem):
     """Class for multiples of the same item stored as a single item with a
     qty (quantity)
     """
+    _bundle_type = True
     __slots__ = "_item", "_qty"
     def __init__(self, item, qty):
         self._item =    item
         self._qty =     int(qty)
-
-    @property
-    def qty(self):
-        """The quantity of this item available."""
-        return self._qty
 
     def is_max(self):
         return self._item.max_bundlesize == self._qty
