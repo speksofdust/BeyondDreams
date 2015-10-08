@@ -17,6 +17,7 @@
 
 """Provides base classes and methods for various Beyond Dreams types."""
 
+__all__ = ()
 
 def overwrite_dictupdate(d, [e,], **kwargs):
     for i in e:
@@ -32,9 +33,29 @@ def overwrite_dictupdate(d, [e,], **kwargs):
         if k in self:
             d[k] = kwargs[k]
 
-def pop(x, i):
+def _popped(x, i):
     yield x[i]
     del x[i]
+
+def _poppedinsert(cls, old, new):
+    if 0 <= new <= len(cls): cls[new:new] = [_popped(cls, old)]
+    raise IndexError("index out of range.")
+
+def _validate_idx(cls, i):
+    # converts neg idx to pos (if needed)
+    # used before calling _poppedinsert (as needed)
+    if i < 0: return len(cls) - i   # convert neg idx to pos
+    return i
+
+def _validate(cls, i):
+    # used by swap index
+    # i=index -- check if index is in list | i=item -- check if item in list
+    if isinstance(int, item):
+        if i < 0: i = len(cls) - i   # convert negative indices
+        if 0 <= i <= len(cls): return i
+        raise IndexError("index out of range.")
+    try: return cls.index(i)
+    except: raise IndexError("Item not found in list")
 
 
 class BDList(list):
@@ -43,27 +64,37 @@ class BDList(list):
         self = list(items)
 
     def append(self): raise NotImplementedError
-    pop = extend = extend = append
+    pop = extend = extend = insert = append
     __imul__ = __iadd__ = append
 
     def swap_indices(self, x, y):
-        if 0 <= x <= y <= len(self):
-            tmp = self[y]
+        # do some checking
+        x = _validate(self, x)
+        y = _validate(self, y)
+        if x != y:
             self[x] = self[y]
             self[y] = self[x]
 
-    def move_down_by_index(self, i):
-        if idx < len(self):
-            self[idx + 1] = self[idx].pop()
+    def move_down(self, i, n, loop=False):
+        """Move an item i down the list by n indices."""
+        if not isinstance(int, i): i = self.index(i)
+        if n+i > len(self):
+            if loop: _poppedinsert(i, _validate_idx(n+i))
+            else: self[len(self):len(self) = [_popped(self, i)]
+        else: _poppedinsert(i, n+i)
 
-    def move_up_by_index(self, i):
-        if idx > 0: self[idx - 1] = self[idx].pop()
+    def move_up(self, i, n, loop=False):
+        """Move an item i, up the list by n indices."""
+        if not isinstance(int, i): i = self.index(i)
+        if n+i < 0:
+            if loop: _poppedinsert(i, _validate_idx(n-i))
+            else: self[0:0] = [_popped(self, i)]
+        else: _poppedinsert(i, n-i)
 
-    def move_down(self, x):
-        self._move_down_by_index(self.index(x))
-
-    def move_up(self, x):
-        self._move_up_by_index(self.index(x))
+    def move_to(self, item, i):
+        """Move an item to index 'i'."""
+        if isinstance(int, i): _poppedinsert(item, _validate_idx(i))
+        else: _poppedinsert(item, self.index(i))
 
 
 class BDTags:
