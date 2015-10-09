@@ -81,7 +81,8 @@ class MapMarker(MapObject):
         self._parent.delete_marker(self)
 
 
-class _MapMarkersBase(BDList):
+class MapMarkers(BDList):
+    """Storage class for map markers."""
     _markercls = None
     __slots__ = BDList.__slots__ + "parent"
     def __init__(self, parent):
