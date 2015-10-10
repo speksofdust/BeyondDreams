@@ -19,6 +19,8 @@
 from item import ItemType
 from item import ItemDict
 #from item import regitem
+from equipslots import EQUIPSLOTS
+
 
 class WearableTypeDict(ItemDict):
     CATTYPE = "wearable"
@@ -31,6 +33,12 @@ class WearableType(ItemType):
     _classifiers =  ()
     _sc =           (ItemType, )
     _equipslots =   'default'
+
+    def _equipslots(self):
+        """ """
+        yield 'default'
+        for i in self._equipslots:
+            for j in i: yield EQUIPSLOTS[j]
 
     @property
     def equipslots(self):
