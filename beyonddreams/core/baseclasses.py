@@ -98,21 +98,15 @@ class BDList(list):
 
 
 class BDTags:
-    _sc = ()    # tuple of super classes to this -- shared by all instances
     _inctags = ()
 
-    def _sc_tags():
-        """Return tags from this objects super class."""
-        for i in _inctags: yield i         # yield own include tags
-        for i in _sc: yield _sc._sc_tags() # include tags from super classes
-
     def __init__(self, tags=()):
-        self._tags = set(tags).difference(self._sc_tags())
+        self._tags = tags
 
     def tags(self):
         """Return an iterator of all tags for this."""
         for i in self._tags: yield i
-        for i in self._sc_tags(): yield i
+        for i in self._inctags: yield i
 
     def has_tag(self, tag, exact=False):
         """True if any tags for this start with the given tag.

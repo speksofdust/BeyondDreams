@@ -50,17 +50,18 @@ class Items:
         self.wearables =    WearableTypeDict()
 
 
-from .baseclasses import BDTaggedType
-
 class ItemType(BDTaggedType):
     """Base class for all item types."""
     _bundleable =     False
     CATTYPE =       ""    # Primary catagory type (CONSUMABLE, WEAPON, etc.)
+    _classifiers =  ()
     _typename =     ""    # name for this item type -- not for primary types
     _typedesc =      ""
     ATTRIBS =       ()    # attribs for items when in inventory
     ALL_TYPE_ATTRIBS = () # all possible attribs for this type
     _bwt =          1.0   # base weight must be (float)
+    _slotsize =     1     # inventory slots used
+    _itemset =      None
 
     def __init__(self, name, tags=(), item_sets=()):
         BDTaggedType.__init__(self, name=name, tags=tags)
@@ -70,34 +71,34 @@ class ItemType(BDTaggedType):
     def typename(self):
         """The name of this item type."""
         if self._typename: return self._typename
-        return self.__class__.__name__.lower() # only for primary types
-
-    def _get_typetags(self):
-        yield self.CATTYPE
-        yield self.typename
-        yield i for i in self._sc_tags()
+        return self.CATTYPE
 
     def typetags(self):
         """Yield all type tags for this."""
-        return iter(self._get_typetags())
+        yield self.CATTYPE
+        for i in self._classifiers: yield i
+        if (self._typename and typename not in self._classifiers):
+            yield self._typename
 
     def tags(self):
         for i in self._tags: yield i
         for i in self.typetags(): yield i
+        for i in self._subcattype_tags: yield i
 
     def is_bundable:
         """True if this item can be bundled."""
-        if self._bundleable and self._bundlesize > 1)
+        if self._bundleable and self._max_bundlesize > 1)
+
+    def is_in_set(self):
+        """True if this item is part of a set."""
+        return self._itemset is not None
 
 
 class BundableItemType(ItemType):
     """Item type with support for bundling."""
     _bundleable = True
-    # some absolute maximums
     ABS_MAX_BUNDLE =    99
-    ABS_MAX_SLOTSIZE =  100
     _max_bundlesize =   1   # max num items grouped per bundle
-    _bundle_slotsize =  1   # base num slots used in inventory per bundlesize
 
 
 
