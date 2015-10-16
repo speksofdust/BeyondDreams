@@ -115,8 +115,8 @@ class User:
 
 
 class _UserStore(dict):
-    def __init__(self, user, d):
-        self = d
+    def __init__(self, user, d={}):
+        super().__init__(d)
         self._user = user
         self._is_saved = True
 
@@ -138,14 +138,14 @@ class UserConfig(_UserStore):
     path_suffix = "config"
     def __init__(self, user):
         from defaultconfig import DEFAULT_USER_CONFIG
-        _UserStore.__init__(user, d=DEFAULT_USER_CONFIG)
+        super().__init__(user, d=DEFAULT_USER_CONFIG)
 
 
 class UserData(_UserStore):
     """Storage class for user data, such as user statitistics."""
     path_suffix = "data"
     def __init__(self, user):
-        _UserStore.__init__(user, d={
+        super().__init__(user, d={
             "name": "",
             })
 
@@ -153,7 +153,7 @@ class UserData(_UserStore):
 class UserChars(_UserStore):
     path_suffix = "charlist"
     def __init__(self, user):
-        _UserStore.__init__(user)
+        super().__init__(user)
 
     def new_char(self, preset=None):
         if preset is not None: pass

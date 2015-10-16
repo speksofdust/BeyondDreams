@@ -14,7 +14,7 @@ class CurrentKeySet(dict):
 
     def __init__(self):
         from defaultconfig import DEFAULT_KEYS_SET
-        self = DEFAULT_KEY_SET
+        super().__init__(DEFAULT_KEY_SET)
 
     def get_confu_keys(self):
         """Return a dict of randomized keys for when a character has the
