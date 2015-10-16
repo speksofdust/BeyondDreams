@@ -23,19 +23,19 @@ def write(filepath, data):
     with open filepath, 'wb') as f:
         for i in data:
             f.write(i)
-    
+
 def iterlines(filepath):
     with open(filepath, 'rb') as f:
         for i in iter(f.readlines()):
             if i.startswith('#'): continue
             else: yield i
-            
+
 def read_as_dict(filepath, sep, d={}):
     for i in iterlines(filepath):
         x, y = i.split(sep)
         d[x] = y
-    
-    
+
+
 def default_globalvars():
     """Return a dict with default globalvars."""
     return {
@@ -51,17 +51,17 @@ def default_userglobals():
 class VarData(dict):
     """Variable data storage class."""
     def __init__(self, items):
-        self = items
+        super().__init__(items)
         self._saved = True
-    
+
     def is_saved(self):
         """True if no (writable) changes have been made since the last save."""
         return self._saved == True
-    
+
     def update(self):
         if self._saved == False: write(f, self)
         self._saved = True
-        
+
 
 class GlobVars(VarData):
     """Global variables storage class."""
@@ -79,7 +79,7 @@ class GlobVars(VarData):
             self = default_userglobals()
         else:           # Attempt to load users globvars file
             pass        # TODO
-            
+
         self._saved = True
 
     def get_defaults(self):

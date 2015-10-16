@@ -19,8 +19,8 @@ ZERO = 0 # cache 0 to reduce ram usage a here a bit
 
 class _B(dict)
     typename = ""
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, items, **kwargs):
+        super().__init__(items)
 
     def immunities(self):
         """Return an iterator of immunities."""
@@ -50,7 +50,7 @@ class StatusEffects(_B):
     typename = "statuseffects"
     # StatusEffects
     def __init__(self, **kwargs):
-        self = {
+        super().__init__({
             # physical types
             "frostbite" =         ZERO,
             "burn" =              ZERO,
@@ -74,7 +74,7 @@ class StatusEffects(_B):
             "physical_status" =   ZERO,
             "mental_status" =     ZERO,
             "transform_status" =  ZERO,
-            }
+            })
         for i in kwargs:    self[i] = kwargs[i]
 
 
@@ -83,7 +83,7 @@ class AddedEffects(_B):
     # Physical/Non-Physical
     reduces =           ()  # reduces dmg from
     def __init__(self, **kwargs):
-        self = {
+        super().__init__({
             "dark" =              ZERO,
             "light" =             ZERO,
             "psychic" =           ZERO,
@@ -101,7 +101,7 @@ class AddedEffects(_B):
             "non-physical" =      ZERO,
             "non-elemental" =     ZERO,
             "elemental" =         ZERO,
-            }
+            })
         for i in kwargs:    self[i] = kwargs[i]
 
 

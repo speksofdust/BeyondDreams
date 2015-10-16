@@ -114,26 +114,26 @@ class _Health(_EnergyStat):
 
 class _StatConst(dict):
     def __init__(self):
-        self = {
-        # physical
-        "p-stamina":    _PStam("physical-stamina", "p-stamina"),
-        "p-energy":     _PEnergy("physical-energy", "p-energy"),
-        "strength":     Stat("strength", "str", 1, 200),
-        "agility":      Stat("agility", "agil", 1),
+        super().__init__({
+            # physical
+            "p-stamina":    _PStam("physical-stamina", "p-stamina"),
+            "p-energy":     _PEnergy("physical-energy", "p-energy"),
+            "strength":     Stat("strength", "str", 1, 200),
+            "agility":      Stat("agility", "agil", 1),
 
-        # mental
-        "m-stamina":    _MStam("mental-stamina", "m-stamina"),
-        "m-energy":     _MEnergy("mental-energy", "m-energy"),
-        "focus":        Stat("focus", "foc", 1, 200),
-        "intellect":    Stat("intellect", "int", 1, 200),
-        "willpower":    Stat("willpower", "will", 0, 200),
+            # mental
+            "m-stamina":    _MStam("mental-stamina", "m-stamina"),
+            "m-energy":     _MEnergy("mental-energy", "m-energy"),
+            "focus":        Stat("focus", "foc", 1, 200),
+            "intellect":    Stat("intellect", "int", 1, 200),
+            "willpower":    Stat("willpower", "will", 0, 200),
 
-        "health":       _Health("health", "hp"),
-        "karma":        _Hidden("karma", None, -1000, 1000),
-        "luck":         Stat("luck", None, -1000, 1000),
-        "adrenaline":   Stat("adrenaline", "adr", 0),
-        "rage":         Stat("rage", None, -100),
-        }
+            "health":       _Health("health", "hp"),
+            "karma":        _Hidden("karma", None, -1000, 1000),
+            "luck":         Stat("luck", None, -1000, 1000),
+            "adrenaline":   Stat("adrenaline", "adr", 0),
+            "rage":         Stat("rage", None, -100),
+            })
 
     def __getitem__(self, i):
         try: return self[i]
@@ -155,7 +155,7 @@ class _StatConst(dict):
 
 class _StatGroups(dict):
     def __init__(self):
-        self = {
+        super().__init__({
         "physical-statuses":  ("frostbite", "burn", "numb", "stun", "poisioning",
                                 "bleed")
         "mental-statuses":    ("blind", "drunk", "dumb", "confusion"),
@@ -166,7 +166,7 @@ class _StatGroups(dict):
         "non-physical":      ("dark", "light", "psychic", "spirit"),
         "physical":          ("acid", "fire", "ice", "wind", "water",
                                 "electric"),
-        }
+        })
 
     def statuseffect_groupnames(self):
         return iter(i for i in self if i.endswith("statuses"))
