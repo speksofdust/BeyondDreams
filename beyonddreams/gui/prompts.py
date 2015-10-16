@@ -19,8 +19,6 @@ class _Prompts(list):
     """Class for storing active prompts. Active prompts are stored in order of
     which they appeared. If multiple prompts they must be closed in reverse
     order."""
-    def __init__(self):
-        self = []
 
     def _clear_ok_prompts(self):
         for i in self:
