@@ -22,7 +22,7 @@ __all__ = ()
 
 class StatsAbsRange(dict):
     def __init__(self, items):
-        self = items
+        super().__init__(items)
 
     def get_clamped(self, name, val):
         if self[name][0] <= val: return self[name][0]
@@ -37,38 +37,41 @@ stats_abs_range = StatsAbsRange(
     'phys-stamina':     (0, 200),
     'mental-stamina':   (0, 200),
     'intellect':        (1, 200),
+    'focus':            (0, 200),
     'strength':         (1, 200),
     'willpower':        (0, 200),
     'agility':          (1, 100),
     'luck':             (-1000, 1000),
 
+    'phys-energy':      (0, 200),
+    'mental-energy':    (0, 200),
+    'health':           (0, 200),
+
     # hidden stats
     'karma':            (-1000, 1000),
     'adrenaline':       (0, 100),
     'rage':             (-100, 100),
-
-    # Frequently Varying Levels
-    'focus':            (0, 200),
-    'phys-energy':      (0, 200),
-    'mental-energy':    (0, 200),
-    'health':           (0, 200),
     })
 
 
 # rage - > 0 increases strength but uses more phys-energy < 0 does the opposite
 
-def calc_energy(c, energy):
-    # energy + (adrenaline * 0.02) + (rage * 0.02)
-    return  (c[stats][energy] + (c[stats]['adrenaline'] * 0.02) +
+
+
+# Real value calculations
+def calc_energy(c, energy_type):
+    # any type
+    # (total base)energy + (adrenaline * 0.02) + (rage * 0.02)
+    return  (c[stats][energy_type] + (c[stats]['adrenaline'] * 0.02) +
         (c[stats]['rage'] * 0.02))
 
 def calc_focus(c):
-    # focus * (mental-energy + (adrenaline * 0.02) + (rage * 0.02))
+    # (total base)focus * (mental-energy + (adrenaline * 0.02) + (rage * 0.02))
     return stats_abs_range.clamped('focus',
         c[stats]['focus'] * calc_energy(c, 'mental-energy'))
 
 def calc_strength(c):
-    # strength * (phys-energy + (adrenaline * 0.02) + (rage * 0.02))
+    # (total base)strength * (phys-energy + (adrenaline * 0.02) + (rage * 0.02))
     return stats_abs_range.clamped('strength',
         c[stats]["strength"] * calc_energy(c, "phys-energy"))
 

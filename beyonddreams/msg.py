@@ -15,16 +15,27 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+# msgcodes
+NORMAL =        0
+USER =          1   # user text
+WHISPER =       2
+USER_WHISPER =  3 # user whisper
 
-class _Channels(dict):
+SERVER =    10
+ADMIN =     11  # admin message
+ERROR =     12
+WARN =      13
+
+
+class _Channels(list):
     def __init__(self):
-        self = {}
+        pass
 
     def __del__(self):
         self.clear_all
         self = None
 
-    def clear(self):
+    def clear_all(self):
         """Clear all messages on all channels."""
         for i in self: i.clear
 
@@ -43,9 +54,9 @@ class _Channels(dict):
 
 class Chan(list):
     """Message channel class."""
-    def __init__(self, name, items=[]):
+    _default_msgcode = NORMAL
+    def __init__(self, name):
         self._name =  name
-        self = items
         self._unread = 0
 
     def __del__(self):
@@ -76,10 +87,13 @@ class Chan(list):
         """The last message."""
         return self[-1]
 
-    def new_message(self, msg):
+    def new_message(self, msg, msgcode='default'):
         """Append a new message to this channel."""
-        if msg: self.append(Message(msg))
-        self._unread += 1
+        if msg:
+            if (msgcode == 'default' or not msgcode):
+                self.append(Message(self._default_msgcode, msg)
+            else self.append(Message(msgcode, msg))
+            self._unread += 1
 
     def dump(self, filepath, append=True):
         """Dump all messages from this channel to a text file."""
@@ -94,13 +108,23 @@ class Chan(list):
 
 class Message(str):
     """Text message with timestamp."""
-    def __init__(self, *args, **kwargs):
+    def __init__(self, msgcode, *args, **kwargs):
         import time
         self._ts = int(time.time())
+        self._msgcode = msgcode
+
+    @classmethod
+    def _from_str(self, s):
+        """Create a message by parsing a text string. Used to load messages."""
+        self._ts, self._msgcode = s.split(';')
+        super().__init__(s.split(':')[1])
+
+    def __str__(self): return "{};{}:{}".format(self._ts, self._msgcode, self)
+    __repr__ = __str__
 
     @property
     def timestamp(self):
         """The timestamp for this message."""
         import datetime
-        return datetime.fromtimestamp(self._ts)
+        return datetime.datetime.fromtimestamp(self._ts)
 
