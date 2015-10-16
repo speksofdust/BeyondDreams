@@ -60,8 +60,6 @@ def _validate(cls, i):
 
 class BDList(list):
     __slots__ = ()
-    def __init__(self, items=[]):
-        self = list(items)
 
     def append(self): raise NotImplementedError
     pop = extend = extend = insert = append

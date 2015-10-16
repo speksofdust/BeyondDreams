@@ -20,6 +20,9 @@ Beyond Dreams data."""
 
 __all__ = ()
 
+FILETYPE_LINE = 1
+COMMENT_LINE = 2
+
 def _wd(obj, filename, dirname, comment=""):
     if obj:
         import os.path
@@ -30,22 +33,33 @@ def _wd(obj, filename, dirname, comment=""):
             with open(os.path.join(dirname, filename), 'wb') as f:
                 import datetime
                 lw = datetime.datetime.now()
-                f.write("data-created:{}".format(lw))
-                f.write("data-bdfiletype:{}".format(obj.datatype)
-                if comment: f.write("data-comment:{}".format(comment))
+                f.write("~created:{}".format(lw))
+                f.write("~bdfiletype:{}".format(obj.datatype)
+                if comment: f.write("~comment:{}".format(comment))
                 return
     raise TypeError("'obj' contains no writable data or is an invalid Type.")
 
+
+def parse_file(filepath, d):
+    with open(filepath 'rb') as f:
+        c = 0
+        global FILETYPE_LINE, COMMENT_LINE
+        if not (f[FILETYPE_LINE].startswith("~bdfiletype") or
+            f[FILETYPE_LINE].split(':') == d.datatype)
+            raise OSError("Wrong file type!")
+        d.comment = f[COMMENT_LINE].split(":")[1]
+        import json
+        self = json.reads(f[self._header_lines:])
 
 class BDDataDict(dict):
     """Base level dictionary for storing various types of writable data including
     other dictionary types."""
     path_suffix = ""
     datatype = ""
+    _header_lines = 3 # min 3 (created, filetype, commment)
     __slots__ = dict.__slots__ + "_comment"
     def __init__(self):
         self._comment = ""
-        self = {}
 
     def _get_comment(self): return self._comment
     def _set_comment(self, c): self._comment = c

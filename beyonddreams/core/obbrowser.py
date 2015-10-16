@@ -26,12 +26,12 @@ class BDOBrowserCommon:
 class BDOBrowserSearch(BDBrowserCommon):
     _browsertype = ""
     def __init__(self, browser):
-        self._browser =         browser
+        self._browser = browser
 
 
 class _BFuncs(list):
     # Shared by BDOBrowser and BDOBrowserSelection
-    __slots__ = ()
+    __slots__ = list.__slots__
 
     # invalidate some list methods
     def __imul__(self): raise NotImplementedError
@@ -46,10 +46,9 @@ class _BFuncs(list):
 
 
 class BDOBrowserSelection(_BFuncs, BDOBrowserCommon):
-    __slots__ = ("_browser")
+    __slots__ = _BFuncs.__slots__ + "_browser"
     def __init__(self, browser):
         self._browser = browser
-        self = []
 
     def is_multiple(self):
         return len(self) > 1
@@ -77,9 +76,8 @@ class BDOBrowserAutoHide:
 
 
 class BDOBrowser(_BFuncs, BDOBrowserCommon):
-    __slots__ = ("_selected", "_searchfunc")
+    __slots__ = _BFuncs.__slots__ + "_selected", "_searchfunc"
     def __init__(self, SelectedCls=None, SearchFuncCls=None):
-        self = []
         if SelectedCls is None: self._selected = _null
         else: self._selected = SelectedCls
         if SearchFuncCls is None: self._searchfunc = _null

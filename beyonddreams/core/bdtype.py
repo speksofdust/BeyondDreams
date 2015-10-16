@@ -45,5 +45,5 @@ class BDTaggedType(BDType, BDTags):
 class BDTypeDict(dict):
     """Dictionary for storing BDType objects."""
     __slots__ = dict.__slots__
-    def __init__(self, items):
-        self = items
+    def __init__(self, *args, **kwargs):
+        pass

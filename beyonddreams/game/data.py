@@ -30,8 +30,6 @@ class GamaData(BDDataDict):
     def __init__(self, game):
         self._game = game
         self._last_save_num = 0
-        self = {
-            }
 
     def load_game(filepath):
         if self._game:
@@ -42,8 +40,7 @@ class GamaData(BDDataDict):
                 # TODO
                 # do we need to create a new player object?
         else:
-            import json
-            self = json.reads()
+            pass
 
 
     def quick_save(self):
