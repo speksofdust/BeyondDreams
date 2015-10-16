@@ -15,69 +15,8 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+from eqslotdata import EQUIPSLOTS
 
-class EqSlotData:
-    __slots__ = "_name", "_layers", "_linking",
-    def __init__(self, name, layers=0):
-        self._name = name
-        self._layers = layers   # expiremental
-        self._linking = 0   # always 0 for the basic type
-
-    @property
-    def layers(self):
-        """The max layer index or 0 if layers are unsupported."""
-        return self._layers
-
-    @property
-    def fullnames(self):
-        """A tuple of all the full names of this slot."""
-        return (self._name,)
-
-    @property
-    def linking(self):
-        """Whether linking is allowed. (0 - False, 1 - optional, 2 - required)"""
-        return self._linking
-
-    @property
-    def plural_name(self):
-        """The plural name of this slot."""
-        if self._name not in equipslots._noplural: return self._name
-        return "".join(self._name, 's')
-
-
-
-class EqSlotDataLR(EqSlot):
-    __slots__ = EqSlot.__slots__
-    def __init__(self, name, layers=1, linking=1):
-        self.name = name
-        self._linking = linking
-
-    @property
-    def fullnames(self):
-        return "".join(name, '.R'), "".join(name, '.L')
-
-
-class _EqSlots(dict):
-    _noplural = ('headwear', )
-    __slots__ = dict.__slots__
-    def __init__(self):
-        self = {
-            'ankle':            EqSlotDataLR('ankle',       3, 0),
-            'wrist':            EqSlotDataLR('wrist',       3, 0),
-            'headwear':         EqSlotData('headwear'       0, 0),
-            'sock':             EqSlotDataLR('sock',        1, 1),
-            'glove':            EqSlotDataLR('glove',       1, 1),
-            'top':              EqSlotData('top',           2, 0),
-            'bottom':           EqSlotData('bottom',        2, 0),
-            'undies-top':       EqSlotData('undies-top',    0, 0),
-            'undies-bottom':    EqSlotData('undies-bottom'  0, 0),
-            }
-
-
-EQUIPSLOTS = _EQSlots()
-
-
-# ---- Char Equip ------------------------------------------------------------ #
 NULL = 0
 
 class EquipError(Exception): pass
@@ -93,15 +32,14 @@ class _EquipSlot:
     def __init__(self, name):
         self._name = name
         self._item = NULL
-        self._glued = False
+        self._glued() = False
 
     def __str__(self):
-        return "{}:{},{}".format(self._name, self._item, int(self._glued))
+        return "{}:{},{}".format(self._name, self._item, int(self._glued()))
 
-    @property
-    def glued(self):
+    def is_glued(self):
         """True if the item cannot normally be removed from this slot."""
-        return self._glued
+        return self._glued()
 
     def weight(self):
         """The weight of all items in this slot."""
@@ -109,7 +47,7 @@ class _EquipSlot:
         except: return 0
 
     def equip(self, item, glued=False):
-        if self._glued: return 1
+        if self._glued(): return 1
         self._item = item
 
 
@@ -137,7 +75,7 @@ class SlotLayer(_EquipSlot):
     __slots__ = _EquipSlot.__slots__
     # the name attr is an int indicating the layer starting with 0
     def __str__(self):
-        return "({}:{},{})".format(self._name, self._item, int(self._glued))
+        return "({}:{},{})".format(self._name, self._item, int(self._glued()))
 
 
 class EquipSlotML(tuple):
@@ -197,8 +135,8 @@ class Equip(dict):
 
     def _equip(self, i, s, layer):
         try: # check if item is glued
-            if self[s]._get_layer(layer).glued
-                return glued("")
+            if self[s]._get_layer(layer).is_glued()
+                return glued("This item cannot be removed!")
         except:
             if s not in self:
                 if EQUIPSLOTS[s].layers == 0: self[s] = EquipSlot(s)

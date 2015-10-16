@@ -19,7 +19,7 @@
 from item import ItemType
 from item import ItemDict
 #from item import regitem
-from equipslots import EQUIPSLOTS
+from eqslotdata import *    # classifiers, EQUIPSLOTS
 
 
 class WearableTypeDict(ItemDict):
@@ -45,22 +45,6 @@ class WearableType(ItemType):
         """
         if self._equipslots == 'default': return ('default', self._typename)
         return ('default',) + self._equipslots
-
-
-# classifiers
-ARM = "armor"
-CLO = "clothing"
-TOP = "tops"
-BTM = "Bottoms"
-UND = "undies"
-SWM = "swimwear"
-JEW = "jewelry",
-ACC = "accessories"
-FTW = "footwear"
-HDW = "headwear"
-NEK = "neckwear"
-BOD = "bodysuit"
-GLV = "glove"
 
 
 # ---- Base Types ------------------------------------------------------------ #
