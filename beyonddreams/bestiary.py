@@ -20,6 +20,7 @@ __all__ = ()
 
 class BestiaryBase(dict):
     _sort_attrs = 'id', 'name'
+    _sort_attrs_special = ()
     __slots__ = dict.__slots__
 
     def __getitem__(self, i):
@@ -28,24 +29,47 @@ class BestiaryBase(dict):
             for k in self: # access by id
                 if self[k].id == i: return self[k]
 
-    def _sorted_by(self, r=False, k):
+    def _sorted_by(self, k, r=False):
         return sorted(self.values(), key=attrgetter(k), reverse=r)
 
-    def sortby(self, reverse=False):
-        return self._sorted_by(self.values(), reverse=reverse)
-        def id(self, reverse=False): return self._sorted_by(reverse, 'id')
+    def sortby(self, key, reverse=False):
+        if key in self._sort_attrs:
+            return self._sorted_by(key, reverse=reverse)
+        elif key in self._sort_attrs_special:
+            pass
+        else:
+            raise ValueError('Invalid sort key: "{}"'.format(key))
 
 
 all_entries = BestiaryBase() # The full bestiary
 
 
+class _ItemDrops(tuple):
+    def __init__(self, common, uncommon, rare, exrare):
+        super().__init__((common, uncommon, rare, exrare)
+
+    def common(self):
+        return self[0]
+
+    def uncommon(self):
+        return self[1]
+
+    def rare(self):
+        return self[2]
+
+    def exrare(self):
+        return self[3]
+
+
 class BestiaryEntry:
-    __slots__ = "_name", "_fam", "_id"
-    def __init__(self, name, entry_id, fam[]):
+    __slots__ = "_name", "_fam", "_id" "_drops"
+    def __init__(self, name, entry_id, fam, itemdrops):
         self._name = name
         self._id =  entry_id
         self._fam = fam
         all_entries[self._name] = self  # add to entries
+        self._drops = _ItemDrops()
+
 
     def __str__(self): return ", ".join(self.name, self.id, self.fam)
 
@@ -108,7 +132,6 @@ class PlayerBestiaryEntry:
 
 class PlayerBestiary(BestiaryBase):
     __slots__ = BestiaryBase.__slots__
-
 
 
     def _get_entry(self, x):
