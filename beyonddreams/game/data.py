@@ -33,6 +33,19 @@ class GamaData(BDDataDict):
         self = {
             }
 
+    def load_game(filepath):
+        if self._game:
+            from gui.prompts import QuitPrompt
+            x = QuitPrompt(("""There is already a game in progress.\nDo you wish to load a new game?\n(Your progress will not be saved.)""")
+            if x.get_input() == True:
+                pass
+                # TODO
+                # do we need to create a new player object?
+        else:
+            import json
+            self = json.reads()
+
+
     def quick_save(self):
         if self._game._writable:
             self.write(self.default_dirname, fmt_filename(
