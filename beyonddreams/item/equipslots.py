@@ -82,7 +82,8 @@ class EquipSlotML(tuple):
     """Multi-layer equip slot."""
     def __init__(self, name):
         self._name = name
-        self = tuple(SlotLayer(i) for i in range(EQUIPSLOTS[name]._layers])
+        super().__init__(
+            tuple(SlotLayer(i) for i in range(EQUIPSLOTS[name]._layers]))
 
     def __str__(self):
         return "{}:{}".format(self._name, ", ".join(self))
@@ -127,7 +128,6 @@ class EquipSlotML(tuple):
 
 class Equip(dict):
     def __init__(self):
-        self = {}
 
     def equip(self, item, slot="default", layer='default'):
         """Equip item in slot on layer."""
