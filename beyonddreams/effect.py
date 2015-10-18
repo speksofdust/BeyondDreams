@@ -52,28 +52,29 @@ class StatusEffects(_B):
     def __init__(self, **kwargs):
         super().__init__({
             # physical types
-            "frostbite" =         ZERO,
-            "burn" =              ZERO,
-            "numb" =              ZERO,
-            "stun" =              ZERO,
-            "poisoning" =         ZERO,
-            "bleed" =             ZERO,
+            "freeze":           ZERO,
+            "frostbite" :       ZERO,
+            "burn" :            ZERO,
+            "numb" :            ZERO,
+            "stun" :            ZERO,
+            "poisoning" :       ZERO,
+            "bleed" :           ZERO,
 
             # mental types
-            "blind" =             ZERO,
-            "drunk" =             ZERO,
-            "dumb" =              ZERO,
-            "confusion" =         ZERO,
+            "blind" :           ZERO,
+            "drunk" :           ZERO,
+            "dumb" :            ZERO,
+            "confusion" :       ZERO,
 
             # transform types
-            "zombie" =            ZERO,
-            "mutagen" =           ZERO,
+            "zombie" :          ZERO,
+            "mutagen" :         ZERO,
 
             # Bonuses -- Added to all qualifing type
             #   eg: mental_status adds to any mental_status type
-            "physical_status" =   ZERO,
-            "mental_status" =     ZERO,
-            "transform_status" =  ZERO,
+            "physical-status" : ZERO,
+            "mental-status" :   ZERO,
+            "transformation" :  ZERO,
             })
         for i in kwargs:    self[i] = kwargs[i]
 
@@ -84,23 +85,23 @@ class AddedEffects(_B):
     reduces =           ()  # reduces dmg from
     def __init__(self, **kwargs):
         super().__init__({
-            "dark" =              ZERO,
-            "light" =             ZERO,
-            "psychic" =           ZERO,
-            "spirit" =            ZERO,
-            "acid" =              ZERO,
-            "fire" =              ZERO,
-            "ice" =               ZERO,
-            "wind" =              ZERO,
-            "water" =             ZERO,
-            "electric" =          ZERO,
+            "dark" :            ZERO,
+            "light" :           ZERO,
+            "psychic" :         ZERO,
+            "spirit" :          ZERO,
+            "acid" :            ZERO,
+            "fire" :            ZERO,
+            "ice" :             ZERO,
+            "wind" :            ZERO,
+            "water" :           ZERO,
+            "electric" :        ZERO,
 
             # Bonuses -- Added to all qualifing type
             #   eg: physical adds to all physical types
-            "physical" =          ZERO,
-            "non-physical" =      ZERO,
-            "non-elemental" =     ZERO,
-            "elemental" =         ZERO,
+            "physical" :        ZERO,
+            "non-physical" :    ZERO,
+            "non-elemental" :   ZERO,
+            "elemental" :       ZERO,
             })
         for i in kwargs:    self[i] = kwargs[i]
 

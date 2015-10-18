@@ -156,17 +156,22 @@ class _StatConst(dict):
 class _StatGroups(dict):
     def __init__(self):
         super().__init__({
-        "physical-statuses":  ("frostbite", "burn", "numb", "stun", "poisioning",
-                                "bleed")
-        "mental-statuses":    ("blind", "drunk", "dumb", "confusion"),
-        "transform-statuses":   ("undead", "mutagen"),
-        "non-elemental":    ("acid", "psychic", "spirit"),
-        "elemental":        ("dark", "light", "fire", "ice", "wind", "water",
-                                "electric"),
-        "non-physical":      ("dark", "light", "psychic", "spirit"),
-        "physical":          ("acid", "fire", "ice", "wind", "water",
-                                "electric"),
-        })
+            "physical-status":  ("freeze", "frostbite", "burn", "numb", "stun",
+                "poisioning", "bleed"),
+            "mental-status":    ("blind", "drunk", "dumb", "confusion"),
+            "transformation":       ("undead", "mutagen"),
+            "non-elemental":    ("acid", "psychic", "spirit"),
+            "elemental":        ("dark", "light", "fire", "ice", "wind", "water",
+                                    "electric"),
+            "non-physical":     ("dark", "light", "psychic", "spirit"),
+            "physical":         ("acid", "fire", "ice", "wind", "water",
+                                    "electric"),
+            })
+            self['all-physical'] = ('physical',) + self['physical'] +
+                self['physical-statuses']
+            # FIXME when calling i['physical'] for an ob with 'all-physical
+            # some stuff can get calculated 2x
+
 
     def statuseffect_groupnames(self):
         return iter(i for i in self if i.endswith("statuses"))
