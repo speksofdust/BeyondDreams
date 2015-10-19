@@ -60,6 +60,7 @@ class BDDataDict(dict):
     __slots__ = dict.__slots__ + "_comment"
     def __init__(self):
         self._comment = ""
+        super().__init__({})
 
     def _get_comment(self): return self._comment
     def _set_comment(self, c): self._comment = c

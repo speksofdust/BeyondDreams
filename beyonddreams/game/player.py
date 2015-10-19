@@ -45,6 +45,30 @@ class CharRoster(BDList):
             except: raise IndexError("Cannot get index from item: {}".format(x)
 
 
+class _Party(GameDataAccessor):
+    _ident = VIDENT_TYPES["party"]
+    MAX_CHARS = 8
+    def __dpath(): return gamedata['party'][1]
+    __slots__ = ()
+    def __init__(self): pass
+
+    def is_full(self):
+        """True if no more members can be added to this party."""
+        return len(self) == self.MAX_CHARS
+
+    def _get_active(self): return gamedata['party'][0]
+    def _set_active(self, i):
+        if 0 <= i <= 8: gamedata['party'][0] = i
+        else:
+            if i in self.__dpath(): gamedata['party'][0] = self.__dpath.index(i)
+    current = property(_get_current, _set_current,
+        doc="""The active party member.""")
+
+    def alive(self):
+        """Return an iterator of all alive party members."""
+        pass
+
+
 class Party(BDSelectedItemList, CharRoster):
     _ident = VIDENT_TYPES["party"]
     MAX_CHARS = 8
