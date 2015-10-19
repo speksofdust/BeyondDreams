@@ -52,7 +52,7 @@ class StatusEffects(_B):
     def __init__(self, **kwargs):
         super().__init__({
             # physical types
-            "freeze":           ZERO,
+            "frozen":           False
             "frostbite" :       ZERO,
             "burn" :            ZERO,
             "numb" :            ZERO,
