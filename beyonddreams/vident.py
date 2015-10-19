@@ -28,15 +28,15 @@ class _DummyVIdent:
     __repr__ = __str__
 
 
-class _PlayerVIdent(_VIdent):
+class _PlayerVIdent(_DummyVIdent):
     name = "player"
     index = 1
 
-class _CharVIdent(_VIdent):
+class _CharVIdent(_DummyVIdent):
     name = "char"
     index = 2
 
-class _PartyVIdent(_VIdent):
+class _PartyVIdent(_DummyVIdent):
     name = "party"
     index = 3
 
