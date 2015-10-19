@@ -17,6 +17,8 @@
 
 __all__ = ()
 
+from properties import get_visible, set_visible
+
 
 class BDOBrowserCommon:
     _browsertype = ""
@@ -51,6 +53,7 @@ class BDOBrowserSelection(_BFuncs, BDOBrowserCommon):
         self._browser = browser
 
     def is_multiple(self):
+        """True if more than one item is selected."""
         return len(self) > 1
 
     def hide(self):
@@ -131,9 +134,7 @@ class BDOBrowserItem(BDOBrowserCommon):
     def tags(self):
         return self._obj.tags
 
-    def _get_visible(self): return self._visible
-    def _set_visible(self, x): self._visible = bool(x)
-    visible = property(_get_visible, _set_visible)
+    visible = property(get_visible, set_visible)
 
     def _menuitems_onesel(self): yield
     def _menuitems_mulsel(self): yield
