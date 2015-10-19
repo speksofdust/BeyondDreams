@@ -19,70 +19,173 @@ from .bd import session
 from beyonddreams.core.baseclasses import BDDataDict
 from .vident import VIDENT_TYPES
 
+class CFWrapper:
+    """Character data access wrapper."""
+    def __init__(self, char): self.char = char
 
-class CharName(tuple):
-    __slots__ = "_editable"
-    def __init__(self, first="", middle="", last="", nick=""):
-        self._editable = False
-        self = (first, middle, last, nick) # first, middle, last, nick
+    def __eq__(self, c): return self._char == (c or c._char)
+    def __ne__(self, c): return self._char != (c or c._char)
 
-    def _set_tuple(self, a, b, c, d):
-        if self._editable: self = (a, b, c, d)
 
-    def _get_first(self): return self[0]
-    def _set_first(self, n): self._set_tuple(n, *self[1:3])
+class CharName(CFWrapper):
+
+    def __str__(self): return str(self.__repr__[1:-1])
+    def __repr__(self): return str((self.first, self.last, self.middle, self.nick))
+
+    def _sn(self, n, v):
+        if self.char._name_is_ediatble: self.char["".join('name-', v)] = n
+
+    def _get_first(self): return self.char['name-first']
+    def _set_first(self, n): self._sn(n, 'first')
     first = property(_get_first, _set_first)
 
-    def _get_middle(self): return self[1]
-    def _set_middle(self, n): self._set_tuple(self[0], n, *self[-2:])
+    def _get_middle(self): return self.char['name-middle']
+    def _set_middle(self, n): self._sn(n, 'middle')
     middle = property(_get_middle, _set_middle)
 
-    def _get_last(self): return self[2]
-    def _set_last(self, n): self._set_tuple(self[0], self[1], n, self[-1])
+    def _get_last(self): return self.char['name-last']
+    def _set_last(self, n): self._sn(n, 'last')
     last = property(_get_last, _set_last)
 
-    def _get_nick(self): return self[3]
-    def _set_nick(self, n): self._set_tuple(self[0], self[1], self[2], n)
+    def _get_nick(self): return self.char['name-nick']
+    def _set_nick(self, n): self._sn(n, 'nick')
     nick = property(_get_nick, _set_nick)
 
     @property
     def full(self):
         """The first and last name."""
-        return self[0], self[2]
+        return self.char[0], self.char[2]
 
     @property
     def middle_initial(self):
         """The first letter of the middle name."""
-        return self[1][0]
+        return self.char[1][0]
 
     @property
     def initials(self):
         """The first letters of the first and last name."""
-        return self[0][0], self[2][0]
+        return self.char[0][0], self.char[2][0]
 
 
 class CharData(BDDataDict):
-    __slots__ = "_char", "_base"
+    __slots__ = "_char", "_base", "_name_is_editable"
     def __init__(self, char, base=""):
         self._char =    char
         self._base =    base
-        self = {
-            "name":         CharName(),
-            "party":        None
-            "body":         None,
-            "inventory":    None,
-            "equip":        None,
-            "wallet":       None,
-            "stats":        Stats(self),
-            "resistances":  None,
-            "location":     None,
-            }
+        self._party =   party
+        self._name_is_editable = False
+        self._location = None
+        self._data_id = None        # access data[self._data_id][some_data]
+        super().__init__({
+            "name-first":           "",
+            "name-last":            "",
+            "name-middle":          "",
+            "name-nick":            "",
+
+            "location": {
+                'region':   0,
+                }
+
+            "body":     {
+                }
+
+            # inventory
+            "inventory-consumables":    [],
+            "inventory-weapons":        [],
+            "inventory-wearables":      [],
+            "inventory-keyitems":       [],
+
+            # equip
+            "equip":    {
+                },
+
+            "handedness":               0,  # 0-left, 1-right, 2-ambidextrous
+
+            # wallet
+            "wallet-coupons":           [],
+            "wallet-cash":              {},
+
+            # stats stuff
+            "stats":        {
+                "phys-energy":      100,
+                "mental-energy":    100,
+                "health":           100,
+                }
+
+            "statuses": {
+                # physical types
+                "frozen":           False
+                "frostbite" :       0,
+                "burn" :            0,
+                "numb" :            0,
+                "stun" :            0,
+                "poisoning" :       0,
+                "bleed" :           0,
+
+                # mental types
+                "blind" :           0,
+                "drunk" :           0,
+                "dumb" :            0,
+                "confusion" :       0,
+
+                # transform types
+                "zombie" :          0,
+                "mutagen" :         0,
+                }
+
+            })
         if self._char.is_npc:
             from .game.location import NPCCharLocData
-            self["location"] = NPCCharLocData
+            self._location = NPCCharLocData
         else:
             from .game.location import CharLocData
-            self["location" = CharLocData
+            self._location = CharLocData
+
+    @property
+    def handedness(self):
+        return self['handedness']
+
+    @property
+    def name(self):
+        return Charname(self)
+
+    @property
+    def statuses(self):
+        return Statuses(self)
+
+    @property
+    def location(self):
+        return self._location
+
+
+class Stauses:
+
+    def _gs(self, status):
+        pass
+        # self.char['statuses'][status]
+
+    def _set_status(self, status):
+        pass
+        # self.char['statuses'][status]
+
+    def _gs_bool(self, status):
+        pass
+
+    def _ss_bool(self, status):
+        pass
+
+
+    def _get_frozen(self):    return self._gs_bool(self, "frozen")
+    def _set_frozen(self, x): self._ss_bool(self, "frozen")
+    frozen = property(_get_frozen, _set_frozen)
+
+    def _get_frostbite(char): return self._gs(self, "frostbite")
+    def _set_frostbite(char, x): self._ss(self, "frostbite")
+    frostbite = property(_get_frostbite, _set_frostbite)
+
+    def _get_burn(char): return self._gs(self, "burn")
+    def _set_burn(char, x): self._ss(self, "burn")
+    burn = property(_get_burn, _set_burn)
 
 
 class Char:
