@@ -16,16 +16,39 @@
 # ---------------------------------------------------------------------------- #
 
 # msgcodes
-NORMAL =        0
+NORMAL =        0   # normal text
 USER =          1   # user text
-WHISPER =       2
-USER_WHISPER =  3 # user whisper
+WHISPER_RECV =  2   # recieved whisper
+WHISPER_SEND =  3   # sent whisper
 
-SERVER =    10
-ADMIN =     11  # admin message
-ERROR =     12
-WARN =      13
+SERVER =        10  # server messages
+ADMIN =         11  # admin message
+NOTICE =        12
 
+ERROR =         20
+WARN =          25
+IMPORTANT =     30
+
+# local
+DIV_LINE =      50  # normal divider line
+DIV_LINE_DASH = 51  # dashed divider line
+
+DIV_LINE_CODES = 50, 51
+
+DEFAULT_TIMEFMT = "[%l:%M:%S]"
+
+DEFAULT_MSG_COLORS = {
+    "normal":       "#CCCCCC",
+    "user":         "#BFF0FF",
+    "whisper":      "#7BA59E",
+    "user-whisper": "#1E90FF",
+    "server":       "#757575",
+    "admin":        "#800080",
+    "notice":       "#E5E545",
+    "error":        "#FF0000",
+    "warn":         "#FFA500",
+    "important":    "#A5F378",
+    }
 
 class _Channels(list):
     def __init__(self):
@@ -87,6 +110,10 @@ class Chan(list):
         """The last message."""
         return self[-1]
 
+    def add_div_line(self, code):
+        if code in DIV_LINE_CODES:
+            self.append(DivLine(code))
+
     def new_message(self, msg, msgcode='default'):
         """Append a new message to this channel."""
         if msg:
@@ -127,4 +154,18 @@ class Message(str):
         """The timestamp for this message."""
         import datetime
         return datetime.datetime.fromtimestamp(self._ts)
+
+
+class DivLine:
+    """Text Divider Line"""
+    def __init__(self, msgcode):
+        self._msgcode = msgcode
+
+    def _get_divline(code, length):
+        if code == DIV_LINE_DASH: return "-"*length
+        else: return "—"*length
+
+
+
+
 
