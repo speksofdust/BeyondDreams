@@ -33,6 +33,7 @@ class GameDataAccessorSeq(GameDataAccessor):
     def __len__(self):          return len(self.__dpath())
     def __contains__(self, i):  return i in self.__dpath()
     def __getitem__(self, i):   return self.__dpath[i]
+    def index(self, i):         return self.__dpath.index(i)
 
 
 class GameDataAccessorDict(GameDataAccessorSeq):
@@ -40,6 +41,7 @@ class GameDataAccessorDict(GameDataAccessorSeq):
     __slots__ = ()
     def keys(self):     return self.__dpath.keys()
     def values(self):   return self.__dpath.values()
+    def index(self):    raise NotImplementedError
 
 
 # ---- Char Data Accessors --------------------------------------------------- #
