@@ -15,7 +15,7 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-"""Data accessors."""
+"""Data accessor base classes for gamedata and chardata."""
 
 
 class GameDataAccessor:
@@ -27,7 +27,7 @@ class GameDataAccessor:
 
 
 class GameDataAccessorSeq(GameDataAccessor):
-    """Game data accessor for sequences."""
+    """Game data accessor for data stored in a sequence."""
     __slots__ = ()
     def __iter__(self):         return iter(self.__dpath())
     def __len__(self):          return len(self.__dpath())
@@ -37,7 +37,7 @@ class GameDataAccessorSeq(GameDataAccessor):
 
 
 class GameDataAccessorDict(GameDataAccessorSeq):
-    """Game data accessor for dicts."""
+    """Game data accessor for data stored in a dict."""
     __slots__ = ()
     def keys(self):     return self.__dpath.keys()
     def values(self):   return self.__dpath.values()
@@ -59,8 +59,10 @@ class CharDataAccessor(GameDataAccessor, _CA):
 
 
 class CharDataAccessorDict(GameDataAccessorDict, _CA):
+    """Character data accessor for data stored in a dict."""
     __slots__ = _CA.__slots__
 
 
 class CharDataAccessorSeq(GameDataAccessorSeq, _CA):
+    """Char data accessor for data stored as a sequence."""
     __slots__ = _CA.__slots__
