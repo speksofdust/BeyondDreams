@@ -16,7 +16,7 @@
 # ---------------------------------------------------------------------------- #
 
 from .core.bddata import BDDataDict
-
+import gameaccessors as gacc
 
 gamedata = None
 
@@ -27,38 +27,21 @@ def fmt_filename(name, number):
     return '{}_{}'.format(name, number)
 
 
-class GameDataAccessor:
-    def __dpath(): raise NotImplementedError
-    __slots__ = ()
-
-    def __eq__(self, x): return self.__dpath == (x or x.__dpath())
-    def __ne__(self, x): return self.__dpath != (x or x.__dpath())
-
-
-class GameDataAccessorSeq(GameDataAccessor):
-    __slots__ = ()
-    def __init__(self):
-        pass
-    def __iter__(self): return iter(self.__dpath())
-    def __len__(self): return len(self.__dpath())
-    def __contains__(self, i): return i in self.__dpath()
-    def __getitem__(self, i): return self.__dpath[i]
-
-
 class GamaData(BDDataDict):
     """Storage class for game data."""
     path_suffix = 'savedgames'
     datatype = "gamedata"
-    def __init__(self, game):
+    def __init__(self, game=None, *args, **kwargs):
         self._game = game
         self._last_save_num = 0
         super().__init__({
             'chars': {},
             'party': (0, []), # active, list of members
+            'visited': {},    # locations visited data
             }
 
     @classmethod
-    def load_game(self, filepath):
+    def load_data(self, filepath):
         if self._game:
             from gui.prompts import QuitPrompt
             x = QuitPrompt(("""There is already a game in progress.\nDo you wish to load a new game?\n(Your progress will not be saved.)""")
@@ -70,23 +53,51 @@ class GamaData(BDDataDict):
             pass
         #super().__init__() # json.loads stuff here
 
+    @property
+    def writable(self):
+        """True if this gamedata is writable."""
+        return self._game.writable
 
     def quick_save(self):
-        if self._game._writable:
+        if self.writable:
             self.write(self.default_dirname, fmt_filename(
                 ''.join(self._name, '_', 'quicksave'), self._last_save_num += 1))
 
-    def write(self, filename, dirname, comment=''):
-        if self._game._writable:
+    def write_data(self, filename, dirname, comment=''):
+        if self.writable:
             bddata._wd(self, filename, dirname, comment)
 
     # ---- Data Accessors ----------------------------------------------- #
     @property
     def party(self):
         """Access party data."""
-        return
+        return gacc.PartyAccessor(self)
 
     @property
     def all_chars(self):
         """Access all character data."""
-        return
+        return gacc.AllCharsAccessor(self)
+
+    def party_chars(self):
+        """Return an iterator of all party character data in current party order."""
+        return iter(self['chars'][i] for i in self['party'][1])
+
+    #def _get_char(self, char):
+    #    return CharDataAccessor(self, char)
+
+    @property
+    def visited(self):
+        """Access the data visited locations."""
+        return gacc.VisitedAccessor(self)
+
+
+class EntryModeData(GameData):
+    """Storage class for entry mode data."""
+    path_suffix = 'savedgames'
+    datatype = "emdata"
+
+    def quick_save(self): raise NotImplementedError
+
+    @property
+    def visited(self):
+        return gacc.EMVisitedAccessor
