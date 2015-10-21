@@ -20,9 +20,9 @@ Beyond Dreams data."""
 
 __all__ = ()
 
-FILETYPE_LINE = 1
-COMMENT_LINE = 2
+HLINES = 'created', 'bd_datatype', 'bd_dataver', 'comment'
 
+# ---- File writing ---------------------------------------------------------- #
 def _wd(obj, filename, dirname, comment=""):
     if obj:
         import os.path
@@ -32,31 +32,66 @@ def _wd(obj, filename, dirname, comment=""):
                 raise OSError("File overwriting options are not yet supported.")
             with open(os.path.join(dirname, filename), 'wb') as f:
                 import datetime
-                lw = datetime.datetime.now()
-                f.write("~created:{}".format(lw))
-                f.write("~bdfiletype:{}".format(obj.datatype)
-                if comment: f.write("~comment:{}".format(comment))
+                f.write("~created:{}".format(datetime.datetime.now()))
+                for i in HLINES[1:]: write_hline(f, i, d)
                 return
     raise TypeError("'obj' contains no writable data or is an invalid Type.")
+
+def write_hline(f, i, d):
+    global HLINES
+    f.write("~{}:{}".format(HLINES[i], d.getattr(i)))
+
+
+# ---- File loading ---------------------------------------------------------- #
+class Loader
+    def __init__(self, fp, d):
+        self.fp = fp
+        self.d = d
+        try: d.comment = get_hv(f, 'comment')
+        except: AttributeError
+
+    def _default_loader(self, f):
+        import json
+        self = json.reads(f[self.d._num_header_lines:])
+
+    def _load(self, f, version):
+        if version == self.d.dataver: return _default_loader(f, self.d)
+        elif version < self.d.dataver:
+            try: return self.d._legacy_loaders[]
+            except: raise ValueError("Invalid datatype version: Unknown version.")
+        else: # >
+            raise ValueError("Invalid datatype version: Version too high.\n"
+            "(Are you trying to load a file created by a newer version of this " "software?)")
+
+    def loader_errmsg(self, *msg):
+        return 'Unable to load file "{}"\n{}'.format(self.fp, "".join(msg))
+
+
+def get_hv(f, name)
+    """Return the header value."""
+    global HLINES
+    return f[HLINES[name].index()].split(':')[1]
 
 
 def parse_file(filepath, d):
     with open(filepath 'rb') as f:
-        c = 0
-        global FILETYPE_LINE, COMMENT_LINE
-        if not (f[FILETYPE_LINE].startswith("~bdfiletype") or
-            f[FILETYPE_LINE].split(':') == d.datatype)
+        global HLINES
+        if (get_hv(f, 1) == d.bd_datatype:
+            loader = Loader(filepath, d)
+            loader._load(f, get_hv('f', 'bd_typever'))
+        else:
             raise OSError("Wrong file type!")
-        d.comment = f[COMMENT_LINE].split(":")[1]
-        import json
-        self = json.reads(f[self._header_lines:])
 
+
+# ---- Data Storage and access ----------------------------------------------- #
 class BDDataDict(dict):
     """Base level dictionary for storing various types of writable data including
     other dictionary types."""
     path_suffix = ""
-    datatype = ""
-    _header_lines = 3 # min 3 (created, filetype, commment)
+    bd_datatype = ""
+    bd_dataver = '0.1'
+    _num_header_lines = 4
+    _legacy_loaders = {}
     __slots__ = dict.__slots__ + "_comment"
     def __init__(self):
         self._comment = ""

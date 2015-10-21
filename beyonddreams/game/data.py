@@ -30,7 +30,8 @@ def fmt_filename(name, number):
 class GamaData(BDDataDict):
     """Storage class for game data."""
     path_suffix = 'savedgames'
-    datatype = "gamedata"
+    bd_datatype = "gamedata"
+    bd_dataver = '0.1'
     def __init__(self, game=None, *args, **kwargs):
         self._game = game
         self._last_save_num = 0
