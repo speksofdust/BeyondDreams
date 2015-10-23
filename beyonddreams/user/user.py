@@ -17,8 +17,6 @@
 
 import string
 
-from globvars import GlobVars
-
 
 def valid_username_chars():
     yield '_'
@@ -53,9 +51,6 @@ class User:
         self._data = UserData(self)
         self._keyset = CurrentKeySet()
         self._chars = UserChars(self)
-        # makes a new user if filepath is None
-        #self._globvars = GlobVars.userglobals(filepath)
-        #self._data = None
         import msg
         self._msgchans = msg._Channels()
 
@@ -108,8 +103,6 @@ class User:
         self._config.write
         del self._msgchans
         del self._config
-        self._msgchans = None
-        self._config = None
         if q: # quitting
             pass
 

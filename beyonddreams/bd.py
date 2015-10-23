@@ -16,41 +16,45 @@
 # ---------------------------------------------------------------------------- #
 
 VERSION =   "0.1.1"
+NAME =      "Beyond Dreams"
 session =   None
 
-def version():
-    """Return the version number.."""
-    global VERSION
-    def major(): return VERSION.split(".")[0]
-    def minor(): return VERSION.split(".")[1]
-    def revision(): return VERSION.split(".")[2]
-    return VERSION
 
+from core.utils import getversion
+version = getversion(VERSION)
 
-__all__ = "version", "session"
+__all__ = "version", "session", "NAME"
 
 
 def _start():
-    global session
-    import xsquare
     from core.paths import set_localcfg_path
     set_localcfg_path()
 
+    try: import xsquare
+    except:
+        #from core.paths import xs_path_from_file
+        #try: # TODO xs_path_from_file()
+        #except:
+        raise ImportError("""Could not find package 'xsquare'. Make sure XSquare  is installed and try setting the path to xsquare in '{}'""".format(
+            get_xs_path_file()))
+
     # init session then run xsquare app
+    global session
     session = _Session()
     xsquare.app.run()
 
 
 class Session:
     def __init__(self):
-        from globvars import GlobVars
         from user import User
         from screen import ScreenNav
 
-        # If no globals path can be found defaults will be used
-        self._globvars = GlobVars(BD_GLOBALS_PATH)
         self._user = None
         self._screen = ScreenNav() # The current screen
+
+    @property
+    def user(self):
+        return self._user
 
     @property
     def screen(self):

@@ -35,6 +35,8 @@ DIV_LINE_DASH = 51  # dashed divider line
 
 DIV_LINE_CODES = 50, 51
 
+ALL_CODES = 0,1,2,3, 10, 11, 12, 20, 25, 30, 50, 51
+
 DEFAULT_TIMEFMT = "[%l:%M:%S]"
 
 DEFAULT_MSG_COLORS = {
@@ -49,6 +51,8 @@ DEFAULT_MSG_COLORS = {
     "warn":         "#FFA500",
     "important":    "#A5F378",
     }
+
+import session
 
 class _Channels(list):
     def __init__(self):
@@ -73,6 +77,41 @@ class _Channels(list):
     def clear_unread(self):
         """Reset the number of unread messages to 0 on all channels."""
         for i in self: i._unread = 0
+
+
+class GlobalChan:
+    def __init__(self):
+        pass
+
+    def _get_default_codes(self):
+        return session.user.config['msg-globchan-showcodes-default']
+    def _set_default_codes(self, codes):
+        session.user.config['msg-globchan-showcodes-default'] = list(set(codes))
+    default_codes = property(_get_default_codes, _set_default_codes,
+        doc="The default shown message codes."
+
+    def _get_shown(self):
+        session.user.config['msg-globchan-showcodes-last']
+    def _set_shown(self):
+        session.user.config['msg-globchan-showcodes-last'] = list(set(codes))
+    codes = property(_get_lastcodes, _set_lastcodes,
+        "The currently shown message codes.")
+
+    def hidden_codes(self):
+        """Return an iterator of all currently hidden message codes."""
+        return iter(i for i in ALL_CODES if i not in self.codes)
+
+    def hide_codes(self, *codes):
+        """Hide given codes."""
+        self.codes = [i for i in self.codes if i not in codes]
+
+    def show_codes(self, *codes):
+        """Show given codes."""
+        self.codes += codes
+
+    def reset_codes(self):
+        """Reset current codes to defaults."""
+        self.codes = self.default_codes
 
 
 class Chan(list):
@@ -122,9 +161,10 @@ class Chan(list):
             else self.append(Message(msgcode, msg))
             self._unread += 1
 
-    def dump(self, filepath, append=True):
+    def _dump_scrollback(self, filepath):
         """Dump all messages from this channel to a text file."""
         with open(filepath, 'wb') as f:
+            f.write(self.name)
             for i in self:
                 f.write(i.timestamp, i)
 

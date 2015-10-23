@@ -21,8 +21,7 @@ _localcfg = None
 
 def bd_datapath(*args):
     """Returns the absolute path of "beyonddreams/data/" joined with args."""
-    return os.path.join(os.path.split(os.path.abspath(__file__)),
-        "data", *args)
+    return os.path.join(os.path.split(os.path.abspath(__file__)), "data", *args)
 
 def localcfg_path(*args):
     """Returns the path of the local localcfg directory joined with args."""
@@ -39,6 +38,19 @@ def set_localcfg_path(path=None):
         _localcfg = tmp
     # TODO set custom path
 
+def xs_path_from_file():
+    try: with open(localcfg_path('xsquare_path.cfg', 'rb') as f:
+        for i in f.readlines():
+            if i.startswith('path_to_xsquare='):
+                return i.split('=')[1].lstrip()
+    except:
+        if not os.path.exists(localcfg_path('xsquare_path.cfg'):
+            f = open(localcfg_path('xsquare_path.cfg', 'wb')
+            f.write('path_to_xsquare=')
+            f.close()
+
+
+# ---- User ------------------------------------------------------------------ #
 def get_user_ids():
     """Return an iterator of all user ids."""
     return iter(i for i in os.listdir(localcfg_path('users')) if
