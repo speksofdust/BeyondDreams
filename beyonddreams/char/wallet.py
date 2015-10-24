@@ -24,9 +24,31 @@ class CardType:
     __slots__ = ()
 
 
+
+DEFAULT = 0
+PERCENT_OFF = 1
+FREE = 2
+
+# coupon abbrs
+BQGQ = 0
+PERCOFF = 1
 class CouponType:
     _typename = "coupon"
+    modes = {BQGQ:(1,2),}
     __slots__ = ()
+
+    def _set_coupon(char, name, coupontype, a, b, exp, d=0):
+        char.wallet.coupons.append(name, coupontype, a, b, exp, d)
+
+    def bqgq(char, name, req_qty, get_qty, expires, mode=0):
+        """'Buy qty get qty' coupon type."""
+        if (get_qty > 0 and req_qty >= 0)
+            _set_coupon(char, name, BQGQ, req_qty, get_qty, expires, mode)
+
+    def percentoff:
+        def __init__(char, name, req_qty, val_off, expire):
+            if (req_qty >= 1 and off > 0):
+                _set_coupon(char, name, PERCOFF, req_qty, val_off, expire)
 
 
 class CashType(int):
@@ -71,29 +93,27 @@ class CardPocket(WalletPocket):
     _pockettype = "cards"
 
 
-class Wallet(ItemStorageChar):
+class Wallet:
     _name = "wallet"
-    __slots__ = CharAttrib.__slots__ + "_coupons"
-    def __init__(self, char, zil=0):
-        self._char = char
-        self = (
-            CashPocket((zil)),
-            CouponPocket(),
-            CardPocket()
-            )
+    __slots__ = '_char'
+    def __init__(self, char):
+        self.char = char
+
+    def __str__(self): return self.__repr__()[1:-1]
+    def __repr__(self): return str(self.cash, self.coupons, self.cards)
 
     @property
     def cash(self):
         """Access the cash pocket."""
-        return self[0]
+        return self.char['wallet-cash']
 
     @property
     def coupons(self):
         """Access the coupons pocket."""
-        return self[1]
+        return self.char['wallet-coupons']
 
     @property
     def cards(self):
         """Access the cards pocket."""
-        return self[2]
+        return self.char['wallet-cards']
 

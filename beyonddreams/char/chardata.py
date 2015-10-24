@@ -18,6 +18,7 @@
 
 # will replace char.py
 import cacc
+from wallet import Wallet
 
 class CharAccessor(GameDataAccessorDict):
     __slots__ = ()
@@ -38,12 +39,22 @@ class CharAccessor(GameDataAccessorDict):
     def statuses(self):
         return cacc.Statuses(self)
 
+    @property
+    def wallet(self):
+        return Wallet(self)
+
     # ---- Query --------------------------------------------------------- #
     @property
     def famtypes(self):
         """Return an iterator of family types for this character starting with
         the primary type."""
         return () #TODO
+
+    @property
+    def handedness(self):
+        """The handedness of this character.
+        0: left    1: right    2: ambidextrious"""
+        return self['handedness']
 
     def is_alive(self):
         """True if this character's hp is 0."""

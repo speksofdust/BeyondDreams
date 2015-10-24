@@ -56,8 +56,9 @@ class CharData(BDDataDict):
             "handedness":               0,  # 0-left, 1-right, 2-ambidextrous
 
             # wallet
-            "wallet-coupons":           [],
             "wallet-cash":              {},
+            "wallet-coupons":           [],
+            "wallet-cards":             [],
 
             # stats stuff
             "stats":        {
@@ -110,6 +111,11 @@ class CharData(BDDataDict):
     @property
     def location(self):
         return self._location
+
+    @property
+    def wallet(self):
+        return Wallet(self)
+
 
 
 
