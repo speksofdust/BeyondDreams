@@ -75,6 +75,9 @@ class StatusEffects(_B):
             "physical-status" : ZERO,
             "mental-status" :   ZERO,
             "transformation" :  ZERO,
+
+            'immunnull':        False
+            'immundown':        ZERO
             })
         for i in kwargs:    self[i] = kwargs[i]
 

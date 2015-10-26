@@ -62,6 +62,88 @@ class Inventory(gacc.CharDataAccessor):
     __slots__ = gacc.CharDataAccessor.__slots__
 
 
+
+class StatsAbsRange(dict):
+    def __init__(self, items):
+        super().__init__(items)
+
+    def get_clamped(self, name, val):
+        if self[name][0] <= val: return self[name][0]
+        elif self[name][1] >= val: return self[name][1]
+        else: return val
+
+
+# Absolute minimum and maximum for stats
+STATS_ABS_RANGE = StatsAbsRange(
+    {
+    # ---- Stats -------------------------------------------------------- #
+    # Levels change with equip, skill, etc. changes.
+    'phys-stamina':     (0, 200),
+    'mental-stamina':   (0, 200),
+    'intellect':        (1, 200),
+    'focus':            (0, 200),
+    'strength':         (1, 200),
+    'willpower':        (0, 200),
+    'agility':          (1, 100),
+    'luck':             (-1000, 1000),
+
+    'phys-energy':      (0, 200),
+    'mental-energy':    (0, 200),
+    'health':           (0, 200),
+
+    # hidden stats
+    'karma':            (-1000, 1000),
+    'adrenaline':       (0, 100),
+    'rage':             (-100, 100),
+
+    # ---- Statuses ----------------------------------------------------- #
+    "frozen":           (0, 1),     # bool
+    "frostbite" :       (0, 100),
+    "burn" :            (0, 100),
+    "numb" :            (0, 100),
+    "stun" :            (0, 100),
+    "poisoning" :       (0, 100),
+    "bleed" :           (0, 100),
+    'poisioning':       (0, 100),
+
+    # mental
+    "blind" :           (0, 100),
+    "drunk" :           (0, 200),
+    "dumb" :            (0, 200),
+    "confusion" :       (0, 100),
+
+    # transform
+    "zombie" :          (0, 100),
+    "mutagen" :         (0, 100),
+
+    # specials
+    "immunnull":        (0, 1),     # bool
+    "immundown":        (0, 200),
+    })
+
+
+# rage - > 0 increases strength but uses more phys-energy < 0 does the opposite
+
+
+
+# Real value calculations
+def calc_energy(c, energy_type):
+    # any type
+    # (total base)energy + (adrenaline * 0.02) + (rage * 0.02)
+    return  (c[stats][energy_type] + (c[stats]['adrenaline'] * 0.02) +
+        (c[stats]['rage'] * 0.02))
+
+def calc_focus(c):
+    # (total base)focus * (mental-energy + (adrenaline * 0.02) + (rage * 0.02))
+    return stats_abs_range.clamped('focus',
+        c[stats]['focus'] * calc_energy(c, 'mental-energy'))
+
+def calc_strength(c):
+    # (total base)strength * (phys-energy + (adrenaline * 0.02) + (rage * 0.02))
+    return stats_abs_range.clamped('strength',
+        c[stats]["strength"] * calc_energy(c, "phys-energy"))
+
+
 class Stauses(gacc.CharDataAccessorDict):
     __slots__ = gacc.CharDataAccessorDict.__slots__
     #priorities:
@@ -71,21 +153,22 @@ class Stauses(gacc.CharDataAccessorDict):
     #   Primary & Secondary Fam Immunities
     #   Primary Fam stat + Secondary Fam stat(s)
 
+    def set_status(self, name, v):
+        if name in BOOLSTATUSES: self.char['statuses'][name] = bool(v)
+        else: self.char['statuses'][name] = int(v)
 
-    def _gs(self, s): # uncalculated
-        return self.char['statuses'][s]
+    def get_status(self, name):
+        return self.char['statuses'][name]
 
     def _set_status(self, s, v):
         if s not in self.immunities():
             self.char['statuses'][s] = v # TODO clamping
 
-    def _gs_bool(self, s, v): # uncalculated
-        return self.char['statuses'][s]
-
     def _ss_bool(self, s, v):
         if s not in self.immunities(): self['stats'][s] = bool(v)
 
     def has_immunity_nullifiers(self):
+        """True if this char has 'immunnull' status or 'immundown' level is greater than 0"""
         return (self.char['statuses']['immunnull'] or
             self.char['statuses']['immundown'] >= 1)
 
@@ -94,29 +177,6 @@ class Stauses(gacc.CharDataAccessorDict):
         if self.has_immunity_nullifiers(): return iter(())
         return iter(())
 
-    # ---- bool type ----------------------------------------------------- #
-    def _get_frozen(self):    return self._gs_bool(self, "frozen")
-    def _set_frozen(self, x): self._ss_bool(self, "frozen")
-    frozen = property(_get_frozen, _set_frozen)
-
-    def _get_immunnull(self):    return self._gs_bool(self, "immunnull")
-    def _set_immunnull(self, x): self._ss_bool(self, "immunnull")
-    immunnull = property(_get_immunnull, _set_immunnull)
 
 
-    # ---- level type ---------------------------------------------------- #
-    def _get_frostbite(char): return self._gs(self, "frostbite")
-    def _set_frostbite(char, x): self._ss(self, "frostbite")
-    frostbite = property(_get_frostbite, _set_frostbite)
 
-    def _get_burn(char): return self._gs(self, "burn")
-    def _set_burn(char, x): self._ss(self, "burn")
-    burn = property(_get_burn, _set_burn)
-
-    def _get_drunk(char): return self._gs(self, "drunk")
-    def _set_drunk(char, x): self._ss(self, "drunk")
-    drunk = property(_get_drunk, _set_drunk)
-
-    def _get_poisoned(char): return self._gs(self, "poisoned")
-    def _set_poisoned(char, x): self._ss(self, "poisoned")
-    poisoned = property(_get_poisoned, _set_poisoned)

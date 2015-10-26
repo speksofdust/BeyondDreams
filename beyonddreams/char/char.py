@@ -61,15 +61,13 @@ class CharData(BDDataDict):
             "wallet-cards":             [],
 
             # stats stuff
-            "stats":        {
-                "phys-energy":      100,
-                "mental-energy":    100,
-                "health":           100,
-                }
+            "phys-energy":          100,
+            "mental-energy":        100,
+            "health":               100,
 
             "statuses": {
-                # physical types
-                "frozen":           False
+                # physical
+                "frozen":           0,   # bool
                 "frostbite" :       0,
                 "burn" :            0,
                 "numb" :            0,
@@ -77,16 +75,20 @@ class CharData(BDDataDict):
                 "poisoning" :       0,
                 "bleed" :           0,
 
-                # mental types
+                # mental
                 "blind" :           0,
                 "drunk" :           0,
                 "dumb" :            0,
                 "confusion" :       0,
 
-                # transform types
+                # transform
                 "zombie" :          0,
                 "mutagen" :         0,
-                }
+
+                # specials
+                "immunnull":        0,  # bool
+                "immundown":        0,
+                },
 
             })
         if self._char.is_npc:
