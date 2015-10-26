@@ -14,20 +14,40 @@
 #     along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
-"""Provides easy access to all bd types."""
+
+from famtypes import FamAffinities
 
 
-from items.itemtypes import ItemDict
-from char.famtypes import famtypes
-#from realms import RealmTypes
+class CreatureBaseTraits:
+    def __init__(self):
+        self._tameness = 0
+        self._affinities = FamAffinities()
+
+    @property
+    def affinities(self):
+        """Family type affinities. These values determine how hostile or tame a creature to different family types. Higher values are more tame."""
+        return self._affinities
+
+    def _get_aff(self, char, attr):
+        try: return sum(
+                self[i] for i in getattr(char.famtypes)) // len(char.famtypes)
+        except: return 0
+
+    def _calc_total_base_affinity(self, char):
+        """Calculate and return the base affinity of this creature to a given character or other creature."""
+        return sum(self._tameness, self[char.famtypes.primary],
+            self._get_aff(char, 'secondary'),
+            self._get_aff(char, 'elemental'),
+            self._get_aff(char, 'auxilaries'))
 
 
-itemtypes =     ItemDict()
-realmtypes =    None
-elemtypes =     None
-statustypes =   None
-famtypes =      famtypes
+class CreatureTraits:
+    def __init__(self):
+        self._basetraits = None
+        self._tameness = 0
 
-
-__all__ = ("itemtypes", "realmtypes", "elemtypes", "statustypes", "famtypes",
-    )
+    def calc_total_affinity(self, char):
+        """Calculate and return the affinity of this creature to a given character
+        or other creature."""
+        return int((self._basetraits._calc_total_base_affinity(char) +
+            self._tameness)//10)

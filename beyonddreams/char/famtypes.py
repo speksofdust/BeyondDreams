@@ -21,11 +21,13 @@ def tuplized(*items): return items
 
 
 class FamTypeData(tuple):
-    def __init__(self, primary, secondaries=(), classifiers=(), auxillaries=()):
+    def __init__(self, primary, secondaries=(), classifiers=(), auxillaries=(),
+        elementals=()):
         super().__init__((primary,
             tuplized(secondaries),
             tuplized(classifiers),
-            #tuplized(auxillaries), # not used
+            tuplized(auxillaries),
+            tuplized(elementals)
             )
 
     @property
@@ -44,16 +46,27 @@ class FamTypeData(tuple):
     def auxillaries(self):
         return self[3]
 
+    @property
+    def elementals(self):
+        return self[4]
 
-class FamType(dict):
+
+class FamType:
     _name = ""
     _desc = ""
+    __slots__ = ()
+
+
+class FamTypeDD(FamType, dict):
+    __slots__ = dict.__slots__
     def __init__(self):
         self.__init_ft(self)
 
     def __init_ft(self, *immunities, **kwargs):
-        self._immunities = immunities
-        # stupid init override mechanism
+        if self._famorder == 3: # make elems immune to own elem by default
+            immunities + (self._name,)
+        else: self._immunities = immunities
+        # init override mechanism so we dont have to call this every time
         super().__init__({
             # status effects
             "freeze":       50,
@@ -80,7 +93,7 @@ class FamType(dict):
             "dark":         0,
             "light":        0,
             "fire":         0,
-            "ice":          0,
+            "cold":         0,
             "water":        0,
             "wind":         0,
             "electric":     0,
@@ -96,6 +109,7 @@ class FamType(dict):
             # set default overrides to 0 for immunities
             for i in immunities:
                 if self[i] != 0: self[i] = 0
+
 
     @property
     def name(self):
@@ -131,14 +145,30 @@ class FamType(dict):
         else: return self._get_sgval(name)
 
 
-class PrimaryFam(_FamType):
+class PrimaryFam(FamTypeDD):
     _famorder = 0
 
-class SecondaryFam(_FamType):
+class SecondaryFam(FamTypeDD):
     _famorder = 1
 
-class AuxillaryFam(FamType):
+class AuxFam(FamType):
     _famorder = 2
+
+class ElemFam(FamType):
+    _famorder = 3
+    _elem_opp = ""
+    __slots__ = ()
+
+    @property
+    def opp_name(self):
+    """The elemental opposite name."""
+        return self._elem_opp
+
+    @property
+    def opp_data(self):
+        """The elemental opposite data."""
+        try: return famtypes[self._elem_opp]
+        except: return None
 
 
 # ---- Primaries -- (char can be only one) ----------------------------------- #
@@ -257,13 +287,66 @@ class Fae(SecondaryFam):
         self["animal-transform"] = 10
 
 
-# ---- Auxillaries -- (char can be multiple as long as compatible) ----------- #
-# currently not used
-
-
-class FamTypes(dict):
+# ---- Elementals ------------------------------------------------------------ #
+class Dark(ElemFam):
+    _name = "fire"
+    _elem_opp = 'light'
     def __init__(self):
-        self = {
+        self.__init_ft()
+
+
+class Light(ElemFam):
+    _name = "light"
+    _elem_opp = 'dark'
+    def __init__(self):
+        self.__init_ft()
+
+
+class Fire(ElemFam):
+    _name = "fire"
+    _elem_opp = 'cold'
+    _elem_weak = 'water'
+    def __init__(self):
+        self.__init_ft()
+
+
+class Cold(ElemFam):
+    _name = "cold"
+    _elem_opp = 'fire'
+    def __init__(self):
+        self.__init_ft()
+
+
+class Water(ElemFam):
+    _name = "water"
+    _elem_weak = 'electric'
+    def __init__(self):
+        self.__init_ft()
+
+
+class Wind(ElemFam):
+    _name = "wind"
+    def __init__(self):
+        self.__init_ft()
+
+
+class Electric(ElemFam):
+    _name = "electric"
+    def __init__(self):
+        self.__init_ft()
+
+
+# ---- Auxillaries -- (char can be multiple as long as compatible) ----------- #
+class Parasitic(AuxFam):
+    _name = "parasitic"
+    def __init__(self):
+        self.__init_ft()
+
+
+class FamTypes(FamTypesCommon, dict):
+    __slots__ = dict.__slots__
+    def __init__(self):
+        super().__init__({
             # primaries
             'reptile':          Reptile(),
             'insect':           Insect(),
@@ -280,7 +363,19 @@ class FamTypes(dict):
             'undead':           Undead(),
             "demon":            Demon(),
             'fae':              Fae()
-            }
+
+            # aux
+            'parasitic':        Parasitic(),
+
+            # elementals
+            "dark":         Dark(),
+            "light":        Light(),
+            "fire":         Fire(),
+            "cold":         Cold(),
+            "water":        Water(),
+            "wind":         Wind(),
+            "electric":     Electric(),
+            })
 
     def primaries(self):
         return iter(i for i in self if i._famorder == 0)
@@ -289,7 +384,32 @@ class FamTypes(dict):
         return iter(i for i in self if i._famorder == 1)
 
     def auxillaries(self):
-        return iter(i for i in self if i._famorder == 2
+        return iter(i for i in self if i._famorder == 2)
+
+    def elementals(self):
+        return iter(i for i in self if i._famorder == 3)
+
+
+famtypes = Famtypes()
+
+
+class FamAffinities(FamTypes):
+    """Family affinity data storage class."""
+    def __init__(self):
+        super().__init__()
+        for i in self: self[i] = 0 # default all values to 0
+
+    def primaries(self):
+        return iter(famtypes.primaries)
+
+    def secondaries(self):
+        return iter(famtypes.secondaries)
+
+    def auxillaries(self):
+        return iter(famtypes.auxillaries)
+
+    def elementals(self):
+        return iter(famtypes.elementals)
 
 
 class _TCDSS:
