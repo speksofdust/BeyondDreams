@@ -21,12 +21,8 @@ UID_LEN = 24
 
 def valid_username_chars():
     yield '_'
-    yield string.ascii_lowercase
-    yield string.digits
-
-def valid_charname_chars():
     yield string.ascii_letters
-
+    yield string.digits
 
 def _get_username_input():
     global valid_username_chars
@@ -34,7 +30,7 @@ def _get_username_input():
     return x
 
 def _get_charname_input():
-    global valid_charname_chars
+    #string.ascii_letters
     #while True:
     return x
 
