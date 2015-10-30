@@ -30,65 +30,7 @@ class CharData(BDDataDict):
         self._name_is_editable = False
         self._location = None
         self._data_id = None        # access data[self._data_id][some_data]
-        super().__init__({
-            "name-first":           "",
-            "name-last":            "",
-            "name-middle":          "",
-            "name-nick":            "",
-
-            "location": {
-                'region':   0,
-                }
-
-            "body":     {
-                }
-
-            # inventory
-            "inventory-consumables":    [],
-            "inventory-weapons":        [],
-            "inventory-wearables":      [],
-            "inventory-keyitems":       [],
-
-            # equip
-            "equip":    {
-                },
-
-            "handedness":               0,  # 0-left, 1-right, 2-ambidextrous
-
-            # wallet
-            "wallet-cash":              {},
-            "wallet-coupons":           [],
-            "wallet-cards":             [],
-
-            # stats stuff
-            "phys-energy":          100,
-            "mental-energy":        100,
-            "health":               100,
-
-            "statuses": {
-                # physical
-                "frozen":           0,   # bool
-                "frostbite" :       0,
-                "burn" :            0,
-                "numb" :            0,
-                "stun" :            0,
-                "poisoning" :       0,
-                "bleed" :           0,
-
-                # mental
-                "blind" :           0,
-                "drunk" :           0,
-                "dumb" :            0,
-                "confusion" :       0,
-
-                # transform
-                "zombie" :          0,
-                "mutagen" :         0,
-
-                # specials
-                "immunnull":        0,  # bool
-                "immundown":        0,
-                },
+        super().__init__(
 
             })
         if self._char.is_npc:
@@ -117,10 +59,6 @@ class CharData(BDDataDict):
     @property
     def wallet(self):
         return Wallet(self)
-
-
-
-
 
 
 class Char:

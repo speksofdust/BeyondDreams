@@ -17,6 +17,7 @@
 
 import string
 
+UID_LEN = 24
 
 def valid_username_chars():
     yield '_'

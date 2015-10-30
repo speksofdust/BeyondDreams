@@ -20,7 +20,32 @@ from statgroups import statgroups
 def tuplized(*items): return items
 
 
+class FamTypeAccessor:
+    """Accessor for char fam type data."""
+
+    @property
+    def primary:
+        return self.char['fam'][0]
+
+    @property
+    def secondaries(self):
+        return self.char['fam'[1]
+
+    @property
+    def classifiers(self):
+        return self.char['fam'][2]
+
+    @property
+    def auxillaries(self):
+        return self.char['fam'][3]
+
+    @property
+    def elementals(self):
+        return self.char['fam'][4]
+
+
 class FamTypeData(tuple):
+    """Storage class for fam type data."""
     def __init__(self, primary, secondaries=(), classifiers=(), auxillaries=(),
         elementals=()):
         super().__init__((primary,

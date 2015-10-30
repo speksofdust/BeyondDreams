@@ -27,6 +27,8 @@ def fmt_filename(name, number):
     return '{}_{}'.format(name, number)
 
 
+
+
 class GamaData(BDDataDict):
     """Storage class for game data."""
     path_suffix = 'savedgames'
