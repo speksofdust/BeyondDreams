@@ -24,7 +24,6 @@ class CardType:
     __slots__ = ()
 
 
-
 DEFAULT = 0
 PERCENT_OFF = 1
 FREE = 2
@@ -45,8 +44,7 @@ class CouponType:
         if (get_qty > 0 and req_qty >= 0)
             _set_coupon(char, name, BQGQ, req_qty, get_qty, expires, mode)
 
-    def percentoff:
-        def __init__(char, name, req_qty, val_off, expire):
+    def percentoff(char, name, req_qty, val_off, expire):
             if (req_qty >= 1 and off > 0):
                 _set_coupon(char, name, PERCOFF, req_qty, val_off, expire)
 

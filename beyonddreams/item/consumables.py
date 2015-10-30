@@ -27,7 +27,6 @@ class ConsumableTypeDict(ItemDict):
 
 class ConsumableType(BundableItemType):
     """Base class for all consumable item types."""
-    _sc =           (BundableItemType,)
     CATTYPE =       "consumable"
     edible =        0   # 0-False 1-True 2-Drinkable ('can' be eaten/drunk)
     _perishable =   0   # 0=False or max time as 3 ints (min, hours, days)
@@ -61,134 +60,118 @@ class ConsumableType(BundableItemType):
 
 class Ingredient(ConsumableType):
     """Consumable types that can always be used as an ingredient."""
-    _sc =       (ConsumableType,)
-
 
 class DryIngredient(Ingredient):
-    _sc =       (Ingredient,)
 
-class _DIng(DryIngredient):
-    _sc =       (DryIngredient,)
-
-class _EDing(_DIng):
+class EdibleIngredient(DryIngredient):
     edible =    1
 
 class WetIngredient(Ingredient):
-    _sc =       (Ingredient,)
     edible =    2
 
-class _WIng(WetIngredient):
-    _sc =       (WetIngredient)
 
 
 # ---- Dry Ingredient -------------------------------------------------------- #
-class Dust(_DIng):
+class Dust(DryIngredient):
     _typename = "dust"
 
 
-class Powder(_DIng):
+class Powder(DryIngredient):
     _typname =  "powder"
 
 
-class Seed(_EDing):
+class Seed(EdibleIngredient):
     _typename = "seed"
 
 
-class Flower(_EDIng):
+class Flower(EdibleIngredient):
     _typename = "flower"
 
 
-class Bark(_EDIng):
+class Bark(EdibleIngredient):
     _typename = "bark"
 
 
-class Root(_EDIng):
+class Root(EdibleIngredient):
     _typename = "root"
 
 
-class Leaf(_EDIng):
+class Leaf(EdibleIngredient):
     _typename = "leaf"
 
 
-class Mushroom(_EDIng):
+class Mushroom(EdibleIngredient):
     _typename = "mushroom"
 
 
-class Fruit(_EDIng):
+class Fruit(EdibleIngredient):
     _typename = "fruit"
 
 
 # ---- Wet Ingredient -------------------------------------------------------- #
-class Gel(_WIng):
+class Gel(WetIngredient):
     _typename = "gel"
     edible =    1
 
 
-class Oil(_WIng):
+class Oil(WetIngredient):
     _typename = "oil"
 
 
-class Potion(_WIng):
+class Potion(WetIngredient):
     _typename = "potion"
 
 
-class Perfume(_WIng):
+class Perfume(WetIngredient):
     _typename = "perfume"
+
+
+class Sap(WetIngredient):
+    _typename = "sap"
 
 
 # ---- Consumable ------------------------------------------------------------ #
 class Feather(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "feather"
 
 
 class Shell(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "shell"
 
 
 class Tooth(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "tooth"
 
 
 class Bone(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "bone"
 
 
 class String(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "string"
 
 
 class Button(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "button"
 
 
 class Ribbon(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "ribbon"
 
 
 class Rock(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "rock"
 
 
 class Gem(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "gem"
 
 
 class Ingot(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "ingot"
 
 
 class Cloth(ConsumableType):
-    _sc =       (ConsumableType,)
     _typename = "cloth"
 
 

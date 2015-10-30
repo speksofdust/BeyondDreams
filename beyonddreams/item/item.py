@@ -52,15 +52,17 @@ class Items:
 
 class ItemType(BDTaggedType):
     """Base class for all item types."""
-    _bundleable =     False
+    _bundleable =   False
     CATTYPE =       ""    # Primary catagory type (CONSUMABLE, WEAPON, etc.)
     _classifiers =  ()
     _typename =     ""    # name for this item type -- not for primary types
-    _typedesc =      ""
+    _typedesc =     ""
     ATTRIBS =       ()    # attribs for items when in inventory
     ALL_TYPE_ATTRIBS = () # all possible attribs for this type
+
+    # ---- stuff for consumables, weapons, and wearables only ----------------- #
     _bwt =          1.0   # base weight must be (float)
-    _slotsize =     1     # inventory slots used
+    _slotsize =     1
     _itemset =      None
 
     def __init__(self, name, tags=(), item_sets=()):
@@ -99,8 +101,6 @@ class BundableItemType(ItemType):
     _bundleable = True
     ABS_MAX_BUNDLE =    99
     _max_bundlesize =   1   # max num items grouped per bundle
-
-
 
 
 class ItemSet(BDTaggedType):
