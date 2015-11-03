@@ -20,10 +20,28 @@ NAME =      "Beyond Dreams"
 session =   None
 
 
-from core.utils import getversion
-version = getversion(VERSION)
+__all__ = "getversion", "session", "NAME"
 
-__all__ = "version", "session", "NAME"
+
+def getversion():
+    global VERSION
+    return VERSION
+
+def _gva():
+    global VERSION
+    return VERSION.split(".")[0]
+
+def _gvb():
+    global VERSION
+    return VERSION.split(".")[1]
+
+def _gvc():
+    global VERSION
+    return VERSION.split(".")[2]
+
+getversion.major = _gva
+getversion.minor = _gvb
+getversion.revision = _gvc
 
 
 def _start():

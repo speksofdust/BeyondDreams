@@ -24,37 +24,43 @@ CHAR_ID_LEN = 30
 
 
 CHARFLAGS = {
-    "full-recover": 98,
-    "revive-once":  99,
+    # Temp Flags
+    "has-encounter":    50, # currently attacked or in battle, etc.
+    "full-recover":     98,
 
     # ---- ko-flags ---- #
-    "revive_once":  99, # fails if ko'd in non revivable condition
-    # ko-type flags (as many as applicapable)
-    "suffocated":   111,
-    "drowned":      112,
-    "stabbed":      113, # last hit was stab
-    "beaten":       114, # last hit was blunt
-    "electrocuted": 115,
-    "burned":       116,
-    "froze":        117,
+    "revive_once":      99, # fails if ko'd in non revivable condition
 
-    "bled":         120, # bleed level maxed
-    "poisoned":     121, # poisoning level maxed
-    "drunk":        122, # drunk level maxed + poisioning level maxed
+    # ---- KO-Type flags (as many as applicapable) ---- #
+    "suffocated":       111,
+    "drowned":          112,
 
-    "gutted":       198,
-    "halved":       199, # split in half
+    # last hit
+    "stabbed":          113,
+    "beaten":           114,
+    "electrocuted":     115,
+    "burned":           116,
+    "froze":            117,
+
+    # status(s) maxed
+    "bled":             120, # bleed level maxed
+    "poisoned":         121, # poisoning level maxed
+    "drunk":            122, # drunk & poisioning levels maxed
+
+    # other
+    "gutted":           198,
+    "halved":           199, # split in half
 
     # non-revivable ko-type flags
-    "beheaded":     200,
-    "exploded":     201,
-    "vaporized":    202,
-    "flattened":    203,
+    "beheaded":         200,
+    "exploded":         201,
+    "vaporized":        202,
+    "flattened":        203,
     }
 
 def _inc_stat(char, name, v=1):
-    try: char['stats'][name] += v
-    except: char['stats'][name] = v
+    try: char['game-stats'][name] += v
+    except: char['game-stats'][name] = v
 
 # ---- status stuff ---------------------------------------------------------- #
 def clear_statuses(char):
@@ -72,11 +78,43 @@ def active_statuses(char):
     """Return an iterator of all statuses with a value of at least 1."""
     return iter(i for i in char['statuses'] if i >= 1)
 
+def is_deimmunized(char):
+    """True if character has 'immunull' or 'immundown' status."""
+    return (char['statuses']['immunull'] or char['statuses']['immundown'] >= 1)
+
+def status_immunities(char):
+    """Return an iterator of a character's current status immunities."""
+    if is_deimmunized(char): return iter()
+    pass    #TODO
+
+def base_status_immunites(char):
+    """Return an iterator of a character's base status immunities."""
+    return iter()
+
 def get_status(char, name):
     return char['statuses'][name]
 
 def set_status(char, name, v):
     char['statuses'][name] = v
+
+
+# ---- Query ----------------------------------------------------------------- #
+def is_alive(char):
+    """True if char is currently in ko state."""
+    return not any(i>=100 for i in char['KO-flags'])
+
+def has_koflag(char, flag):
+    global CHARFLAGS
+    return CHARFLAGS[flag] in char['KO-flags']
+
+def _has_spawn_timeout(char):
+    try:
+        if char['temp']['spawn-timeout'] > 0:
+            char['temp']['spawn-timeout'] -= 1
+            return True
+        del char['temp']['spawn-timeout'] # delete if 0
+        return False
+    except: return False # no variable exists
 
 def _killchar(char, *flags):
     global CHARFLAGS
@@ -87,27 +125,9 @@ def _killchar(char, *flags):
     if any(i >= 200 for i in flags):
         char['KO-flags'].discard(CHARFLAGS['revive-once'])
 
-def _is_ko(char):
-    """True if char is currently in ko state."""
-    return any(i>=100 for i in char['KO-flags')
-
-def _has_ko_timeout(char):
-    try:
-        if char['temp']['KO-timeout'] > 0:
-            char['temp']['KO-timeout'] -= 1
-            return True
-        del char['temp']['KO-timeout']
-        return False
-    except: return False
-
 def update_char(char):
-    if _is_ko(char):
-        if not _has_ko_timeout(char):
-            if has_koflag(char, 'revive-once'):
-                return _on_restore(char, revived=True)
-    else:
+    if is_alive(char):  # ---- Alive ------------------------------------ #
         # status ko checks -- these should be done after each statuses is applied
-        if not _is_ko(char):
             if char['statuses']['poisioned'] == 100:
                 # drunk > 200 starts to slowly increment poisoned stat
                 #   as char keeps drinking
@@ -119,15 +139,18 @@ def update_char(char):
             else:
                 return
 
-def has_koflag(char, flag):
-    global CHARFLAGS
-    return CHARFLAGS[flag] in char['KO-flags']
+    else:               # ---- Char KO'd -------------------------------- #
+        if not _has_spawn_timeout(char):
+            if has_koflag(char, 'revive-once'):
+                return _on_restore(char, revived=True)
+        return
+
 
 # ---- post ko events -------------------------------------------------------- #
 def _on_restore(char):
     """Called after restored or revived."""
     if has_koflag(char, 'revive-once'):
-        if char['stats']: _inc_stat(char, 'revived') # increment revived stat
+        if char['game-stats']: _inc_stat(char, 'revived') # increment revived stat
     if has_koflag(char, 'full-recover'): _full_recover(char)
 
     # lastly
@@ -145,10 +168,11 @@ def _warp(char):
 
 
 _chardata_dict = {
-    "temp":     {},     # non-writable stuff
+    "temp":         {}, # non-writable stuff
     # flags
-    "flags":    [],
-    "KO-flags": [],     # cleared after revived|re-spawn
+    "temp-flags":   [], # non-writable
+    "flags":        [],
+    "KO-flags":     [], # cleared after revived|re-spawn
     # base data
     "base":     "",
 
@@ -249,23 +273,24 @@ _chardata_dict = {
         "mutagen" :     0,
 
         # specials
-        "immunnull":    0,
+        "immunull":    0,
         "immundown":    0,
         },
     }
 
 from game.data import gamedata
 
+# ---- Char creation and deletion -------------------------------------------- #
 def _new_game_char(playable):
-    from utils import rand_alphanum
+    from xsquare.utils.strutils import rand_alphanumeric
     global CHAR_ID_LEN, _chardata_dict
-    cid = rand_alphanum(CHAR_ID_LEN)
+    cid = rand_alphanumeric(CHAR_ID_LEN)
     while True:
         if cid in gamedata['chars']:
-            cid = rand_alphanum(CHAR_ID_LEN)
+            cid = rand_alphanumeric(CHAR_ID_LEN)
         gamedata['chars'][cid] = _chardata_dict.copy()
         if playable:
-            gamedata['chars'][cid]['stats'] = {}
+            gamedata['chars'][cid]['game-stats'] = {}
 
 def _del_game_char(charid)
     try: del gamedata['chars'][charid]

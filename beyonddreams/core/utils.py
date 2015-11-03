@@ -15,34 +15,6 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from string import digits, ascii_uppercase
-ALPHANUMERIC = digits + ascii_uppercase
 
-def rand_alphanum(length):
-    """Return a random alphanumeric string of given length."""
-    # used for ids, user, char, etc.
-    global ALPHANUMERIC
-    import random
-    return "".join([ALPHANUMERIC[random.randint(0, 35)] for i in range(length)])
 
-def tuplized(*items):
-    """Converts items to a tuple."""
-    return items
 
-def getversion(v):
-    x = _GetVersion(v)
-    return x.version
-
-class _GetVersion:
-    def __init__(self, v):
-        self._v = v
-        def _a(): return self._v.split(".")[0]
-        def _b(): return self._v.split(".")[1]
-        def _c(): return self._v.split(".")[2]
-        version.major = _a
-        version.minor = _b
-        version.revision = _c
-
-    def version(self):
-        """Return the version number."""
-        return self._v
