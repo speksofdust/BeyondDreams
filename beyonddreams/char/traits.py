@@ -29,11 +29,11 @@ class CreatureBaseTraits:
         return self._affinities
 
     def _get_aff(self, char, attr):
-        try:    # average of attr -- (auxilaries, elemental, secondaries)
-            return sum((
+        try:    # average of each type attr -- (auxilaries, elemental, secondaries)
+            return sum((    # FIXME self[i]?
                 self[i] for i in getattr(char.famtypes, attr)) // len(
                     getattr(char.famtypes, attr))
-        except: return 0 # none of that type (gives ZeroDivisionError)
+        except: return 0 # none of type (gives ZeroDivisionError)
 
     def _calc_total_base_affinity(self, char):
         """Calculate and return the base affinity of this creature to a given character or other creature."""

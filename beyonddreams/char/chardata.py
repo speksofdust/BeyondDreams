@@ -19,6 +19,7 @@
 import cacc
 from wallet import Wallet
 from famtypes import FamTypeAccessor
+import statgroups
 
 CHAR_ID_LEN = 30
 
@@ -62,6 +63,7 @@ def _inc_stat(char, name, v=1):
     try: char['game-stats'][name] += v
     except: char['game-stats'][name] = v
 
+
 # ---- status stuff ---------------------------------------------------------- #
 def clear_statuses(char):
     """Reset all status values to 0."""
@@ -73,23 +75,6 @@ def full_recovery(char):
     char["phys-energy"] = 100
     char["mental-energy"] = 100
     char["health"] = 100
-
-def active_statuses(char):
-    """Return an iterator of all statuses with a value of at least 1."""
-    return iter(i for i in char['statuses'] if i >= 1)
-
-def is_deimmunized(char):
-    """True if character has 'immunull' or 'immundown' status."""
-    return (char['statuses']['immunull'] or char['statuses']['immundown'] >= 1)
-
-def status_immunities(char):
-    """Return an iterator of a character's current status immunities."""
-    if is_deimmunized(char): return iter()
-    pass    #TODO
-
-def base_status_immunites(char):
-    """Return an iterator of a character's base status immunities."""
-    return iter()
 
 def get_status(char, name):
     return char['statuses'][name]
@@ -231,49 +216,7 @@ _chardata_dict = {
         "mutagen" :     0,
 
         # specials
-        "immunnull":    0,  # bool
-        "immundown":    0,
-        },
-
-    "resistances": {
-        # -- attacks -- #
-        # elementals
-        "dark":         0,
-        "light":        0,
-        "fire":         0,
-        "cold":         0,
-        "water":        0,
-        "wind":         0,
-        "electric":     0,
-
-        # non elementals
-        "spirit":       0,
-        "psychic":      0,
-        "acid":         0,
-
-        # -- statuses -- #
-        # physical
-        "frozen":       0,
-        "frostbite" :   0,
-        "burn" :        0,
-        "numb" :        0,
-        "stun" :        0,
-        "poisoning" :   0,
-        "bleed" :       0,
-
-        # mental
-        "blind" :       0,
-        "drunk" :       0,
-        "dumb" :        0,
-        "confusion" :   0,
-        # "hallucination": 0,
-
-        # transform
-        "zombie" :      0,
-        "mutagen" :     0,
-
-        # specials
-        "immunull":    0,
+        "immunull":     0,  # bool
         "immundown":    0,
         },
     }
@@ -345,41 +288,79 @@ class CharAccessor(GameDataAccessorDict):
     def wallet(self):
         return Wallet(self)
 
-    # ---- Query --------------------------------------------------------- #
-    @property
-    def famtypes(self):
-        """Return an iterator of family types for this character starting with
-        the primary type."""
-        return FamTypeAccessor(self.char)
 
-    @property
-    def handedness(self):
-        """The handedness of this character.
-        0: left    1: right    2: ambidextrious"""
-        return self['handedness']
+# ---- Query --------------------------------------------------------- #
+def base(char):
+    """Access the base stats and other properties of this character."""
+    return char['base']
 
-    def is_alive(self):
-        """True if this character's hp is 0."""
-        return self.char['stats']['hp'] != 0
+def famtypes(char):
+    """Return an iterator of family types for this character starting with
+    the primary type."""
+    yield i for i in char['base'].famtypes
 
-    def is_critical(self):
-        """True if this character's hp is health is between 1 and 10 percent."""
-        return 1 <= self.char['stats']['hp'] <= 10
+def handedness(char):
+    """The handedness of this character.
+    0: left    1: right    2: ambidextrious"""
+    return char['handedness']
 
-    def is_undead(self):
-        """True if this character has a fam type of 'undead' or has 'zombie'
-        status."""
-        return ('undead' in self.famtypes or self['statuses']['zombie'] == 100)
+def is_alive(char):
+    """True if this character's hp is 0."""
+    return char['stats']['hp'] != 0
 
-    # ---- Calculated stat/status getters -------------------------------- #
-    def hp(self):
-        """Health for this character."""
-        return self['stats']['hp']
+def is_critical(char):
+    """True if this character's hp is health is between 1 and 10 percent."""
+    return 1 <= char['stats']['hp'] <= 10
 
-    def phys_energy(self):
-        """The current physical energy for this character."""
-        return
+def is_undead(char):
+    """True if this character has a fam type of 'undead' or has 'zombie'
+    status."""
+    return ('undead' in famtypes(char) or self['statuses']['zombie'] == 100)
 
-    def mental_energy(self):
-        """The current mental energy for this character."""
-        return
+
+# ---- Status Iterators ---- #
+def bool_statuses(char):
+    """Return an iterator of active 'bool' (statuses with a value of 0 or 1)
+    status names."""
+    return iter(i for i in statgroups.BOOL_STATUSES if char['statuses'][i])
+
+def active_statuses(char):
+    """Return an iterator of currently active status names.
+    (Has a value of at least 1)"""
+    return iter(i for i in statgroups.ALL_STATUSES if char['statuses'][i] >= 1)
+
+def inactive_statuses(char):
+    """Return an iterator of currently inactive status names.
+    (Has a value of 0)"""
+    return iter(i for i in statgroups.ALL_STATUSES if char['statuses'][i] == 0)
+
+
+# ---- Status getters ---- #
+def is_deimmunized(char):
+    """True if character has 'immunull' or 'immundown' status."""
+    return (char['statuses']['immunull'] == 1 or
+        char['statuses']['immundown'] >= 1)
+
+def status_immunities(char):
+    """Return an iterator of a character's current status immunities."""
+    if is_deimmunized(char): return iter()
+    for i in char['base'].status_immunities(): yield i
+
+def elemental_immunities(char):
+    """Return an iterator of currently active elemental immunities."""
+    if is_deimmunized(char): return iter()
+    for i in char['base'].elemental_immunities(): yield i
+
+
+# ---- Calculated stat/status getters -------------------------------- #
+def hp(char):
+    """Health for this character."""
+    return char['stats']['hp']
+
+def phys_energy(char):
+    """The current physical energy for this character."""
+    return
+
+def mental_energy(char):
+    """The current mental energy for this character."""
+    return

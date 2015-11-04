@@ -1,59 +1,36 @@
 # ---------------------------------------------------------------------------- #
 #                                                                              #
 #     This program is free software: you can redistribute it and/or modify     #
-#     it under the terms of the GNU General Public License as published by     #
-#     the Free Software Foundation, either version 3 of the License, or        #
+#     it under the terms of the GNU General Public Lcoldnse as published by     #
+#     the Free Software Foundation, either version 3 of the Lcoldnse, or        #
 #     (at your option) any later version.                                      #
 #                                                                              #
 #     This program is distributed in the hope that it will be useful,          #
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of           #
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the             #
-#     GNU General Public License for more details.                             #
+#     GNU General Public Lcoldnse for more details.                             #
 #                                                                              #
-#     You should have received a copy of the GNU General Public License        #
-#     along with this program. If not, see <http://www.gnu.org/licenses/>.     #
+#     You should have received a copy of the GNU General Public Lcoldnse        #
+#     along with this program. If not, see <http://www.gnu.org/lcoldnses/>.     #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+from xsquare.utils.iterutils import tupilize
+
 from statgroups import statgroups
-
-def tuplized(*items): return items
-
-
-class FamTypeAccessor:
-    """Accessor for char fam type data."""
-
-    @property
-    def primary:
-        return self.char['fam'][0]
-
-    @property
-    def secondaries(self):
-        return self.char['fam'[1]
-
-    @property
-    def classifiers(self):
-        return self.char['fam'][2]
-
-    @property
-    def auxillaries(self):
-        return self.char['fam'][3]
-
-    @property
-    def elementals(self):
-        return self.char['fam'][4]
 
 
 class FamTypeData(tuple):
+    __slots__ = tuple.__slots__
     """Storage class for fam type data."""
     def __init__(self, primary, secondaries=(), classifiers=(), auxillaries=(),
         elementals=()):
         super().__init__((primary,
-            tuplized(secondaries),
-            tuplized(classifiers),
-            tuplized(auxillaries),
-            tuplized(elementals)
-            )
+            tuplize(secondaries),
+            tuplize(classifiers),
+            tuplize(auxillaries),
+            tuplize(elementals)
+            ))
 
     @property
     def primary:
@@ -75,6 +52,39 @@ class FamTypeData(tuple):
     def elementals(self):
         return self[4]
 
+    def immunities(self):
+        """Return an iterator of all combined immunities."""
+        return iter(set(i.immunities() for i in chain.from_iterable(self)))
+
+    def status_immunities(self):
+        """Return an iterator of all combined status immunities."""
+        return iter(i for i in self.immunities if i in statgroups.ALL_STATUSES)
+
+    def elemental_immunities(self):
+        """Return an iterator of all combined elemental immunities."""
+        return iter(i for i in self.immunities if i in statgroups.ELEMENTALS)
+
+    def _sum_res(self, i, name):
+        try: return sum(self[i][name] // len(self[i][name])
+        except: return 0
+
+    def _calc_resistance(self, name):
+        c = 0 # valid count
+        x = 0 # valid sum
+        # valid only if not 0 from each subtype (primary, secodary, etc.
+        # avg of x (valid sum) divided by c (valid count)
+        # this prevents skewed results from always dividing by 5 which we dont want
+        if self[0][name] > 0:   # check primary
+            c += 1
+            x = self[0][name]
+        for i in range(1,5):    # check secondary, and so on
+            self._sum_res(i, name)
+            if n > 0:
+                c += 1
+                x += n
+        try: return x // c
+        except: return 0
+
 
 class FamType:
     _name = ""
@@ -94,7 +104,7 @@ class FamTypeDD(FamType, dict):
         # init override mechanism so we dont have to call this every time
         super().__init__({
             # status effects
-            "freeze":       50,
+            "frozen":       50,
             "frostbite":    0,
             "burn":         0,
             "numb":         0,
@@ -123,12 +133,16 @@ class FamTypeDD(FamType, dict):
             "wind":         0,
             "electric":     0,
 
-            # Groups
+            # specials
+            "immunull":     0,
+            "immundown":    0,
+
+            # Group type bonuses
             "physical":         0,  # any physical
             "non-physical"      0,  # any non-physical (spirit, psychic, etc.)
             "elemental":        0,  # any elemental
             "non-elemental":    0,  # any non-elemental
-            "transformation":   0,  # any transform
+            "transforma":       0,  # any transform
             "animal-transform": 0,  # transform into any animal
             })
             # set default overrides to 0 for immunities
@@ -201,7 +215,7 @@ class Reptile(PrimaryFam):
     _name = "reptile"
     def __init__(self):
         self.__init_ft()
-        self["ice"] =       -15
+        self["cold"] =       -15
         self["paralysis"] = 10
 
 
@@ -209,8 +223,8 @@ class Insect(PrimaryFam):
     _name = "insect"
     def __init__(self):
         self.__init_ft()
-        self["freeze"] -= 15
-        self["ice"] =       -5
+        self["frozen"] -= 15
+        self["cold"] =       -5
         self["fire"] =      -5
         self["poisoning"] = -10
 
@@ -219,7 +233,7 @@ class Beast(PrimaryFam):
     _name = "beast"
     def __init__(self):
         self.__init_ft()
-        self["freeze"] += 25
+        self["frozen"] += 25
         self["fire"] =      -5
         self["poisoning"] = -5
         self["acid"] =      -10
@@ -230,9 +244,9 @@ class Plant(PrimaryFam):
     _name = "plant"
     def __init__(self):
         self.__init_ft()
-        self["freeze"] =    -40
+        self["frozen"] =    -40
         self["fire"] =      -15
-        self["ice"] =       -20
+        self["cold"] =       -20
         self["water"] =     40
 
 
@@ -241,7 +255,7 @@ class Mechanical(PrimaryFam):
     def __init__(self):
         self.__init_ft(("poisoning", "frostbite", "burn", "dumb", "confusion",
             "stun", "paralysis", "bleed", "numb")
-        self["freeze"] =    95
+        self["frozen"] =    95
         self["electric"] =  -10
         self["water"] =     -10
 
@@ -250,7 +264,7 @@ class Goo(PrimaryFam):
     _name = "goo"
     def __init__(self):
         self.__init_ft(("frostbite", "burn", "paralysis", "bleed"))
-        self["freeze"] =    -50
+        self["frozen"] =    -50
         self["water"] =     20
         self["physical"] =  200 # physical attack need more exclusive value
 
@@ -272,7 +286,7 @@ class Aquatic(SecondaryFam):
     _name = "aquatic"
     def __init__(self):
         self.__init_ft("water",)
-        self["freeze"] =    20
+        self["frozen"] =    20
         self["mutagen"] =   -5
         self["electric"] =  -15
 
@@ -290,7 +304,7 @@ class Undead(SecondaryFam):
         self.__init_ft(('zombie',))
         self["fire"] =      -5
         self["heal"] =      -10
-        self["ice"] =       10
+        self["cold"] =       10
         self["mutagen"] =   20
 
 
@@ -474,24 +488,29 @@ class _TCDSS:
     class EvolutionTC(TypeClassifier):
         classifier_name = "evolution"
 
-    class StanceTC(TypeClassifier):
+    class BodyTypeTC(TypeClassifier):
         classifier_name = "stance"
 
 
     # ---- Classifier data ----------------------- #
     evolution = ClassifierTuple(
-                        EvolutionTC("primative"),
-                        EvolutionTC("non-primative"),
+                        EvolutionTC("primative",
+                        "Incapable of making higher order decisions."
+                            ),
+                        EvolutionTC("non-primative",
+                            "Capable of making higher order decisions."
+                            ),
                         )
     stance =    ClassifierTuple(
-                        StanceTC("biped"),
-                        StanceTC("quadruped"),
-                        StanceTC("other"),
+                        BodyTypeTC("biped", "Creatures that walk on two legs."),
+                        BodyTypeTC("quadruped", "Creatures that walk on four legs."),
+                        BodyTypeTC("fish"),
+                        BodyTypeTC("snake"),
+                        BodyTypeTC("bird"),
                         )
     def __init__(self):
         pass
 
-
     def _gettc_by_idx(self, tcd_name, i):
-        return self.__dict__[tcdname].keys()[i]
+        return self.__slots__[tcdname].keys()[i]
 

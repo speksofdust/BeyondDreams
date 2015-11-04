@@ -158,7 +158,8 @@ PHYSICAL_STATUSES = ("freeze", "frostbite", 'burn', 'numb', 'stun', 'poisoning',
 BOOL_STATUSES = 'freeze', 'immunnull'
 MENTAL_STATUSES = 'blind', 'drunk', 'dumb', 'confusion'
 XFORM_STATUSES = 'undead', 'mutagen'
-ALL_STATUSES = BOOL_STATUSES + PHYSICAL_STATUSES[1:] + MENTAL_STATUSES +
+ALL_STATUSES = (BOOL_STATUSES + PHYSICAL_STATUSES[1:] + MENTAL_STATUSES +
+    XFORM_STATUSES)
 
 ELEMENTALS = 'dark', 'light', 'fire', 'cold', 'water', 'wind', 'electric'
 NON_ELEMENTALS = 'psychic', 'spirit', 'acid'
