@@ -51,6 +51,11 @@ def xs_path_from_file():
 
 
 # ---- User ------------------------------------------------------------------ #
+def get_user_path(*args):
+    """Return the users localcfg path from a user id joined with args."""
+    from .bd import session
+    if session.user._uid: return get_localcfg_path('users', user._uid, *args)
+
 def get_user_ids():
     """Return an iterator of all user ids."""
     return iter(i for i in os.listdir(localcfg_path('users')) if
@@ -66,11 +71,13 @@ def add_user():
     import datetime
     d = datetime.datetime.now()
     import random
-    from .user import User
+    from .user.user import User
     user = User()
     while True:
-        user._uid = str(random.randint(100000000, 99999999999999))
-        if user._uid not in get_user_ids(): break
+        uid = str(random.randint(100000000, 99999999999999))
+        if uid not in get_user_ids():
+            user['uid'] = uid
+            break
     try: os.mkdir(user.datapath())
     except:
         raise OSError('Unable to create directory: {}'.format(user.datapath())

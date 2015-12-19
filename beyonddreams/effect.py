@@ -52,7 +52,7 @@ class StatusEffects(_B):
     def __init__(self, **kwargs):
         super().__init__({
             # physical types
-            "frozen":           False
+            "frozen":           ZERO, # booltype
             "frostbite" :       ZERO,
             "burn" :            ZERO,
             "numb" :            ZERO,
@@ -76,7 +76,7 @@ class StatusEffects(_B):
             "mental-status" :   ZERO,
             "transformation" :  ZERO,
 
-            'immunnull':        False
+            'immunnull':        ZERO, # booltype
             'immundown':        ZERO
             })
         for i in kwargs:    self[i] = kwargs[i]

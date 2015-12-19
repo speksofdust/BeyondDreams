@@ -27,15 +27,15 @@ def getversion():
     global VERSION
     return VERSION
 
-def _gva():
+def _gva(): # major
     global VERSION
     return VERSION.split(".")[0]
 
-def _gvb():
+def _gvb(): # minor
     global VERSION
     return VERSION.split(".")[1]
 
-def _gvc():
+def _gvc(): # rev
     global VERSION
     return VERSION.split(".")[2]
 
@@ -62,7 +62,7 @@ def _start():
     xsquare.app.run()
 
 
-class Session:
+class _Session:
     def __init__(self):
         from user import User
         from screen import ScreenNav
@@ -72,6 +72,7 @@ class Session:
 
     @property
     def user(self):
+        """The current user."""
         return self._user
 
     @property

@@ -15,6 +15,9 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+from .core.exceptions import UserException
+from .core.exceptions import UserIDError
+
 import string
 
 UID_LEN = 24
@@ -40,16 +43,37 @@ class BDUserException(Exception):
     pass
 
 
-class User:
+class User(dict):
     def __init__(self):
-        self._uid = ""
         from keyset import CurrentKeySet
-        self._config = UserConfig(self)
-        self._data = UserData(self)
-        self._keyset = CurrentKeySet()
-        self._chars = UserChars(self)
         import msg
-        self._msgchans = msg._Channels()
+        super().__init__({
+            "uid": "",
+            'config': UserConfig(self),
+            'data': UserData(self),
+            'keyset': CurrentKeySet(),
+            'chars': UserChars(self),
+            'msgchans': msg._Channels(),
+            })
+        self._uid = ""
+
+
+    def __write(self):
+        from .core import bddata
+        with open(self.datapath(), 'wb') as f:
+            bddata.write_hlines(f, d=self)
+            for k in self:
+                if i[0] != '~':
+                    write_dump(f, self[k], k)
+
+
+    def __read(self, f):
+        from .core import bddata
+        with open(self.datapath(), 'rb') as f:
+            for i in f.readlines():
+                for k in self:
+                    if i.startswith(k):
+                        self[k] = bddata.read_dump(i, k)
 
 
     @property
@@ -60,24 +84,22 @@ class User:
     @property
     def config(self):
         """The BeyondDreams configuration for this user."""
-        return self._config
+        return self['config']
 
     @property
     def data(self):
         """User data such as username, ."""
-        return self._data
+        return self['data']
 
     @property
     def chars(self):
-        return self._chars
+        return self['chars']
 
     def datapath(self, *args):
         """Return the users localcfg path from a user id joined with args.
-        A ValueError is raised if user_id is an empty string."""
-        if self._uid: return get_localcfg_path('users', user._uid, *args)
-        raise ValueError("Invalid 'user_id'")
-        import core.paths
-        core.paths.get_user_path(self, *args)
+        A UserIDError is raised if user_id is an empty string."""
+        if self['uid']: return get_localcfg_path('users', self['uid'], *args)
+        raise UserIDError("UserID not set.")
 
     def delete(self):
         # confirm(title="Delete User?",
@@ -85,12 +107,12 @@ class User:
         #   "are you sure you wish to continue?")
         pass
 
-    def logout(self, q=False):
+    def logout(self, quitting=False):
         """Logout this user."""
         from .bd import session
         # check if we need to confirm before logout
-        if (self._config["session-confirm-logout"] == 1 or
-            (self._config["session_confirm_logout"] == 2 and
+        if (self['config']["session-confirm-logout"] == 1 or
+            (self['config']["session_confirm_logout"] == 2 and
                 session.screen.current.name != "title"):
                     pass    # TODO
                 #   confirm(title="Confirm Logout",
@@ -98,9 +120,9 @@ class User:
                 #       "are you sure you wish to continue?")
 
         self._config.write
-        del self._msgchans
-        del self._config
-        if q: # quitting
+        del self['msgchans']
+        del self['config']
+        if quitting:
             pass
 
 

@@ -20,7 +20,28 @@ Beyond Dreams data."""
 
 __all__ = ()
 
-HLINES = 'created', 'bd_datatype', 'bd_dataver', 'comment'
+HLINES = 'created', 'modified', 'bd_datatype', 'bd_dataver', 'file_comment'
+
+
+def write_hlines(f, datatype, dataver, created=None, file_comment=""):
+    import datetime
+    elif created is None:
+        f.write("~created:{}".format(datetime.datetime.now()))
+        f.write("~modified:{}".format(datetime.datetime.now()))
+    else:
+        f.write("~modified:{}".format(datetime.datetime.now()))
+    f.write("~bd_datatype:{}".format(datatype)
+    f.write("~bd_dataver:{}".format(dataver)
+    f.write("~file_comment:{}".format(file_comment)
+
+def write_hline(f, i, d):
+    # not used?
+    global HLINES
+    f.write("~{}:{}".format(HLINES[i], d.getattr(i)))
+
+def read_hlines(f):
+    global HLINES
+    for i in HLINES
 
 # ---- File writing ---------------------------------------------------------- #
 def _wd(obj, filename, dirname, comment=""):
@@ -31,15 +52,19 @@ def _wd(obj, filename, dirname, comment=""):
                 # TODO
                 raise OSError("File overwriting options are not yet supported.")
             with open(os.path.join(dirname, filename), 'wb') as f:
-                import datetime
-                f.write("~created:{}".format(datetime.datetime.now()))
-                for i in HLINES[1:]: write_hline(f, i, d)
-                return
+                write_hlines(f)
     raise TypeError("'obj' contains no writable data or is an invalid Type.")
 
-def write_hline(f, i, d):
-    global HLINES
-    f.write("~{}:{}".format(HLINES[i], d.getattr(i)))
+
+
+def write_dump(f, data, prefix="", sep=":"):
+    import json
+    if prefix: f.write("".join(prefix, sep, json.dumps())
+    else: f.write(json.dumps())
+
+def read_dump(line, prefix="", sep=":"):
+    if prefix: return json.reads(line[len(prefix + sep):])
+    return json.reads(line)
 
 
 # ---- File loading ---------------------------------------------------------- #
