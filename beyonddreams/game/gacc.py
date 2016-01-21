@@ -41,7 +41,7 @@ class AllCharsAccessor(da.GameDataAccessorDict):
     def party_chars(self):
         """Return an iterator of all party character data in current party
         order."""
-        return iter(gamedata['chars'][i] for i in gamedata['party']
+        return iter(gamedata['chars'][i] for i in gamedata['party'])
 
 
 class PartyAccessor(da.GameDataAccessorSeq):

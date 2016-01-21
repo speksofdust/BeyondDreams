@@ -18,54 +18,130 @@
 from .bd import session
 from beyonddreams.core.baseclasses import BDDataDict
 from .vident import VIDENT_TYPES
+from .game.location import Visited
 
 
-# To be replaced by chardata.py
-class CharData(BDDataDict):
-    __slots__ = "_char", "_base", "_name_is_editable"
-    def __init__(self, char, base=""):
-        self._char =    char
-        self._base =    base
-        self._party =   party
-        self._name_is_editable = False
-        self._location = None
-        self._data_id = None        # access data[self._data_id][some_data]
-        super().__init__(
+CHAR_TYPEFLAGS = ('VISITED_NOMEM',)
 
+
+def _boolkw(char, k, **kwargs): if k in kwargs: char[k] = bool(kwargs[k])
+
+
+class Char(dict):
+    """Character data storage class."""
+    _ident = VIDENT_TYPES["char"]
+    __slots__ = dict.__slots__ + ('_gamechar', '_npc', '_controller',
+        '_specialflags')
+    def __init__(self, data={}, jparse=False, **kwargs):
+        self._gamechar = False
+        self._npc = False
+        self._controller = None # AI, player, etc. # needed for gamechar only
+        self._specialflags = set()
+        _boolkw(self, 'gamechar', kwargs)
+        _boolkw(self, 'npc', kwargs)
+        if 'specialflags' in kwargs:
+            self._specialflags = set(kwargs['specialflags'])
+        if jparse == False:
+            super().__init__({
+                'npc':          False,
+                'charid':       0,  # local charid
+                'handedness':   0,
+                'partyid':      -1,
+                'equip':        Equip(self),
+                'inventory':    Inventory(self),
+                'stats':        Stats(self, *kwargs),
+                'statuses':     Statuses(self, *kwargs),
+                'visited':      False,
             })
-        if self._char.is_npc:
-            from .game.location import NPCCharLocData
-            self._location = NPCCharLocData
-        else:
-            from .game.location import CharLocData
-            self._location = CharLocData
+            if 'VISITED_NOMEM' not in self._specialflags:
+                self['visited'] = Visted()
+            # assign charid
 
+        else:
+            super().__init__(data)
+            # convert json data to proper classes
+            self['equip'] =     Equip(self, self['equip'])
+            self['inventory'] = Inventory(self, self['inventory'])
+            self['stats'] =     Stats(self, self['stats'])
+            self['statuses'] =  Statuses(self, self['statuses'])
+
+            if 'VISITED_NOMEM' in self._specialflags: self['visited'] = False
+            else: self['visited'] = Visited(self['visited'])
+            # validate charid
+
+        if self._gamechar: # add to gamechars
+            gamedata['chars'][self['charid']] = self
+
+
+    # ---- Quick access to common stuff ---------------------------------- #
     @property
     def handedness(self):
+        """This character's primary hand. (0=Left, 1=Right 2=Ambidextrous)"""
         return self['handedness']
 
+    # ---- Object access ------------------------------------------------- #
     @property
-    def name(self):
-        return Charname(self)
+    def party(self):
+        """This character's party."""
+        return gamedata.party_by_id(self._partyid)
 
     @property
+    def inventory(self):
+        """This character's inventory."""
+        return self['inventory']
+
+    @property
+    def stats(self):
+        """This character's stats."""
+        return self['stats']
+
+    @property(self):
     def statuses(self):
-        return Statuses(self)
+        """This character's statuses."""
+        return self['statuses']
 
     @property
-    def location(self):
-        return self._location
+    def famtypes(self):
+        """This character's family types."""
+        return iter() # TODO
+
+    # ---- Management ---------------------------------------------------- #
+    def typeflags(self):
+        """Returns an iterator of chartypeflags for this character."""
+        return iter(self._typeflags)
 
     @property
-    def wallet(self):
-        return Wallet(self)
+    def controller(self):
+        """This character's controller. ('ai', 'player', etc.)"""
+        return self._controller
+
+    def _set_controller(self, mode, party=None):
+        if mode == 'player':
+        elif mode == 'ai':
+        else: pass # TODO should log this
+
+
+class Chars(dict):
+    """Character storage & management class."""
+    __slots__ = dict.__slots__
+
+
+class GameChars(Chars):
+    """Ingame character storage & management class."""
+    __slots__ = dict.__slots__
+
+
+    def npcs(self):
+        """Return an iterator of all NPCs (Non-playable characters)."""
+        return iter(i for i in self if i._npc)
+
+    def ai(self):
+        """Return an iterator of all ai controlled characters."""
+        return iter(i for i in self if i._controller == 'ai')
 
 
 class Char:
     """Base class for character objects."""
-    _ident = VIDENT_TYPES["char"]
-    _is_npc = False
-    _type = ""
     __slots__ = "_chardata", "_controller", "_owner"
     def __init__(self, player, base):
         self._owner =       owner

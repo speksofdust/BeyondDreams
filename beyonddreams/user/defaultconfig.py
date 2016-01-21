@@ -36,7 +36,12 @@ DEFAULT_USER_CONFIG = {
     "volume-game-sfx":                  80,
     "volume-menu-sfx":                  60,
     "volume-menu-music":                90,
+
+    "censors-allow-toggle":             False,
+    "censors-mode":                     0,
+    "censors-size":                     1.0,
     }
+
 
 
 DEFAULT_KEY_SET = {
@@ -56,10 +61,16 @@ DEFAULT_KEY_SET = {
     "drop":                     "",     # drop selected item
     "kick":                     "",
     "block":                    "",     # block with arms or shield (when holding)
+
+    # item
     "item-prev":                "",
     "item-next":                "",
     "item-prev-favs":           "",
     "item-next-favs":           "",
+    #"item-quick-1":             "",
+    #"item-quick-2":             "",
+    #"item-quick-3":             "",
+
     # camera
     "camera-rotate-left":       "NUM_4",
     "camera-rotate-right":      "NUM_6",
@@ -68,14 +79,27 @@ DEFAULT_KEY_SET = {
     "camera-center":            "NUM_5",
     "camera-tilt-up":           "NUM_8",
     "camera-tilt-down":         "NUM_2",
-    "pause":                    "",
     "target":                   "",     # target an object
+
     # sidepanel
-    "sidepanel-toggle":         "",     # Show/Hide the sidepanel
-    "sidepanel-page-next":      "",
-    "sidepanel-page-prev":      "",
-    # go to or open given page
-    "sidepanel-page-inventory": "",
-    "sidepanel-page-config":    "",
-    "sidepanel-page-stats":     "",
+    "sidepanel-toggle":         "F2",     # Show/Hide the sidepanel
+    "sidepanel-page-next":      "F3",
+    "sidepanel-page-prev":      "F4",
+    # sidepanel -- go to or open given page
+    "sidepanel-page-inventory": "F5",
+    "sidepanel-page-config":    "F6",
+    "sidepanel-page-stats":     "F7",
+
+    # misc
+    "help":                     "F1",
+    "fullscreen-toggle":        "F11",
+    "pause":                    "PAUSE",
+    "quit":                     ("ALT", "Q"),
+
+    # censors -- only used if 'censors-allow-toggle' is enabled in user settings
+    "censor-toggle":            ("ALT", "F2"),
+    "censor-toggle-full":       ("SHIFT", "ALT", "F2"),
+    "censor-mode-next":         "",
+    "censor-type-next":         "",
+    "censor-type-prev":         "",
     }

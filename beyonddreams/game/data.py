@@ -17,6 +17,10 @@
 
 from .core.bddata import BDDataDict
 import gameaccessors as gacc
+from location import Visited
+from .char.char import GameChars
+from party import parties
+
 
 gamedata = None
 
@@ -27,6 +31,24 @@ def fmt_filename(name, number):
     return '{}_{}'.format(name, number)
 
 
+def load_game(filepath):
+    global gamedata
+    if gamedata._game is not None:
+        from gui.prompts import QuitPrompt
+        prompt = QuitPrompt(("""There is already a game in progress.\nDo you wish to load a new game?\n(Your progress will not be saved.)""")
+        if prompt.get_input() == True:
+            _do_loading_stuff(filepath)
+            # TODO
+            # do we need to create a new player object?
+    else: _do_loading_stuff(filepath)
+
+def _do_loading_stuff(filepath):
+    global gamedata
+    gamedata = None
+    ok = False
+    # do json.loads stuff
+
+    gamedata = GameData(, jparse=True)
 
 
 class GamaData(BDDataDict):
@@ -34,27 +56,32 @@ class GamaData(BDDataDict):
     path_suffix = 'savedgames'
     bd_datatype = "gamedata"
     bd_dataver = '0.1'
-    def __init__(self, game=None, *args, **kwargs):
+    def __init__(self, game=None, jparse=False, *args, **kwargs):
         self._game = game
+        self._readystate = 0     #0-no, 1-yes (not started), 2-yes (started)
         self._last_save_num = 0
-        super().__init__({
-            'chars': {},
-            'party': (0, []), # active, list of members
-            'visited': {},    # locations visited data
-            }
+        if not jparse: # new game
+            super().__init__({
+                'chars': GameChars({}),
+                'parties': {},
+                'playerpartyid': 0,
+                'visited': Visited(),    # locations visited data
+                }
 
-    @classmethod
-    def load_data(self, filepath):
-        if self._game:
-            from gui.prompts import QuitPrompt
-            x = QuitPrompt(("""There is already a game in progress.\nDo you wish to load a new game?\n(Your progress will not be saved.)""")
-            if x.get_input() == True:
-                pass
-                # TODO
-                # do we need to create a new player object?
+        self._readystate = 1
         else:
-            pass
-        #super().__init__() # json.loads stuff here
+            ok = False
+            super().__init__(kwargs['data'])
+            # convert json data to proper classes
+            self['chars'] = GameChars(self['chars'])
+            for i in self['chars'] i = Char(self['chars'][i]
+            self['visited'] = Visited(self['visited'])
+
+            if not ok:
+                gamedata._game = False
+            else:
+                gamedata._readystate = 1
+
 
     @property
     def writable(self):
@@ -72,9 +99,17 @@ class GamaData(BDDataDict):
 
     # ---- Data Accessors ----------------------------------------------- #
     @property
-    def party(self):
-        """Access party data."""
-        return gacc.PartyAccessor(self)
+    def parties(self):
+        """Access parties."""
+        return self['parties']
+
+    def party_by_id(self, partyid):
+        """Get and return a given party using a party id, or None
+        if unavailable."""
+        if partyid == -1: return None
+        try: return self['parties'][partyid]
+        except:
+            return None
 
     @property
     def all_chars(self):

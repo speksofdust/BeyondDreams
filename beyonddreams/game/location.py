@@ -16,6 +16,21 @@
 # ---------------------------------------------------------------------------- #
 
 
+class Visited(dict):
+    __slots__ = dict.__slots__
+    def __init__(self, data={}, jparse=False, **kwargs):
+        super().__init__(data)
+        if jparse: # convert json data to proper classes
+            for i in data:
+                self[i] = VisitedLoctation(i, jparse)
+
+
+class VisitedLocation(dict):
+    __slots__ = dict.__slots__
+    def __init__(self, data={}, jparse=False, **kwargs):
+        super().__init__(data)
+
+
 class Regions(dict):
     def __init__(self):
         self = {}

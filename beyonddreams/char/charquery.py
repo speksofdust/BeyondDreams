@@ -27,6 +27,15 @@ import statgroups
 def name(char):
     return CharName(char)
 
+def age(char):
+    return char['age']
+
+def height(char):
+    return
+
+def weight(char):
+    return
+
 
 # ---- Equipment ------------------------------------------------------------- #
 def handedness(char):
