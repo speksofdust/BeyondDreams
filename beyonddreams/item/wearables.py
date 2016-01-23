@@ -31,6 +31,8 @@ class WearableType(ItemType):
     """Base class for wearable item types."""
     CATTYPE =       "wearable"
     _equipslots =   'default'
+    _forcelayer =   False   # top, bottom or False
+    _removes =      ()      # items to be remove when equipped
 
     def _equipslots(self):
         """ """
@@ -70,6 +72,12 @@ class Bottoms:
     _typename = BTM
 
 
+class Onepiece:
+    _classifiers = ONE
+    _typename = ONE
+    _equipslots = ONE
+
+
 class Glove:
     _classifiers = GLV
     _typename = GLV
@@ -97,7 +105,7 @@ class Clothing(WearableType):
     class Bottoms:
         _classifiers = CLO, BTM
 
-    class BodySuit:
+    class BodySuit(Onepiece):
         _typename =  BOD
         _classifiers = CLO, BOD
         _slotsize =    3
@@ -138,16 +146,19 @@ class Undies(Clothing):
 
 class Swimwear(Clothing):
     _typename = "swimwear"
-    _classifiers =  SWM
+    _classifiers =  CLO, SWM
     _bwt =      0.2
 
     class Tops(Tops):
-        _classifiers = CLO, TOP, SWM
+        _classifiers = CLO, SWM, TOP
         _equipslots = 'undies.tops'
 
     class Bottoms(Bottoms):
-        _classifiers = CLO, BTM, SWM
+        _classifiers = CLO, SWM, BTM
         _equipslots = 'undies.Bottoms'
+
+    class Onepiece(Onepiece):
+        _classifiers = CLO, SWM, ONE
 
 
 class Accessories(WearableType):
@@ -202,6 +213,7 @@ class Pants(Clothing.Bottoms):
 # misc
 class CatSuit(Clothing.BodySuit):
     _typename = "catsuit"
+    _forcelayer = "top"
 
 
 class Glove(Clothing.Glove):
@@ -242,14 +254,17 @@ class _Bikini(Swimwear):
 class Gauntlet(Armor.Glove):
     _typename = "gauntlet"
     _typedesc = """An armored glove."""
+    _forcelayer = "top"
 
 
 class Curiass(Armor.Top):
     _typename = "curiass"
+    _forcelayer = "top"
 
 
 class Breastplate(Armor.Top):
     _typename = "breastplate"
+    _forcelayer = "top"
 
 
 class Helm(Armor.Headwear):

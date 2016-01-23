@@ -16,8 +16,8 @@
 # ---------------------------------------------------------------------------- #
 
 DEFAULT_USER_CONFIG = {
-    "chareditor-undohist":      64,
-    #"chareditor-undo-maxmem":   "auto",
+    "chareditor-undohist":              64,
+    #"chareditor-undo-maxmem":          "auto",
 
 
     "sidepanel-defaultorder-game":     (0,1,2),
@@ -67,9 +67,16 @@ DEFAULT_KEY_SET = {
     "item-next":                "",
     "item-prev-favs":           "",
     "item-next-favs":           "",
-    #"item-quick-1":             "",
-    #"item-quick-2":             "",
-    #"item-quick-3":             "",
+    #"item-quick-1":            "",
+    #"item-quick-2":            "",
+    #"item-quick-3":            "",
+    #"item-quick-4":            "",
+    #"item-quick-5":            "",
+    #"item-quick-6":            "",
+    #"item-quick-7":            "",
+    #"item-quick-8":            "",
+    #"item-quick-9":            "",
+    #"item-quick-10":           "",
 
     # camera
     "camera-rotate-left":       "NUM_4",

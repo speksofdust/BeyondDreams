@@ -27,8 +27,10 @@ ACC = "accessories"
 FTW = "footwear"
 HDW = "headwear"
 NEK = "neckwear"
-BOD = "bodysuit"
+ONE = "onepiece" # top and bottom
+BOD = "bodysuit" # top, bottom, (possibly legs, arms, etc)
 GLV = "glove"
+
 
 
 class _EqSlotData:
@@ -82,7 +84,7 @@ class _EqSlots(dict):
     _noplural = (HDW, FTW, BTM, TOP, NEK)
     __slots__ = dict.__slots__
     def __init__(self):
-        self = {
+        super().__init__({
             # LR - no linking
             'ankle.L':          _EqSlotDataLR('ankle.L',    3, 0),
             'ankle.R':          _EqSlotDataLR('ankle.R',    3, 0),
@@ -104,7 +106,7 @@ class _EqSlots(dict):
             # Normal - misc
             'glasses':          _EqSlotData('glasses',  0),
             'belt':             _EqSlotData('belt',     0),
-            }
+            })
 
 
 EQUIPSLOTS = _EQSlots()
