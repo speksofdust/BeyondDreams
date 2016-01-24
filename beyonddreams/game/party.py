@@ -17,9 +17,17 @@
 
 import gamedata
 
-def add_party():
-    """Add a new party to gamedata."""
-    if gamedata._readystate != 0:
+PARTYID_LEN = 10
+
+
+def _set_party_dict(data):
+    from xsquare.utils.strutils import rand_alphanumeric
+    x = rand_alphanumeric(PARTYID_LEN)
+    while True:
+        if cid in gamedata['parties']: x = rand_alphanumeric(PARTYID_LEN)
+        else break
+    data._partyid = x
+    gamedata['parties'][data._partyid] = data
 
 class Party(tuple):
     MAX_CHARS = 8
@@ -29,10 +37,17 @@ class Party(tuple):
         if jparse:  # convert json data to proper classes
             self[0] = tuple(self[0])
             self[1] = PartyMembers(self[1])
-        try: self._partyid = kwargs['partyid']
-        except: self._partyid = max(gamedata['parties'].keys())+1
-        if not jparse:
-            gamedata['parties'][self._partyid] = self
+        try:
+            self._partyid = kwargs['partyid']
+            if self._partyid in gamedata['parties']:
+                # partyid already taken
+                if not self.members: _set_party_dict(self)
+                elif gamedata['partyid'].members != self.members:
+                    _set_party_dict(self)
+                    for i in self.members:
+                        gamedata['chars'][i]._partyid = self._partyid
+                else: pass # party already created
+        except: _set_party_dict(self)
 
     def _get_active(self):
     def _set_active(self, x):
@@ -94,20 +109,20 @@ class Party(tuple):
 
 
     class PartyMembers(list):
+        # stored as charids
         __slots__ = list.__slots__
-        pass
+
+        def chardata(self):
+            """Return an iterator of chardata."""
+            return iter(gamedata['chars'][i] for i in self)
 
         def alive(self):
             """Return an iterator of all alive party members."""
-            return iter(i for i in self if i.is_alive())
+            return iter(i for i in self.chardata if i.is_alive())
 
         def names(self):
             """Return an iterator of all party member's."""
-            return iter(i.name for i in self)
-
-        def charids(self):
-            """Return an iterator of all party member's charids."""
-            return iter(i.charid for i in self)
+            return iter(i.name for i in self.chardata)
 
 
 

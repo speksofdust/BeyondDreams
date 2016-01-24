@@ -506,7 +506,7 @@ class _TCDSS:
                         BodyTypeTC("quadruped", "Creatures that walk on four legs."),
                         BodyTypeTC("fish"),
                         BodyTypeTC("snake"),
-                        BodyTypeTC("bird"),
+                        BodyTypeTC("avian"),
                         )
     def __init__(self):
         pass

@@ -18,7 +18,7 @@
 from game.data import gamedata
 
 # will replace char.py
-CHAR_ID_LEN = 30
+CHARID_LEN = 30
 
 _chardata_dict = {
     "temp":         {}, # non-writable stuff
@@ -115,10 +115,10 @@ def _update_chars():
 
 def _set_chardata_dict(data=None):
     from xsquare.utils.strutils import rand_alphanumeric
-    global _chardata_dict, CHAR_ID_LEN
+    global _chardata_dict, CHARID_LEN
     cid = rand_alphanumeric(CHARID_LEN)
     while True: # generate a unique cid (char id)
-        if cid in gamedata['chars']: cid = rand_alphanumeric(CHAR_ID_LEN)
+        if cid in gamedata['chars']: cid = rand_alphanumeric(CHARID_LEN)
         else: break
     if data == None:    gamedata['chars'][cid] = _chardata_dict.copy()
     else:               gamedata['chars'][cid] = data

@@ -112,13 +112,14 @@ class GamaData(BDDataDict):
             return None
 
     @property
-    def all_chars(self):
-        """Access all character data."""
-        return gacc.AllCharsAccessor(self)
+    def playerparty
+        """Access the player party data."""
+        return self.party_by_id(self['playerpartyid']
 
-    def party_chars(self):
-        """Return an iterator of all party character data in current party order."""
-        return iter(self['chars'][i] for i in self['party'][1])
+    @property
+    def chars(self):
+        """Access all character data."""
+        return self['chars']
 
     #def _get_char(self, char):
     #    return CharDataAccessor(self, char)
@@ -126,7 +127,7 @@ class GamaData(BDDataDict):
     @property
     def visited(self):
         """Access the data visited locations."""
-        return gacc.VisitedAccessor(self)
+        return self['visited']
 
 
 class EntryModeData(GameData):
