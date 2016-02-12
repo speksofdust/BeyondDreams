@@ -39,8 +39,7 @@ class ShopHours(Tuple):
         return self.today(day).is_open(hour, minute)
 
 
-def _fmtt(t):
-    return "".join(t[0], ":" t[1])
+def _fmtt(t): return "{}:{}".format(t[0], t[1])
 
 def _fmtsdtime(t):
     if t == None: return (None, None)
@@ -58,8 +57,8 @@ class ShopDay:
     def _is_bc(self, x): return self.break_end[0] <= x <= self.closes_at[0]
 
     def __str__(self):
-        return "".join(_fmtt(self.opens_at), "-", _fmtt(self.closes_at), " ",
-        _fmtt(self.break_start) "-", _fmtt(self.break_end))
+        return "".join((_fmtt(self.opens_at), "-", _fmtt(self.closes_at), " ",
+        _fmtt(self.break_start) "-", _fmtt(self.break_end)))
 
     @property
     def opens_at(self):
@@ -107,6 +106,22 @@ class ShopDay:
         else:
             return self.closes_at > hour
 
+class ShopdayNoBreak(ShopDay):
+    def __init__(self, opentime, closetime):
+        self._opentime =     _fmtsdtime(opentime)
+        self._closetime =    _fmtsdtime(closetime)
+        self._breakstart = self._breakend = (None, None)
+
+    def __str__(self):
+        return "-".join((_fmtt(self.opens_at), _fmtt(self.closes_at)))
+
+    def is_after_break(self, hour): return False
+    is_before_break = is_after_break = is_on_break
+
+    def is_open(self, hour, minute):
+        return self.is_open_hours(hour) and self._atopenchk(hour, min)
+
+
 class ShopDayClosed(ShopDay):
     def __init__(self):
         self._opentime = (None, None)
@@ -121,19 +136,32 @@ class ShopDayClosed(ShopDay):
     is_before_break = is_after_break = is_on_break
 
 
-CLOSED_TODAY = ClosedShopToday()
+CLOSED_TODAY = ShopdayClosed()
+SD_7Ato7P = ShopDay(6, 19, 12, 13)
+SD_6Ato8P = ShopDay(5, 8, 10, 11)
+SD_6Ato9P = ShopDay(5, 20, 10, 11)
+SD_5Ato10P = ShopDay(4, 21, 9, 10)
+SD_5Pto12A = ShopDayNoBreak(16, 23)
 
-class ShopdayNoBreak(ShopDay):
-    def __init__(self, opentime, closetime):
-        self._opentime =     _fmtsdtime(opentime)
-        self._closetime =    _fmtsdtime(closetime)
-        self._breakstart = self._breakend = (None, None)
 
-    def __str__(self):
-        return "".join(_fmtt(self.opens_at), "-", _fmtt(self.closes_at))
+# code generator #
+def _cl(x):
+    if x > 23: return 0
+    return x
 
-    def is_after_break(self, hour): return False
-    is_before_break = is_after_break = is_on_break
+def _cf(x):
+    if x > 23: return x - 23
+    return x
 
-    def is_open(self, hour, minute):
-        return self.is_open_hours(hour) and self._atopenchk(hour, min)
+def _gsd(op, opa, cl, bs=0, be=0, nb=""):
+    o = "".join(("SD_", str(op), opa.capitalize(), "to"))
+    c = op + cl
+    cc = _cl(c-1)
+    op = _cl(op-1)
+    if nb: nb = "NoBreak({}, {})".format(op, _cf(cc))
+    else: nb = "({}, {}, {}, {})".format(op, _cf(cc), _cf(op+bs), _cf(op+be))
+    if c > 12: return "{}{}A = ShopDay{}".format(o, c - 12, nb)
+    return "{}{}P = ShopDay{}".format(o, c, nb)
+
+
+

@@ -18,8 +18,16 @@
 from shophours import ShopHours
 
 class Shop:
-    _name = ""
-    _shophours = None # default shop hours
+    _shoptype = ""
+    _default_shophours = None
+    def __init__(self, shophours=None):
+        if shophours = None:
+            self._shophours = self._default_hours
+        else: self._shophours = shophours
+
+    @property
+    def shoptype(self):
+        return self._shoptype
 
     @property
     def name(self):
@@ -28,3 +36,11 @@ class Shop:
     @property
     def hours(self):
         return self._shophours
+
+    def todays_hours(self, day):
+        return self._shophours.today(day)
+
+    def is_open(self, day, hour, minute):
+        """True if this shop is currently open at the given
+        day, hour, and minute."""
+        self._shophours.is_open(day, hour, minute)
