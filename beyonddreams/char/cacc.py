@@ -17,6 +17,7 @@
 
 from .game import gacc
 
+
 class CharName(gacc.CharDataAccessor):
     __slots__ = gacc.CharDataAccessor.__slots__
 
