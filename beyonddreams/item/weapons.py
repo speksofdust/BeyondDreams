@@ -26,7 +26,6 @@ SWORDS =    ("sword", "longsword")
 HAMMERS =   ("hammer", "sledge-hammer")
 
 class WeaponFam:
-    _sc =           ()
     name =         ""
     includes =     ()
     def __init__(self):
@@ -34,68 +33,58 @@ class WeaponFam:
 
 
 class RangedWeaponFam(WeaponFam):
-    _sc =           (WeaponFam,)
     name =          "ranged"
     includes =      BOWS + ("blowgun",)
 
 
 class BladedWeaponFam(WeaponFam):
-    _sc =           (WeaponFam,)
     name =          "bladed"
     includes =      SWORDS + ("knife", "dagger")
 
 
 class PolearmWeaponFam(WeaponFam):
-    _sc =           (WeaponFam,)
     name =          "ranged"
     includes =      ("spear", "javelin")
 
 
 class BludgeonWeaponFam(WeaponFam):
-    _sc =           (WeaponFam,)
     name =          "bludgeon"
     includes =      HAMMERS + ("mace", "morning-star")
 
 
 class WeaponFamDict():
     def __init__(self):
-        self = {
+        super().__init__({
             "ranged":   RangedWeaponFam(),
             "bladed":   BladedWeaponFam(),
             "polearm":  PolearmWeaponFam(),
             "bludgeon": BludgeonWeaponFam(),
-            }
+            })
 
 
 # ---- Ammo ------------------------------------------------------------------ #
 class Ammo(BundableItemType):
-    _sc =           (BundableItemType,)
     max_bundlesize =    25
     weapontypes =   () # weapontypes usable in
 
 
 class Dart(Ammo):
-    _sc =           (Ammo,)
     weapontypes =   ("blowgun",)
 
 
 class Arrow(Ammo):
-    _sc =           (Ammo,)
     weapontypes =   BOWS
 
 
 class DefensiveType(WeaponType):
-    _sc =           (WeaponType,)
 
 
 class WeaponAccessories(WeaponType):
-    _sc =           (WeaponType,)
 
 
 # ---- Weapon Types ---------------------------------------------------------- #
 class WeaponType(ItemType):
     """Base class for weapon types."""
-    _sc =           (ItemType,)
     CATTYPE =       "weapon"
     _ammotypes =    ()  # compatable ammo types -- empty if uses no ammo
 
@@ -106,22 +95,18 @@ class WeaponType(ItemType):
 
 
 class RangedWeaponType(WeaponType):
-    _sc =           (WeaponType,)
     _family =       "ranged"
 
 
 class BladedWeaponType(WeaponType):
-    _sc =           (WeaponType,)
     _family =       "bladed"
 
 
 class PolearmWeaponType(WeaponType):
-    _sc =           (WeaponType,)
     _family =       "polearm"
 
 
 class BludgeonWeaponType(WeaponType):
-    _sc =           (WeaponType,)
     _family =       "bludgeon"
 
 

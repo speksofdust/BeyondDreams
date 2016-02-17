@@ -18,6 +18,7 @@
 from item import BundableItemType
 from item import regitem
 from item import ItemDict
+from .shop.shopnames import *
 
 
 class ConsumableTypeDict(ItemDict):
@@ -62,13 +63,16 @@ class Ingredient(ConsumableType):
     """Consumable types that can always be used as an ingredient."""
 
 class DryIngredient(Ingredient):
+    _resale_shoptypes = (INGREDIENTS_SHOP, )
 
 class EdibleIngredient(DryIngredient):
     edible =    1
 
+class HerbalIngredient(EdibleIngredient):
+    _resale_shoptypes = (INGREDIENTS_SHOP, HERB_SHOP)
+
 class WetIngredient(Ingredient):
     edible =    2
-
 
 
 # ---- Dry Ingredient -------------------------------------------------------- #
@@ -82,6 +86,7 @@ class Powder(DryIngredient):
 
 class Seed(EdibleIngredient):
     _typename = "seed"
+    _resale_shoptypes = (GARDENING_SHOP, SEED_SHOP)
 
 
 class Flower(EdibleIngredient):
@@ -108,11 +113,16 @@ class Fruit(EdibleIngredient):
     _typename = "fruit"
 
 
+# ---- Herbals --------------------------------------------------------------- #
+class HerbalFlower(HerbalIngredient, Flower): pass
+class HerbalLeaf(HerbalIngredient, Leaf): pass
+class HerbalBark(HerbalIngredient, Bark): pass
+class HerbalRoot(HerbalIngredient, Root): pass
+
 # ---- Wet Ingredient -------------------------------------------------------- #
 class Gel(WetIngredient):
     _typename = "gel"
     edible =    1
-
 
 class Oil(WetIngredient):
     _typename = "oil"
@@ -120,11 +130,12 @@ class Oil(WetIngredient):
 
 class Potion(WetIngredient):
     _typename = "potion"
+    _resale_shoptypes = (POTION_SHOP,)
 
 
 class Perfume(WetIngredient):
     _typename = "perfume"
-
+    _resale_shoptypes = (INGREDIENT_SHOP, PERFUME_SHOP)
 
 class Sap(WetIngredient):
     _typename = "sap"

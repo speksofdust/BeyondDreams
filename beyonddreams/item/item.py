@@ -59,8 +59,15 @@ class ItemType(BDTaggedType):
     _typedesc =     ""
     ATTRIBS =       ()    # attribs for items when in inventory
     ALL_TYPE_ATTRIBS = () # all possible attribs for this type
-
-    # ---- stuff for consumables, weapons, and wearables only ----------------- #
+    # ---- Minimum worth values ---------------------------------------------- #
+    _min_resale_value = 1 # <-- must be <= all other 'worth' 'values'
+    _min_pawn_value = 1   #
+    _min_trade_value = 1  #
+    # ---- Resale/trade attribs ---------------------------------------------- #
+    _pawnable = True
+    _tradable = True
+    _resale_shoptypes = () # shoptypes that will buy this
+    # ---- stuff for consumables, weapons, and wearables only ---------------- #
     _bwt =          1.0   # base weight must be (float)
     _slotsize =     1
     _itemset =      None
@@ -81,6 +88,26 @@ class ItemType(BDTaggedType):
         for i in self._classifiers: yield i
         if (self._typename and typename not in self._classifiers):
             yield self._typename
+
+    def is_pawnable(self):
+        """True if this item can be sold to a pawn shop."""
+        return self._pawnable
+
+    def is_tradable(self):
+        """True if this item can be traded to another player or npc."""
+        return self._tradable
+
+    def is_sellable(self, buyer=None):
+        """True if this itemtype can be sold to the given buyer. If buyer is
+        'None', then returns True if this itemtype is allowed to be sold."""
+        if (buyer is None or buyer.is_player):
+            return self.tradable()
+        else:
+            try:
+                if buyer.storetype() == 'pawn': return self.is_pawnable()
+                else: return buyer.storetype() in self._resale_shoptypes
+            except:
+                return False
 
     def tags(self):
         for i in self._tags: yield i

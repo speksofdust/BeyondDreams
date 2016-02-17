@@ -32,10 +32,11 @@ class WearableType(ItemType):
     CATTYPE =       "wearable"
     _equipslots =   'default'
     _forcelayer =   False   # top, bottom or False
+    _multislots =   False   # False or tuple of slots
     _removes =      ()      # items to be remove when equipped
 
+
     def _equipslots(self):
-        """ """
         yield 'default'
         for i in self._equipslots:
             for j in i: yield EQUIPSLOTS[j]
@@ -47,6 +48,30 @@ class WearableType(ItemType):
         """
         if self._equipslots == 'default': return ('default', self._typename)
         return ('default',) + self._equipslots
+
+    def is_multislot(self):
+        """True if this item occupies multiple slots when worn."""
+        return self._multislots != False
+
+    # ---- Character Equip data query ------------------------------------ #
+    #def will_remove(self, char):
+        #"""Return an iterator of tuples (slotdata, item) that will be removed
+        #from the given character when equipped."""
+        #if self._removes:
+            #yield
+        #else: yield
+
+    #def has_equipped(self, char):
+        #"""True if given char has at least one of this item equipped."""
+        #pass
+
+    #def can_equip(self, char):
+        #"""True if given char can equip this item."""
+        #pass
+
+    #def has_empty_slot(self, char):
+        #"""True if the given char has an empty slot(s) to equip this in."""
+        #pass
 
 
 # ---- Base Types ------------------------------------------------------------ #
@@ -76,6 +101,7 @@ class Onepiece:
     _classifiers = ONE
     _typename = ONE
     _equipslots = ONE
+    _multislots = (TOP, BOT)
 
 
 class Glove:
@@ -94,6 +120,10 @@ class Footwear:
 
 
 # ---- Main wearable sub types ----------------------------------------------- #
+## --- Some rules --- ##
+# - only Armor is permitted to increase pdef (must increase by atleast 1)
+
+
 class Clothing(WearableType):
     _subcattype =   (CLO,)
     baseres =       BaseRes()
@@ -112,8 +142,9 @@ class Clothing(WearableType):
 
 
 class Armor(WearableType):
-    # min +1 def
+    # +1 pdef min
     _typename = ARM
+    _forcelayer = "armor"
 
     class Top(Tops):
         _classifiers = ARM, TOP
@@ -254,22 +285,18 @@ class _Bikini(Swimwear):
 class Gauntlet(Armor.Glove):
     _typename = "gauntlet"
     _typedesc = """An armored glove."""
-    _forcelayer = "top"
 
 
 class Curiass(Armor.Top):
     _typename = "curiass"
-    _forcelayer = "top"
 
 
 class Breastplate(Armor.Top):
     _typename = "breastplate"
-    _forcelayer = "top"
 
 
 class Helm(Armor.Headwear):
     _classifiers = ARM, HDW
-    _typename = "helm"
 
 
 # ---- Jewelry --------------------------------------------------------------- #
