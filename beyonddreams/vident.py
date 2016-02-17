@@ -17,15 +17,22 @@
 
 
 class _DummyVIdent:
-    """Visitor identity. Stores constant identiefier values for certain objects
-    which allow location visitation."""
+    """Visitor identity. Stores constant identifier values for certain objects
+    which allow location visitation. Used for object type identification in
+    some cases as well."""
     name = "dummy"
     index = 0
-    def __init__(self):
-        pass
 
     def __str__(self):      return self.name
     __repr__ = __str__
+
+    def __iseq__(self, x):
+        if isinstance(x, _DummyVIdent): return x._name == self._name
+        raise TypeError('Incompatible types for comparison.')
+
+    def __isne__(self, x):
+        if isinstance(x, _DummyVIdent): return x._name != self._name
+        raise TypeError('Incompatible types for comparison.')
 
 
 class _PlayerVIdent(_DummyVIdent):
@@ -53,6 +60,7 @@ def vident_from_index(index):
         if i.index = index: return i
 
 def vident_name(actor):
+    """Returns a 'name' ('player', 'char', 'party') from given actor."""
     return actor._ident.name
 
 
