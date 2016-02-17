@@ -15,62 +15,31 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+import pdict
+
 from .. import bd
 
 
 class CharAttrib:
-    __slots__ = ("_char",)
+    __slots__ = ("_parent",)
     """Base class for all character attributes."""
-    def __init__(self, char):
-        self._char = char
 
     @property
     def char(self):
         """The char this attribute belongs to."""
-        return self._char._char
+        try: return self._parent.char
+        except: return self._parent # parent is char
 
     @property
     def base(self):
         """Defaults for the char which this attribute belongs to."""
-        return self._char._base
+        return self._parent.base
 
 
-class CharAttribDict(CharAttrib):
-    __slots__ = CharAttrib.__slots__ + "_items"
-    def __init__(self, char):
-        self._char = char
-        self = {}
+class CharAttrDict(ChildPDict, CharAttrib):
+    """CharAttrib dict type for use with Char attributes and sub attributes."""
+    __slots__ = ChildPDict.__slots__
 
-    def __getitem__(self, i):       return self._items[i]
-    def __len__(self):              return len(self._items)
-    def __contains__(self, i):      return i in self._items
-    def __iter__(self):             return iter(self._items)
-    def __str__(self):              return str(self._items)[0:-1]
-    def __repr__(self):             return repr(self._items)
-
-    def _getiter(self, n):          return iter(self._items[i] for i in n)
-
-
-class StatAttrib(CharAttribDict):
-    __slots__ = CharAttribDict.__slots__
-
-    def __setitem__(self, i, v):    self._items[i].value = v
-
-class CharAttribSubAttrib:
-    """Subattribute class for use within a CharAttrib class."""
-    __slots__ = ()
-    def __init__(self, charattrib):
-        self._charattrib = charattrib
-
-    @property
-    def charattrib(self):
-        """The charattrib this is part of."""
-        return self._charattrib
-
-    @property
-    def char(self):
-        """The character which this belongs to."""
-        return self._charattrib._char
 
 
 class Equip(CharAttrib):
