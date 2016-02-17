@@ -52,5 +52,8 @@ def vident_from_index(index):
     for i in VIDENT_TYPES:
         if i.index = index: return i
 
+def vident_name(actor):
+    return actor._ident.name
 
-__all__ = "vident_from_index", "VIDENT_TYPES"
+
+__all__ = "vident_from_index", "vident_name", "VIDENT_TYPES"

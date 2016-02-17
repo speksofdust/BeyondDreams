@@ -16,9 +16,13 @@
 # ---------------------------------------------------------------------------- #
 
 from .bd import session
+import pdict
+
 from beyonddreams.core.baseclasses import BDDataDict
 from .vident import VIDENT_TYPES
 from .game.location import Visited
+from stats import Stats
+import charflags
 
 
 CHAR_TYPEFLAGS = ('VISITED_NOMEM',)
@@ -27,50 +31,64 @@ CHAR_TYPEFLAGS = ('VISITED_NOMEM',)
 def _boolkw(char, k, **kwargs): if k in kwargs: char[k] = bool(kwargs[k])
 
 
-class Char(dict):
+class Char(pdict.PDict):
     """Character data storage class."""
     _ident = VIDENT_TYPES["char"]
-    __slots__ = dict.__slots__ + ('_gamechar', '_npc', '_controller',
+    __slots__ = JparseDict.__slots__ + ('_gamechar', '_controller',
         '_specialflags')
-    def __init__(self, data={}, jparse=False, **kwargs):
+    def __init__(self, data={}, parseinit=True, **kwargs):
+        # Non-Writable values
         self._gamechar = False
-        self._npc = False
         self._controller = None # AI, player, etc. # needed for gamechar only
         self._specialflags = set()
+        self._tempflags = set()
+
+        # parse kwargs
         _boolkw(self, 'gamechar', kwargs)
         _boolkw(self, 'npc', kwargs)
         if 'specialflags' in kwargs:
             self._specialflags = set(kwargs['specialflags'])
-        if jparse == False:
-            super().__init__({
+
+
+        super().__init__(data=data, parseinit=parseinit)
+
+        if 'VISITED_NOMEM' not in self._specialflags:
+            self['visited'] = Visited()
+
+        # TODO validate/assign charid
+
+        if self._gamechar: # add to gamechars
+            gamedata['chars'][self['charid']] = self
+
+    def _defaultdict(self):
+        return {'base':         None,
                 'npc':          False,
                 'charid':       0,  # local charid
                 'handedness':   0,
                 'partyid':      -1,
                 'equip':        Equip(self),
                 'inventory':    Inventory(self),
-                'stats':        Stats(self, *kwargs),
-                'statuses':     Statuses(self, *kwargs),
+                'stats':        Stats(self, kwargs),
+                'statuses':     Statuses(self, kwargs),
                 'visited':      False,
-            })
-            if 'VISITED_NOMEM' not in self._specialflags:
-                self['visited'] = Visted()
-            # assign charid
+                # flags
+                'dflags':       charflags.DFlags(), # died flags
+                'ond-flags':    charflags.CharFlags(), # on died flags
+                'onr-flags':    charflags.CharFlags(), # on revive flags
+                }
 
-        else:
-            super().__init__(data)
-            # convert json data to proper classes
-            self['equip'] =     Equip(self, self['equip'])
-            self['inventory'] = Inventory(self, self['inventory'])
-            self['stats'] =     Stats(self, self['stats'])
-            self['statuses'] =  Statuses(self, self['statuses'])
-
-            if 'VISITED_NOMEM' in self._specialflags: self['visited'] = False
-            else: self['visited'] = Visited(self['visited'])
-            # validate charid
-
-        if self._gamechar: # add to gamechars
-            gamedata['chars'][self['charid']] = self
+    def _parseinit(self):
+        from pdict import init_from_key_child
+        from pdict import init_from_key
+        # convert json data to proper classes
+        init_from_key_child(self, 'equip', Equip)
+        init_from_key_child(self, 'inventory', Inventory)
+        init_from_key_child(self, 'stats', Stats)
+        init_from_key_child(self, 'statuses', Statuses)
+        # convert flags to sets
+        self['dflags'] = charflags.DFlags(self['dflags']
+        init_from_key(self, 'ond-flags', charflags.CharFlags)
+        init_from_key(self, 'onr-flags', charflags.CharFlags)
 
 
     # ---- Quick access to common stuff ---------------------------------- #
@@ -103,13 +121,32 @@ class Char(dict):
     @property
     def famtypes(self):
         """This character's family types."""
-        return iter() # TODO
+        return iter(self['base'].famtypes)
+
+    @property
+    def base(self):
+        return self['base']
+
+    @property
+    def plane(self):
+        return 0 # TODO
+
+    # ---- Tests --------------------------------------------------------- #
+    def is_alive(self):
+        return self.hp > 0
+
+    def hp(self):
+        return self['stats']['health']
+
+    def is_critical(self):
+        return self['stats']['health'].is_critical()
+
+    def is_undead(self):
+        """True if this character is an undead type or has zombie status."""
+        return ("zombie" in self["statuses"]["bools"] or
+            "zombie" in self.famtypes)
 
     # ---- Management ---------------------------------------------------- #
-    def typeflags(self):
-        """Returns an iterator of chartypeflags for this character."""
-        return iter(self._typeflags)
-
     @property
     def controller(self):
         """This character's controller. ('ai', 'player', etc.)"""
@@ -119,6 +156,80 @@ class Char(dict):
         if mode == 'player':
         elif mode == 'ai':
         else: pass # TODO should log this
+
+    def tempflags(self):
+        return self._tempflags
+
+    @property
+    def dflags(self):
+        return self['dflags']
+
+    @property
+    def ond_flags(self):
+        return self['ond-flags']
+
+    @property
+    def onr_flags(self):
+        return self['onr-flags']
+
+    def has_dflag(self, name):
+        return DFLAGS[name] in self['dflags']
+
+    def has_onr_flag(self, name):
+        return x in self['onr-flags']
+
+    def has_ond_flag(self, name):
+        return x in self['ond-flags']
+
+    # ---- Event actions ------------------------------------------------- #
+    def died(self, *causes):
+        self.stats.health.hp = 0
+        for i in causes: self.dflags.add(i)
+
+
+    def revive(self, restore_amt=0):
+        if (restore_amt > 0 and not self.has_onr_flag('null'))
+            if self.is_alive():
+                if self.dflags.has_nonrevivable() and
+                    not in self['onr-flags']):
+
+                    self.dflags.clear()
+
+                    if self.has_onr_flag('half'):
+                        self.stats.health.hp = restore_amt/2
+                    elif self.has_onr_flag('2x'):
+                        self.stats.health.hp = restore_amt*2
+                    else:
+                        self.stats.health.hp = restore_amt
+
+
+                    self.onr_flags.clear()
+                    self.on_revived(self)
+
+            # zombie checks
+            # TODO zombie famtype
+            elif self.statuses['undead'] > 0: # undead status
+                self._undead_revive(restore_amt, self.statuses['undead'])
+            else: pass # no effect
+
+    def _undead_revive(self, res, val):
+        import random # TODO 'calc_factor' in restore_amt
+        n = random.randint(0, int(val)) # FIXME
+        if val > 50:
+            x = bool(n in range(0, 100)) # FIXME
+            if x: self.died('revived-as-zombie')
+            else: pass # do n% dmg of health
+
+        else: # do n% dmg of health
+            pass
+
+
+    # ---- Events -------------------------------------------------------- #
+    def on_died(self, plane):
+        pass
+
+    def on_revived(self):
+        pass
 
 
 class Chars(dict):
@@ -166,67 +277,5 @@ class Char:
         """True if this char is controlled by the "player" object
             on the local machine."""
         return self._player == session.screen.player
-
-
-    # ---- Chardata access ---- #
-    @property
-    def location(self):
-        return self._chardata["location"]
-
-    @property
-    def name(self):
-        return self._chardata["name"]
-
-    @property
-    def base(self):
-        """Base values for this character."""
-        return self._chardata.base
-
-    @property
-    def body(self):
-        """This characters body attributes."""
-        return self._chardata["body"]
-
-    @property
-    def wallet(self):
-        """This characters wallet."""
-        return self._chardata["wallet"]
-
-    @property
-    def inventory(self):
-        """This characters inventory."""
-        return self._chardata["inventory"]
-
-    @property
-    def equip(self):
-        """This characters equipment."""
-        return self._chardata["equip"]
-
-    @property
-    def party(self):
-        """The party this char is in."""
-        return self._chardata["party"]
-
-    # ---- Query ---- #
-    def famtypes(self):
-        """Return an iterator of family types for this character."""
-        return ()
-
-    def is_alive(self):
-        """True if this character is alive."""
-        if self._chardata["stats"]["HP"] == 0: return False
-        return True
-
-    def is_critical(self):
-        """True if this characters health level is in the critical range."""
-        return self._chardata["stats"]["HP"].is_critical()
-
-    def is_undead(self):
-        """True if this character is an undead type or has zombie status."""
-        return ("zombie" in self._items["statuses"]["bools"] or
-            "zombie" in self.famtypes)
-
-    def hp(self):
-        return self._chardata["stats"]["HP"]
 
 
