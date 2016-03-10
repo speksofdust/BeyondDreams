@@ -145,38 +145,7 @@ def calc_strength(c):
         c[stats]["strength"] * calc_energy(c, "phys-energy"))
 
 
-class Stauses(gacc.CharDataAccessorDict):
-    __slots__ = gacc.CharDataAccessorDict.__slots__
-    #priorities:
-    #   Status 'immunnull' (nullifies effect of all immunites)
-    #   Status 'immundown' (all immune stats become 100 - immunodown level
-    #   Char Equip
-    #   Primary & Secondary Fam Immunities
-    #   Primary Fam stat + Secondary Fam stat(s)
 
-    def set_status(self, name, v):
-        if name in BOOLSTATUSES: self.char['statuses'][name] = bool(v)
-        else: self.char['statuses'][name] = int(v)
-
-    def get_status(self, name):
-        return self.char['statuses'][name]
-
-    def _set_status(self, s, v):
-        if s not in self.immunities():
-            self.char['statuses'][s] = v # TODO clamping
-
-    def _ss_bool(self, s, v):
-        if s not in self.immunities(): self['stats'][s] = bool(v)
-
-    def has_immunity_nullifiers(self):
-        """True if this char has 'immunnull' status or 'immundown' level is greater than 0"""
-        return (self.char['statuses']['immunnull'] or
-            self.char['statuses']['immundown'] >= 1)
-
-    def immunities(self):
-        """Return an iterator of all immunities."""
-        if self.has_immunity_nullifiers(): return iter(())
-        return iter(())
 
 
 

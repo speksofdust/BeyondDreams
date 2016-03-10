@@ -15,7 +15,7 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-import pdict
+from pdict import ChildPdict
 
 from .. import bd
 

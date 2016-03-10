@@ -31,7 +31,7 @@ class Pocket(list):
     def __init__(self, inventory, pockettype, items=[]):
         self._inventory =   inventory
         self._pockettype =  pockettype
-        self = list(items)
+        super().__init__(items)
 
     # Note: Pocket x Pocket comparison must compare pockettype
     def __eq__(self, x):

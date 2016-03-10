@@ -20,6 +20,7 @@ from charflags import CFlags
 
 
 class Energy(CharAttrDict):
+    """Dictionary data storage class for 'Energy' type data."""
     _ABSMAX = 1000
     _NORMMAX = 100
     __slots__ = CharAttrDict.__slots__
@@ -53,3 +54,19 @@ class Energy(CharAttrDict):
 
 class Stats(CharAttrDict):
     __slots__ = CharAttrDict.__slots__
+
+    def _defaultdict(self):
+        return {
+            'intellect': 1,
+            'strength': 50,
+            }
+
+    def _get_intellect(self): return self['intellect']
+    def _set_intellect(self, x): self['intellect'] = clamped(x, 1, 100)
+    intellect = property(_get_intellect, _set_intellect)
+
+    def _get_strength(self): return self['strength']
+    def _set_strength(self, x): self['strength'] = clamped(x, 1, 100)
+    strength = property(_get_strength, _set_strength)
+
+

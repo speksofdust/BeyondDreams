@@ -17,11 +17,13 @@
 
 from .bd import session
 import pdict
+from pdict import *
 
 from beyonddreams.core.baseclasses import BDDataDict
 from .vident import VIDENT_TYPES
 from .game.location import Visited
 from stats import Stats
+from statuses import Statuses
 import charflags
 
 
@@ -34,7 +36,7 @@ def _boolkw(char, k, **kwargs): if k in kwargs: char[k] = bool(kwargs[k])
 class Char(pdict.PDict):
     """Character data storage class."""
     _ident = VIDENT_TYPES["char"]
-    __slots__ = JparseDict.__slots__ + ('_gamechar', '_controller',
+    __slots__ = pdict.PDict.__slots__ + ('_gamechar', '_controller',
         '_specialflags')
     def __init__(self, data={}, parseinit=True, **kwargs):
         # Non-Writable values
@@ -48,7 +50,6 @@ class Char(pdict.PDict):
         _boolkw(self, 'npc', kwargs)
         if 'specialflags' in kwargs:
             self._specialflags = set(kwargs['specialflags'])
-
 
         super().__init__(data=data, parseinit=parseinit)
 
@@ -71,6 +72,11 @@ class Char(pdict.PDict):
                 'stats':        Stats(self, kwargs),
                 'statuses':     Statuses(self, kwargs),
                 'visited':      False,
+
+                # not yet implemented
+                #'personality':  Mood(),
+                #'mood':         Personality(),
+
                 # flags
                 'dflags':       charflags.DFlags(), # died flags
                 'ond-flags':    charflags.CharFlags(), # on died flags
@@ -78,13 +84,13 @@ class Char(pdict.PDict):
                 }
 
     def _parseinit(self):
-        from pdict import init_from_key_child
-        from pdict import init_from_key
         # convert json data to proper classes
-        init_from_key_child(self, 'equip', Equip)
-        init_from_key_child(self, 'inventory', Inventory)
-        init_from_key_child(self, 'stats', Stats)
-        init_from_key_child(self, 'statuses', Statuses)
+        init_from_key_cls_pairs_child(self, (
+            ('equip', Equip),
+            ('inventory', Inventory),
+            ('stats', Stats),
+            ('statuses', Statuses),
+            )
         # convert flags to sets
         self['dflags'] = charflags.DFlags(self['dflags']
         init_from_key(self, 'ond-flags', charflags.CharFlags)
@@ -127,11 +133,22 @@ class Char(pdict.PDict):
     def base(self):
         return self['base']
 
+    #@property
+    #def personality(self):
+        #return self['personality']
+
+    #@property
+    #def mood(self):
+        #return self['mood']
+
     @property
     def plane(self):
         return 0 # TODO
 
     # ---- Tests --------------------------------------------------------- #
+    def bodytype(self):
+        return self.body.bodytype()
+
     def is_alive(self):
         return self.hp > 0
 
@@ -162,23 +179,29 @@ class Char(pdict.PDict):
 
     @property
     def dflags(self):
+        """Died flags."""
         return self['dflags']
 
     @property
     def ond_flags(self):
+        """On Died flags."""
         return self['ond-flags']
 
     @property
     def onr_flags(self):
+        """On Revive flags."""
         return self['onr-flags']
 
     def has_dflag(self, name):
+        """True if at this char has at least one Died flag."""
         return DFLAGS[name] in self['dflags']
 
     def has_onr_flag(self, name):
+        """True if this char has at least one On-Revive flag."""
         return x in self['onr-flags']
 
     def has_ond_flag(self, name):
+        """True if this char has at least one On-Died flag."""
         return x in self['ond-flags']
 
     # ---- Event actions ------------------------------------------------- #

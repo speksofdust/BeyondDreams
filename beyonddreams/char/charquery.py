@@ -126,7 +126,7 @@ def elemental_immunities(char):
     for i in char['base'].elemental_immunities(): yield i
 
 
-# ---- Calculated stat/status getters -------------------------------- #
+# ---- Calculated stat/status getters ---------------------------------------- #
 def phys_energy(char):
     """The current physical energy for this character."""
     return

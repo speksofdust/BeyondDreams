@@ -71,7 +71,7 @@ class FamTypeData(tuple):
     def _calc_resistance(self, name):
         c = 0 # valid count
         x = 0 # valid sum
-        # valid only if not 0 from each subtype (primary, secodary, etc.
+        # valid only if not 0 from each subtype (primary, secodary, etc.)
         # avg of x (valid sum) divided by c (valid count)
         # this prevents skewed results from always dividing by 5 which we dont want
         if self[0][name] > 0:   # check primary
@@ -267,6 +267,7 @@ class Goo(PrimaryFam):
         self["frozen"] =    -50
         self["water"] =     20
         self["physical"] =  200 # physical attack need more exclusive value
+        self["psychic"] = 25
 
 
 # ---- Secondaries -- (char can be multiple as long as compatible) ----------- #
@@ -280,6 +281,7 @@ class Psychic(SecondaryFam):
     _name = "psychic"
     def __init__(self):
         self.__init_ft(())
+        self["psychic"] = 25
 
 
 class Aquatic(SecondaryFam):
