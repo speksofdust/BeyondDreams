@@ -30,16 +30,21 @@ class _QCommon:
 
 class _QContainerCommon:
     # Mixin for Quest and (*QuestManager* see _QContainerCommonX)
+
+    def not_started(self):
+        """Return an iterator of all yet to be started items."""
+        return iter(i for i in self if i._state = 0)
+
+    def incomplete(self):
+        """Return an iterator of all incomplete items."""
+        return iter(i for i in self if i._state == 1)
+
     def completed(self):
         """Return an iterator of all completed items."""
         return iter(i for i in self if i._state = 2)
 
-    def not_started(self):
-        """Return an iterator of all items that have not yet been started."""
-        return iter(i for i in self if i._state = 0)
-
     def failed(self):
-        """Return an iterator of all items that have been failed."""
+        """Return an iterator of all failed items."""
         return iter(i for i in self if i._state = 3)
 
 
@@ -47,16 +52,28 @@ class _QContainerCommonX(_QCommon, _QContainerCommon): pass
 
 
 class QuestTask(_QuestCommon):
-    def __init__(self, name, optional=False):
+    def __init__(self, quest, name, optional=False, is_last=False):
+        self._quest = quest
         self._state = 0
         self._name = name
         self._optional = bool(optional)
+        self._is_last_task = False
+
+    def on_started_task(self):
+        self._state = 1
+
+    def on_completed_task(self, qm):
+        self._state = 2
+
+    def on_failed_task(self, qm):
+        self._state = 3
 
 
 class Quest(tuple, _QContainerCommonX):
     def __init__(self, name):
         self._name = name
-        self = ()
+
+        super().__init__()
 
     @property
     def _state(self):
@@ -79,7 +96,10 @@ class QuestManager(list, _QContainerCommon):
     def __init__(self):
         self = []
 
-    def incomplete(self):
-        """Return an iterator of all incomplete items."""
-        return iter(i for i in self if i._state = 1)
+    def _ct_state(self, state):
+        return len(i for i in self if i._state == state)
 
+    def failed_count(self): return self._ct_state(3)
+    def completed_count(self): return self._ct_state(2)
+    def incomplete_count(self): return self._ct_state(1)
+    def not_started_count(self): return self._ct_state(0)
