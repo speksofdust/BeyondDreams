@@ -23,12 +23,14 @@ class Compass:
         self._scale = 1
 
 
-class MapObject:
+class MapObject(dict):
     _mapobject_type = ""
-    __slots__ = "_parent", "_pos"
+    __slots__ = dict.__slots__ + ("_parent")
     def __init__(self, parent, pos):
         self._parent = parent
-        self._pos = pos
+        super().__init__({
+            'pos': pos,
+            })
 
     @property
     def _map(self):
@@ -42,39 +44,40 @@ class MapObject:
 
 class MapMarker(MapObject):
     _mapobject_type = "marker"
-    __slots__ = MapObject.__slots__ + ("_name", "_color", "_symbol", "_notes", "_locked")
+    __slots__ = MapObject.__slots__
     def __init__(self, parent, pos, name, color, symbol, notes=[]):
-        self._parent = parent
-        self._pos = pos
-        self._name = name
-        self._color = color
-        self._symbol = symbol
-        self._notes = notes
-        self._locked = False
+        super().__init__({
+            'pos':      pos,
+            'name':     name,
+            'color':    color,
+            'symbol':   symbol,
+            'notes':    notes,
+            'locked':   False,
+            })
 
     def __del__(self):
-        self._color = None
-        self._symbol = None
-        self._locked = None
+        self['color'] = None
+        self['symbol'] = None
+        self['locked'] = None
 
-    def _get_locked(self): return self._locked
-    def _set_locked(self): self._locked = bool(self._locked)
+    def _get_locked(self): return self['locked']
+    def _set_locked(self): self['locked'] = bool(self['locked'])
     locked = property(_get_locked, _set_locked,
         doc="If True this map marker cannot be altered or removed.")
 
-    def _get_color(self): return self._color
-    def _set_color(self, x): self._color = x
+    def _get_color(self): return self['color']
+    def _set_color(self, x): self['color'] = x
     color = property(_get_color, _set_color, doc="The color of this map marker.")
 
     @property
     def name(self):
         """The name of this map marker."""
-        return self._name
+        return self['name']
 
     @property
     def notes(self):
         """Access notes for this map marker."""
-        return self._notes
+        return self['notes']
 
     def delete(self):
         """Delete this map marker from the map."""
@@ -87,7 +90,7 @@ class MapMarkers(BDList):
     __slots__ = BDList.__slots__ + "parent"
     def __init__(self, parent):
         self._parent = parent
-        self = []
+        super().__init__([])
 
     __setitem__ = __delitem__ = remove, discard, clear = append
 
