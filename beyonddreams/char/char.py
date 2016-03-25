@@ -22,6 +22,7 @@ from pdict import *
 from beyonddreams.core.baseclasses import BDDataDict
 from .vident import VIDENT_TYPES
 from .game.location import Visited
+from .game.planes import PLANES
 from stats import Stats
 from statuses import Statuses
 import charflags
@@ -81,6 +82,8 @@ class Char(pdict.PDict):
                 'dflags':       charflags.DFlags(), # died flags
                 'ond-flags':    charflags.CharFlags(), # on died flags
                 'onr-flags':    charflags.CharFlags(), # on revive flags
+
+                'plane':        ['mortal', 'none'],
                 }
 
     def _parseinit(self):
@@ -142,8 +145,14 @@ class Char(pdict.PDict):
         #return self['mood']
 
     @property
-    def plane(self):
-        return 0 # TODO
+    def pplane(self):
+        """The current primary plane."""
+        return PLANES[self['plane'][0]]
+
+    @property
+    def splane(self):
+        """The current secondary plane."""
+        return PLANES[self['plane'][1]]
 
     # ---- Tests --------------------------------------------------------- #
     def bodytype(self):

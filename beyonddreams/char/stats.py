@@ -59,6 +59,7 @@ class Stats(CharAttrDict):
         return {
             'intellect': 1,
             'strength': 50,
+            'focus':    50,
             }
 
     def _get_intellect(self): return self['intellect']
