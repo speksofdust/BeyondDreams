@@ -26,9 +26,10 @@ from .game.planes import PLANES
 from stats import Stats
 from statuses import Statuses
 import charflags
+from chardictkwds import *
 
 
-CHAR_TYPEFLAGS = ('VISITED_NOMEM',)
+CHAR_SPECIALFLAGS = ('VISITED_NOMEM', 'RELATIONSHIPS_OFF')
 
 
 def _boolkw(char, k, **kwargs): if k in kwargs: char[k] = bool(kwargs[k])
@@ -48,51 +49,61 @@ class Char(pdict.PDict):
 
         # parse kwargs
         _boolkw(self, 'gamechar', kwargs)
-        _boolkw(self, 'npc', kwargs)
+        _boolkw(self, NPC, kwargs)
         if 'specialflags' in kwargs:
             self._specialflags = set(kwargs['specialflags'])
 
-        super().__init__(data=data, parseinit=parseinit)
+        super().__init__(data=data, parseinit=parseinit, *args, **kwargs)
 
-        if 'VISITED_NOMEM' not in self._specialflags:
-            self['visited'] = Visited()
+        # special flags/gamedata constflags stuff
+        if 'VISITED_OFF' not in self._specialflags or
+            gamedata['constflags']:
+                self[VISITED] = Visited()
+
+        #if ('RELATIONSHIPS_OFF' not in self._specialflags or
+        #    gamedata['constflags']):
+
 
         # TODO validate/assign charid
 
         if self._gamechar: # add to gamechars
-            gamedata['chars'][self['charid']] = self
+            gamedata['chars'][self[CHARID]] = self
 
     def _defaultdict(self):
-        return {'base':         None,
-                'npc':          False,
-                'charid':       0,  # local charid
-                'handedness':   0,
-                'partyid':      -1,
-                'equip':        Equip(self),
-                'inventory':    Inventory(self),
-                'stats':        Stats(self, kwargs),
-                'statuses':     Statuses(self, kwargs),
-                'visited':      False,
+        return {
+                BASE:           None,
+                NPC:            False,
+                CHARID:         0,  # local charid
+                PARTYID =       -1,
+                HANDEDNESS:     0,
+                EQUIP:          Equip(self),
+                INVENTORY:      Inventory(self),
+                STATS:          Stats(self, kwargs),
+                STATUSES:       Statuses(self, kwargs),
+                VISITED:        False,
+                #### partially implemented ####
+                #RELATIONSHIPS = {},
+                #### not yet implemented ####
+                #PERSONALITY:  Personality(),
+                #MOOD:         Mood(),
 
-                # not yet implemented
-                #'personality':  Mood(),
-                #'mood':         Personality(),
-
-                # flags
+                # -- flags -- #
                 'dflags':       charflags.DFlags(), # died flags
                 'ond-flags':    charflags.CharFlags(), # on died flags
                 'onr-flags':    charflags.CharFlags(), # on revive flags
 
-                'plane':        ['mortal', 'none'],
+                PLANE:        ['mortal', 'none'],
                 }
 
     def _parseinit(self):
         # convert json data to proper classes
         init_from_key_cls_pairs_child(self, (
-            ('equip', Equip),
-            ('inventory', Inventory),
-            ('stats', Stats),
-            ('statuses', Statuses),
+            (EQUIP, Equip),
+            (INVENTORY, Inventory),
+            (STATS, Stats),
+            (STATUSES, Statuses),
+            #(PERSONALITY, Personality),
+            #(MOOD, Mood),
             )
         # convert flags to sets
         self['dflags'] = charflags.DFlags(self['dflags']
@@ -115,26 +126,26 @@ class Char(pdict.PDict):
     @property
     def inventory(self):
         """This character's inventory."""
-        return self['inventory']
+        return self[INVENTORY]
 
     @property
     def stats(self):
         """This character's stats."""
-        return self['stats']
+        return self[STATS]
 
     @property(self):
     def statuses(self):
         """This character's statuses."""
-        return self['statuses']
+        return self[STATUSES]
 
     @property
     def famtypes(self):
         """This character's family types."""
-        return iter(self['base'].famtypes)
+        return iter(self[BASE].famtypes)
 
     @property
     def base(self):
-        return self['base']
+        return self[BASE]
 
     #@property
     #def personality(self):
@@ -147,12 +158,12 @@ class Char(pdict.PDict):
     @property
     def pplane(self):
         """The current primary plane."""
-        return PLANES[self['plane'][0]]
+        return PLANES[self[PLANE][0]]
 
     @property
     def splane(self):
         """The current secondary plane."""
-        return PLANES[self['plane'][1]]
+        return PLANES[self[PLANE][1]]
 
     # ---- Tests --------------------------------------------------------- #
     def bodytype(self):
@@ -162,14 +173,14 @@ class Char(pdict.PDict):
         return self.hp > 0
 
     def hp(self):
-        return self['stats']['health']
+        return self[STATS][HEALTH]
 
     def is_critical(self):
-        return self['stats']['health'].is_critical()
+        return self[STATS][HEALTH].is_critical()
 
     def is_undead(self):
         """True if this character is an undead type or has zombie status."""
-        return ("zombie" in self["statuses"]["bools"] or
+        return ("zombie" in self[STATUSES]["bools"] or
             "zombie" in self.famtypes)
 
     # ---- Management ---------------------------------------------------- #
@@ -283,7 +294,7 @@ class GameChars(Chars):
         return iter(i for i in self if i._controller == 'ai')
 
 
-class Char:
+class _Char_old:
     """Base class for character objects."""
     __slots__ = "_chardata", "_controller", "_owner"
     def __init__(self, player, base):

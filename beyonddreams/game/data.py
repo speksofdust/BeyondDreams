@@ -66,6 +66,8 @@ class GamaData(BDDataDict):
                 'parties': {},
                 'playerpartyid': 0,
                 'visited': Visited(),    # locations visited data
+                # --- Flags --- #
+                'constflags': [],   # cant be changed once game is started
                 }
 
         self._readystate = 1
