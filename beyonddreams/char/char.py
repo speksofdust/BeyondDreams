@@ -25,14 +25,15 @@ from .game.location import Visited
 from .game.planes import PLANES
 from stats import Stats
 from statuses import Statuses
-import charflags
+import cflags
 from chardictkwds import *
 
 
 CHAR_SPECIALFLAGS = ('VISITED_NOMEM', 'RELATIONSHIPS_OFF')
 
 
-def _boolkw(char, k, **kwargs): if k in kwargs: char[k] = bool(kwargs[k])
+def _boolkw(char, k, **kwargs):
+    if k in kwargs: char[k] = bool(kwargs[k])
 
 
 class Char(pdict.PDict):
@@ -56,8 +57,8 @@ class Char(pdict.PDict):
         super().__init__(data=data, parseinit=parseinit, *args, **kwargs)
 
         # special flags/gamedata constflags stuff
-        if 'VISITED_OFF' not in self._specialflags or
-            gamedata['constflags']:
+        if ('VISITED_OFF' not in self._specialflags or
+            gamedata['constflags']):
                 self[VISITED] = Visited()
 
         #if ('RELATIONSHIPS_OFF' not in self._specialflags or
@@ -74,7 +75,7 @@ class Char(pdict.PDict):
                 BASE:           None,
                 NPC:            False,
                 CHARID:         0,  # local charid
-                PARTYID =       -1,
+                PARTYID:       -1,
                 HANDEDNESS:     0,
                 EQUIP:          Equip(self),
                 INVENTORY:      Inventory(self),
@@ -88,9 +89,9 @@ class Char(pdict.PDict):
                 #MOOD:         Mood(),
 
                 # -- flags -- #
-                'dflags':       charflags.DFlags(), # died flags
-                'ond-flags':    charflags.CharFlags(), # on died flags
-                'onr-flags':    charflags.CharFlags(), # on revive flags
+                'dflags':       cflags.DFlags(), # died flags
+                'ond-flags':    cflags.CharFlags(), # on died flags
+                'onr-flags':    cflags.CharFlags(), # on revive flags
 
                 PLANE:        ['mortal', 'none'],
                 }
@@ -104,11 +105,11 @@ class Char(pdict.PDict):
             (STATUSES, Statuses),
             #(PERSONALITY, Personality),
             #(MOOD, Mood),
-            )
+            ))
         # convert flags to sets
-        self['dflags'] = charflags.DFlags(self['dflags']
-        init_from_key(self, 'ond-flags', charflags.CharFlags)
-        init_from_key(self, 'onr-flags', charflags.CharFlags)
+        self['dflags'] = cflags.DFlags(self['dflags'])
+        init_from_key(self, 'ond-flags', cflags.CharFlags)
+        init_from_key(self, 'onr-flags', cflags.CharFlags)
 
 
     # ---- Quick access to common stuff ---------------------------------- #
@@ -133,7 +134,7 @@ class Char(pdict.PDict):
         """This character's stats."""
         return self[STATS]
 
-    @property(self):
+    @property
     def statuses(self):
         """This character's statuses."""
         return self[STATUSES]
@@ -189,10 +190,18 @@ class Char(pdict.PDict):
         """This character's controller. ('ai', 'player', etc.)"""
         return self._controller
 
-    def _set_controller(self, mode, party=None):
-        if mode == 'player':
-        elif mode == 'ai':
-        else: pass # TODO should log this
+    def _set_controller(self, mode, party=None, req=False):
+        if mode != self.controller:
+            if mode == 'player':
+                self._controller = mode
+            elif mode == 'ai':
+                self._controller = mode
+            else:
+                # dont raise unless req=True
+                x = "Unknown controller mode '{}' for char._set_controller.".format(
+                    mode)
+                if req: raise(x)
+                print(x) # TODO should log this instead of print
 
     def tempflags(self):
         return self._tempflags
@@ -212,18 +221,6 @@ class Char(pdict.PDict):
         """On Revive flags."""
         return self['onr-flags']
 
-    def has_dflag(self, name):
-        """True if at this char has at least one Died flag."""
-        return DFLAGS[name] in self['dflags']
-
-    def has_onr_flag(self, name):
-        """True if this char has at least one On-Revive flag."""
-        return x in self['onr-flags']
-
-    def has_ond_flag(self, name):
-        """True if this char has at least one On-Died flag."""
-        return x in self['ond-flags']
-
     # ---- Event actions ------------------------------------------------- #
     def died(self, *causes):
         self.stats.health.hp = 0
@@ -231,20 +228,19 @@ class Char(pdict.PDict):
 
 
     def revive(self, restore_amt=0):
-        if (restore_amt > 0 and not self.has_onr_flag('null'))
-            if self.is_alive():
-                if self.dflags.has_nonrevivable() and
-                    not in self['onr-flags']):
+        # has no effect on any if restore_amt==0
+        if (restore_amt > 0 and 'null' not in self.onr_flags):
+            if not self.is_alive():
+                if not self.dflags.has_nonrevivable():
 
                     self.dflags.clear()
 
-                    if self.has_onr_flag('half'):
+                    if 'half' in self.onr_flags:
                         self.stats.health.hp = restore_amt/2
-                    elif self.has_onr_flag('2x'):
+                    elif '2x' in self.onr_flags:
                         self.stats.health.hp = restore_amt*2
                     else:
                         self.stats.health.hp = restore_amt
-
 
                     self.onr_flags.clear()
                     self.on_revived(self)
@@ -252,19 +248,15 @@ class Char(pdict.PDict):
             # zombie checks
             # TODO zombie famtype
             elif self.statuses['undead'] > 0: # undead status
-                self._undead_revive(restore_amt, self.statuses['undead'])
+                import random # TODO 'calc_factor' in restore_amt
+                n = random.randint(0, int(val)) # FIXME
+                if val > 50:
+                    x = bool(n in range(0, 100)) # FIXME
+                    if x: self.died('revived-as-zombie')
+                    else: pass # do n% dmg of health
+                else: # do n% dmg of health
+                    pass
             else: pass # no effect
-
-    def _undead_revive(self, res, val):
-        import random # TODO 'calc_factor' in restore_amt
-        n = random.randint(0, int(val)) # FIXME
-        if val > 50:
-            x = bool(n in range(0, 100)) # FIXME
-            if x: self.died('revived-as-zombie')
-            else: pass # do n% dmg of health
-
-        else: # do n% dmg of health
-            pass
 
 
     # ---- Events -------------------------------------------------------- #
