@@ -91,7 +91,7 @@ def is_undead(char):
 def famtypes(char):
     """Return an iterator of family types for this character starting with
     the primary type."""
-    yield i for i in char['base'].famtypes
+    yield (i for i in char['base'].famtypes)
 
 
 # ---- Status Query ---------------------------------------------------------- #
@@ -117,13 +117,15 @@ def is_deimmunized(char):
 
 def status_immunities(char):
     """Return an iterator of a character's current status immunities."""
-    if is_deimmunized(char): return iter()
-    for i in char['base'].status_immunities(): yield i
+    if is_deimmunized(char): yield
+    else:
+        for i in char['base'].status_immunities(): yield i
 
 def elemental_immunities(char):
     """Return an iterator of currently active elemental immunities."""
-    if is_deimmunized(char): return iter()
-    for i in char['base'].elemental_immunities(): yield i
+    if is_deimmunized(char): yield
+    else:
+        for i in char['base'].elemental_immunities(): yield i
 
 
 # ---- Calculated stat/status getters ---------------------------------------- #

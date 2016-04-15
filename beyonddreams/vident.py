@@ -57,7 +57,7 @@ VIDENT_TYPES = {"dummy":    _DummyVIdent(),
 def vident_from_index(index):
     global VIDENT_TYPES
     for i in VIDENT_TYPES:
-        if i.index = index: return i
+        if i.index == index: return i
 
 def vident_name(actor):
     """Returns a 'name' ('player', 'char', 'party', etc) from given actor."""

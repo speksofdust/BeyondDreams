@@ -31,7 +31,7 @@ class CreatureBaseTraits:
     def _get_aff(self, char, attr):
         try:    # average of each type attr -- (auxilaries, elemental, secondaries)
             return sum((    # FIXME self[i]?
-                self[i] for i in getattr(char.famtypes, attr)) // len(
+                self[i] for i in getattr(char.famtypes, attr))) // len(
                     getattr(char.famtypes, attr))
         except: return 0 # none of type (gives ZeroDivisionError)
 
