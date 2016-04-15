@@ -26,7 +26,7 @@ def regitem(i):
 
 
 def _iter_by_attrval(ob, attr, val):
-    return iter(i for i in ob if i.attr = val)
+    return iter(i for i in ob if i.attr == val)
 
 def _iterbycattype(ob, cattype):
     return iter(i for i in t if ob.CATTYPE == cattype)
@@ -59,15 +59,15 @@ class ItemType(BDTaggedType):
     _typedesc =     ""
     ATTRIBS =       ()    # attribs for items when in inventory
     ALL_TYPE_ATTRIBS = () # all possible attribs for this type
-    # ---- Minimum worth values ---------------------------------------------- #
+    # ---- Minimum worth values ------------------------------------------ #
     _min_resale_value = 1 # <-- must be <= all other 'worth' 'values'
     _min_pawn_value = 1   #
     _min_trade_value = 1  #
-    # ---- Resale/trade attribs ---------------------------------------------- #
+    # ---- Resale/trade attribs ------------------------------------------ #
     _pawnable = True
     _tradable = True
     _resale_shoptypes = () # shoptypes that will buy this
-    # ---- stuff for consumables, weapons, and wearables only ---------------- #
+    # ---- stuff for consumables, weapons, and wearables only ------------ #
     _bwt =          1.0   # base weight must be (float)
     _slotsize =     1
     _itemset =      None
@@ -114,9 +114,9 @@ class ItemType(BDTaggedType):
         for i in self.typetags(): yield i
         for i in self._subcattype_tags: yield i
 
-    def is_bundable:
+    def is_bundable(self):
         """True if this item can be bundled."""
-        if self._bundleable and self._max_bundlesize > 1)
+        return (self._bundleable and self._max_bundlesize > 1)
 
     def is_in_set(self):
         """True if this item is part of a set."""

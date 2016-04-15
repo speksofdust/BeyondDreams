@@ -32,7 +32,7 @@ class ItemBrowserSelection(BDOBrowserSelection):
     _browsertype = "item"
     __slots__ = BDOBrowserSelection.__slots__
     def __init__(self):
-        BDOBrowserSelection.__init__(self, browser=itembrowser):
+        BDOBrowserSelection.__init__(self, browser=itembrowser)
 
 
 class ItemBrowserItem(BDOBrowserItem):

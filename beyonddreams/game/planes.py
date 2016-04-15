@@ -137,7 +137,7 @@ def is_dreaming(char):
 
 def wakeup(char):
     if is_dreaming(char):
-        PLANES[].on_wakeup(char)
+        PLANES[char.pplane].on_wakeup(char)
         char['plane'][1] = 'none'
 
 def on_die(char):
@@ -148,10 +148,4 @@ def on_enter_pplane(char, plane):
     """Called on entering a new primary plane."""
     if plane == 'dead':
         if char['plane'][1] == 'dream':
-
-
-
-
-
-
-
+            pass #TODO

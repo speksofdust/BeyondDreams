@@ -33,7 +33,7 @@ class ItemStorage(Tuple):
 
     def total_items(self):
         """Return the total number of items in the inventory."""
-        return sum(len(i) for i in iter(self)):
+        return sum(len(i) for i in iter(self))
 
 
 class CharItemStorage(ItemStorage, CharAttrib):
@@ -99,7 +99,7 @@ def _comb(o, a, b):
 
 def _add_bundleditem(obj, item, qty, size):
     if qty <= item.max_bundlesize:
-        obj[size:size] = [StoredItemBundled(item, qty]
+        obj[size:size] = [StoredItemBundled(item, qty)]
     else:
         while True:
             if qty > item.max_bundlesize:

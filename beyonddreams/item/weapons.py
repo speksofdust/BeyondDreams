@@ -77,9 +77,10 @@ class Arrow(Ammo):
 
 
 class DefensiveType(WeaponType):
-
+    pass
 
 class WeaponAccessories(WeaponType):
+    pass
 
 
 # ---- Weapon Types ---------------------------------------------------------- #
@@ -114,8 +115,8 @@ class WeaponTypeDict(ItemDict):
     CATTYPE = "weapon"
     __slots__ = ItemDict.__slots__
     def __init__(self):
-        self = {
-            "bow": ,            0,
+        super().__init__({
+            "bow":              0,
             "longbow":          0,
             "crossbow":         0,
             "blowgun":          0,
@@ -137,7 +138,7 @@ class WeaponTypeDict(ItemDict):
             "javelin":          0,
             "halberd":          0,
             "pike":             0,
-            }
+            })
 
     def bludgeon(self):
         return iter(i for i in self if i._family == "bludgeon")

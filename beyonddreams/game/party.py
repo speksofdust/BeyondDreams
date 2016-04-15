@@ -25,7 +25,7 @@ def _set_party_dict(data):
     x = rand_alphanumeric(PARTYID_LEN)
     while True:
         if cid in gamedata['parties']: x = rand_alphanumeric(PARTYID_LEN)
-        else break
+        else: break
     data._partyid = x
     gamedata['parties'][data._partyid] = data
 
@@ -49,11 +49,11 @@ class Party(tuple):
                 else: pass # party already created
         except: _set_party_dict(self)
 
-    def _get_active(self):
+    def _get_active(self): return self[0][0]
     def _set_active(self, x):
-        if x > len(self[1]) self[0][0] = len(self[1])
+        if x > len(self[1]): self[0][0] = len(self[1])
         elif x < 0: self[0][0] = 0
-        else self[0][0] = x
+        else: self[0][0] = x
     active = property(_get_active, _set_active,
         doc="The currently active character.")
 
@@ -67,7 +67,7 @@ class Party(tuple):
 
     def is_full(self):
         """True if no more members can be added to this party."""
-        return len(self.members) = self.MAX_CHARS
+        return len(self.members) == self.MAX_CHARS
 
     def party_size(self):
         """The current number of party members."""
@@ -123,11 +123,3 @@ class Party(tuple):
         def names(self):
             """Return an iterator of all party member's."""
             return iter(i.name for i in self.chardata)
-
-
-
-
-
-
-
-

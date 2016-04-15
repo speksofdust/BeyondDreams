@@ -35,7 +35,7 @@ class ConsumableType(BundableItemType):
     itemeffects =   None
 
     def _edible_tagname(self):
-        return ("", "edible", "drinkable")self.edible
+        return ("", "edible", "drinkable")[self.edible]
 
     def is_ingredient(self):
         """True if this item can be used as an ingredient."""
@@ -52,7 +52,7 @@ class ConsumableType(BundableItemType):
         if self._ingredient == 1:
             yield "ingredient"
             yield "dry"
-        elif: self._ingredient == 2:
+        elif self._ingredient == 2:
             yield "ingredient"
             yield "wet"
             yield "liquid"
