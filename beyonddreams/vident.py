@@ -60,7 +60,7 @@ def vident_from_index(index):
         if i.index = index: return i
 
 def vident_name(actor):
-    """Returns a 'name' ('player', 'char', 'party') from given actor."""
+    """Returns a 'name' ('player', 'char', 'party', etc) from given actor."""
     return actor._ident.name
 
 

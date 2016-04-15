@@ -15,6 +15,25 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+
+QUEST =         30
+QUEST_COMPLETED = 31
+QUEST_FAILED = 32
+QUEST_ADDED = 33
+
+QUEST_TASK_COMPLETED = 34
+QUEST_TASK_FAILED = 35
+QUEST_TASK_ADDED = 37
+
+DEFAULT_QUEST_MGS_COLORS = {
+    "quest_completed":          "#005DFF",
+    "quest_failed":             "#991200",
+    "quest_added":              "#934DCA",
+    "quest_task_completed":     "#005DFF",
+    "quest_task_failed":        "#991200",
+    "quest_task_added":         "#934DCA",
+}
+
 QUEST_STATES = ("not started", "incomplete", "completed", "failed")
 
 class _QCommon:

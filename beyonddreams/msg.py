@@ -17,39 +17,47 @@
 
 # msgcodes
 NORMAL =        0   # normal text
-USER =          1   # user text
+USER =          1   # users own text
 WHISPER_RECV =  2   # recieved whisper
 WHISPER_SEND =  3   # sent whisper
+USER_WARNING =  4   # warning text recieved by user (ie you are banned)
+CHAN =          5   # for user joined/left/kicked/booted/banned etc.
+BOT =           6   # channel bot
+USER_MENTIONED = 7 # text where own username was mentioned
 
+IMPORTANT =     9   # text marked as important
 SERVER =        10  # server messages
 ADMIN =         11  # admin message
-NOTICE =        12
-
-ERROR =         20
-WARN =          25
-IMPORTANT =     30
+NOTICE =        13
+WARN =          14
+ERROR =         15
 
 # local
-DIV_LINE =      50  # normal divider line
-DIV_LINE_DASH = 51  # dashed divider line
+DIV_LINE =      20  # normal divider line
+DIV_LINE_DASH = 21  # dashed divider line
 
-DIV_LINE_CODES = 50, 51
+DIV_LINE_CODES = 20, 21
 
-ALL_CODES = 0,1,2,3, 10, 11, 12, 20, 25, 30, 50, 51
+ALL_CODES = (0,1,2,3,4,5,6,7, 9, 10,11,12,13,14,15, 20,21)
 
 DEFAULT_TIMEFMT = "[%l:%M:%S]"
 
 DEFAULT_MSG_COLORS = {
     "normal":       "#CCCCCC",
     "user":         "#BFF0FF",
-    "whisper":      "#7BA59E",
-    "user-whisper": "#1E90FF",
+    "whisper_recv": "#7BA59E",
+    "whisper_send": "#1E90FF",
+    "user_warning": "#FF5600",
+    "chan":         "#1A0000",
+    "bot":          "#1AAFBB",
+    "user_mentioned": "#757200",
+    "important":    "#A5F378",
     "server":       "#757575",
     "admin":        "#800080",
     "notice":       "#E5E545",
-    "error":        "#FF0000",
     "warn":         "#FFA500",
-    "important":    "#A5F378",
+    "error":        "#FF0000",
+    "divline":      "#CCCCCC"
     }
 
 import session
@@ -204,8 +212,3 @@ class DivLine:
     def _get_divline(code, length):
         if code == DIV_LINE_DASH: return "-"*length
         else: return "—"*length
-
-
-
-
-
