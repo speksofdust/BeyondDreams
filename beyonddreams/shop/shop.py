@@ -19,7 +19,8 @@ from shophours import ShopHours
 
 class Shop:
     _shoptype = ""
-    _default_shophours = None
+    _default_hours = None
+    _desc = ""
     def __init__(self, shophours=None):
         if shophours = None:
             self._shophours = self._default_hours
@@ -37,6 +38,10 @@ class Shop:
     def hours(self):
         return self._shophours
 
+    @property
+    def desc(self):
+        return self._desc
+
     def todays_hours(self, day):
         return self._shophours.today(day)
 
@@ -44,3 +49,14 @@ class Shop:
         """True if this shop is currently open at the given
         day, hour, and minute."""
         self._shophours.is_open(day, hour, minute)
+
+    def time_till_close(self):
+        if self.is_open():
+            pass
+        else: return 0,0,0 # already closed
+
+    def time_till_open(self):
+        if not self.is_open(): #TODO should use game.time()
+            
+            pass
+        else: return 0,0,0 # already open
