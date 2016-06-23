@@ -25,49 +25,53 @@ from shophours import ShopDay, CLOSED_TODAY, ShopdayNoBreak
 
 
 class PawnShop(Shop):
-    _shoptype = PAWN_SHOP
-    _default_shophours = ShopHours()
+    _shoptype = PAWN
+    _default_hours = ShopHours()
 
 class PotionShop(Shop):
     _shoptype = POTION_SHOP
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
 
 class WeaponShop(Shop):
     _shoptype = WEAPON_SHOP
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
+
+class Blacksmith (Shop):
+    _shoptype = BLACKSMITH
+    _default_hours = Shop hours()
 
 class SeedShop(Shop):
     _shoptype = SEED_SHOP
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
 
 class GardeningShop(Shop):
     _shoptype = GARDENING_SHOP
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
 
 class Pharmacy(Shop):
     _shoptype = PHARMACY
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
 
 class HerbShop(Shop):
     _shoptype = HERB_SHOP
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
 
 class IngredientShop(Shop):
     _shoptype = INGREDIENT_SHOP
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
 
 class Talor(Shop):
     _shoptype = TALOR
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
 
 class Bar(Shop):
     _shoptype = BAR
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
 
 class Hotel(Shop):
     _shoptype = HOTEL
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
 
 class Inn(Shop):
     _shoptype = INN
-    _default_shophours = ShopHours()
+    _default_hours = ShopHours()
