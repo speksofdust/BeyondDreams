@@ -24,6 +24,8 @@ GARDENING_SHOP =    'gardening-shop'
 SEED_SHOP =         'seed-shop'
 HERB_SHOP =         'herb-shop'
 PHARMACY =          'pharmacy'
+BLACKSMITH =        'blacksmith'
+PAWN =              'pawn-shop'
 
 
 
