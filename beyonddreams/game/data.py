@@ -51,6 +51,16 @@ def _do_loading_stuff(filepath):
     gamedata = GameData(, jparse=True)
 
 
+def get_time(game):
+    if game.is_networked():
+       d = game.server.req('game.time')
+    else:
+       d = 0
+    #TODO calc time diff 'd'
+    game._gamedata['time'] = []
+    return game._game data['time']
+
+
 class GamaData(BDDataDict):
     """Storage class for game data."""
     path_suffix = 'savedgames'
@@ -66,6 +76,8 @@ class GamaData(BDDataDict):
                 'parties': {},
                 'playerpartyid': 0,
                 'visited': Visited(),    # locations visited data
+                'time': [0,0,0],         # weekday, hour, min
+                'moonstates': {},        # 
                 # --- Flags --- #
                 'constflags': [],   # cant be changed once game is started
                 }
