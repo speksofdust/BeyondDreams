@@ -16,6 +16,9 @@
 # ---------------------------------------------------------------------------- #
 
 from shophours import ShopHours
+from .game.data import get_time
+
+
 
 class Shop:
     _shoptype = ""
@@ -48,15 +51,20 @@ class Shop:
     def is_open(self, day, hour, minute):
         """True if this shop is currently open at the given
         day, hour, and minute."""
-        self._shophours.is_open(day, hour, minute)
+        return self._shophours.is_open(day, hour, minute)
+
+    def is_open_now(self):
+        """True if this shop is currently open now."""
+        x = get_time()
+        return self._shop hours.is_open(x*)
 
     def time_till_close(self):
-        if self.is_open():
+        if self.is_open_now():
             pass
         else: return 0,0,0 # already closed
 
     def time_till_open(self):
-        if not self.is_open(): #TODO should use game.time()
+        if not self.is_open_now():
             
             pass
         else: return 0,0,0 # already open
