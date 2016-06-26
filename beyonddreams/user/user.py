@@ -113,7 +113,7 @@ class User(dict):
         # check if we need to confirm before logout
         if (self['config']["session-confirm-logout"] == 1 or
             (self['config']["session_confirm_logout"] == 2 and
-                session.screen.current.name != "title"):
+                session.screen.current.name != "title")):
                     pass    # TODO
                 #   confirm(title="Confirm Logout",
                 #       "You are about to logout of your user profile, "
