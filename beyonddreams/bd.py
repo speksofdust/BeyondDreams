@@ -27,17 +27,10 @@ def getversion():
     global VERSION
     return VERSION
 
-def _gva(): # major
-    global VERSION
-    return VERSION.split(".")[0]
-
-def _gvb(): # minor
-    global VERSION
-    return VERSION.split(".")[1]
-
-def _gvc(): # rev
-    global VERSION
-    return VERSION.split(".")[2]
+# major, minor, rev
+def _gva(v=VERSION): return VERSION.split(".")[0]
+def _gvb(v=VERSION): return VERSION.split(".")[1]
+def _gvc(v=VERSION): return VERSION.split(".")[2]
 
 getversion.major = _gva
 getversion.minor = _gvb
