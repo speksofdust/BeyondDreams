@@ -44,7 +44,8 @@ class Prompt:
         while True:
             if self._closed: break
             # wait for user input
-            # return self._on_btn_release(self._pressed_idx)
+            # FIXME
+            else: return self._on_btn_release(self._pressed_idx)
 
 
     def _on_btn_release(self, i):
@@ -53,12 +54,11 @@ class Prompt:
         keyboard key press (hotkey)
         """
         pass
+        
 
-
-    def on_close(self):
-        if self._closed:
-            self._closed = True
-            del _prompts[self]
+    def _close(self):
+        self._closed = True
+        del _prompts[self]
 
 
 class QuitPrompt(Prompt):
@@ -67,6 +67,7 @@ class QuitPrompt(Prompt):
         Prompt.__init__(text, buttons=("quit", "cancel"), default_btn_idx=1)
 
     def _on_btn_release(self, i):
+        self._close
         if i == 0: return True
         return False
 
@@ -76,6 +77,7 @@ class OKPrompt(Prompt):
         Prompt.__init__(text, buttons=("OK",), default_btn_idx=0)
 
     def _on_btn_release(self, i):
+        self._close
         return 1
 
 class ErrorPrompt(OKPrompt):
