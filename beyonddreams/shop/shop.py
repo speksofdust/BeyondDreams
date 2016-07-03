@@ -29,6 +29,12 @@ class Shop:
             self._shophours = self._default_hours
         else: self._shophours = shophours
 
+    def get_mclosed(self): return self._mclosed
+    def set_mclosed(self, x): self._mclosed = bool(x)
+    _mclosed = property(get_mclosed, set_mclosed,
+        doc="""The manually closed state of this shop. Used to temporary close
+        down the shop.""")
+
     @property
     def shoptype(self):
         return self._shoptype
@@ -45,16 +51,23 @@ class Shop:
     def desc(self):
         return self._desc
 
-    def todays_hours(self, day):
-        return self._shophours.today(day)
+    def todays_hours(self):
+        x = get_time()
+        return self._shophours.today(x[0])
 
     def is_open(self, day, hour, minute):
         """True if this shop is currently open at the given
         day, hour, and minute."""
+        if self._mclosed:
+            from .core.datesres import idx_from_weekday_str
+            # special case for 'manually' closing
+            x = get_time()
+            if (x[0] == (day or idx_from_weekday_str): return True
         return self._shophours.is_open(day, hour, minute)
 
     def is_open_now(self):
         """True if this shop is currently open now."""
+        if self._mclosed: return False # 'manually' closed
         x = get_time()
         return self._shop hours.is_open(x*)
 
@@ -65,6 +78,6 @@ class Shop:
 
     def time_till_open(self):
         if not self.is_open_now():
-            
+
             pass
         else: return 0,0,0 # already open

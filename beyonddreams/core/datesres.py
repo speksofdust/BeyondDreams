@@ -15,21 +15,24 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-POTION_SHOP =       'potion-shop'
-PHARMACY =          'pharmacy'
-WEAPON_SHOP =       'weapon-shop'
-ARMORY =            'armory'
-CLOTHING_SHOP =     'clothing-shop'
-INGREDIENTS_SHOP =  'ingredients-shop'
-SEED_SHOP =         'seed-shop'
-GARDENING_SHOP =    'gardening-shop'
-HERB_SHOP =         'herb-shop'
-BLACKSMITH =        'blacksmith'
-PAWN =              'pawn-shop'
-JEWELER =           'jeweler'
+__ALL__ = ["MONTHS", "WEEKDAYS", "WEEKDAYS_ABBR", "idx_from_weekday_str"
+    "idx_from_month_str"]
 
-TALOR =             'talor'
-BANK =              'bank'
-BAR =               'bar'
-HOTEL =             'hotel'
-INN =               'inn'
+MONTHS = ("january", "febuary", "march", "april", "may", "june", "july",
+    "august", "september", "october", "november", "december")
+
+WEEKDAYS = ("sunday", "monday", "tuesday", "wednesday", "thursday", "friday",
+    "saturday")
+
+WEEKENDS = ("sunday", "saturday")
+MIDWEEK = WEEKDAYS[1:5]
+
+WEEKDAYS_ABBR = ("sun", "mon", "tue", "wed", "thur", "fri", "sat")
+
+def idx_from_weekday_str(w):
+    global WEEKDAYS
+    return WEEKDAYS[w.lower()[0:2]].index()
+
+def idx_from_month_str(m):
+    global MONTHS
+    return MONTHS[m.lower()[0:2]].index()
