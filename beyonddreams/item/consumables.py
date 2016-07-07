@@ -30,9 +30,19 @@ class ConsumableType(BundableItemType):
     """Base class for all consumable item types."""
     CATTYPE =       "consumable"
     edible =        0   # 0-False 1-True 2-Drinkable ('can' be eaten/drunk)
+    _edibility =    0
     _perishable =   0   # 0=False or max time as 3 ints (min, hours, days)
-    _ingredient =   0   # 0=False, 1=Dry, 2=Wet
+    _ingredient =   0   # 0=False, 1=Dry, 2=Wet, 3=DrySolid, 4=WetSolid
+    _crafting =     0   # can be used in making non consumables
     itemeffects =   None
+
+    @property
+    def edibility(self):
+        """Ease of eating or drinking this item. 0 is impossible, 9 is easies."""
+        return self._edibility
+
+    def is_edible(self):
+        return self.edible != 0
 
     def _edible_tagname(self):
         return ("", "edible", "drinkable")[self.edible]
@@ -56,134 +66,192 @@ class ConsumableType(BundableItemType):
             yield "ingredient"
             yield "wet"
             yield "liquid"
+        elif self._ingredient == 3:
+            yield "ingredient"
+            yield "dry"
+            yield "solid"
+        elif self._ingredient == 4:
+            yield "ingredient"
+            yield "wet"
+            yield "solid"
         else: pass
+        if self._medicine: yield "medicine"
+        if self._herb: yield "herb"
 
 
-class Ingredient(ConsumableType):
+
+
+class Ingredient:
     """Consumable types that can always be used as an ingredient."""
+    class Ingredient(ConsumableType):
+        pass
 
-class DryIngredient(Ingredient):
-    _resale_shoptypes = (INGREDIENTS_SHOP, )
+    class Dry(Ingredient):
+        _ingredient = 1
 
-class EdibleIngredient(DryIngredient):
-    edible =    1
+    class Edible(Ingredient):
+        edible = 1
+        _edibility = 1 # minimum
 
-class HerbalIngredient(EdibleIngredient):
-    _resale_shoptypes = (INGREDIENTS_SHOP, HERB_SHOP)
+    class Wet(Ingredient):
+        _ingredient = 2
+        edible = 2
+        _edibility = 8 # minimum
 
-class WetIngredient(Ingredient):
-    edible =    2
+    class SolidDry(Dry):
+        _ingredient=3
 
+    class SolidWet(Wet):
+        _ingredient=4
+        _edibility = 7 # default
 
-# ---- Dry Ingredient -------------------------------------------------------- #
-class Dust(DryIngredient):
-    _typename = "dust"
+    class SolidDryEdible(SolidDry):
+        _edible = 1
+        _edibility = 1
 
-
-class Powder(DryIngredient):
-    _typname =  "powder"
-
-
-class Seed(EdibleIngredient):
-    _typename = "seed"
-    _resale_shoptypes = (GARDENING_SHOP, SEED_SHOP)
-
-
-class Flower(EdibleIngredient):
-    _typename = "flower"
-
-
-class Bark(EdibleIngredient):
-    _typename = "bark"
-
-
-class Root(EdibleIngredient):
-    _typename = "root"
-
-
-class Leaf(EdibleIngredient):
-    _typename = "leaf"
-
-
-class Mushroom(EdibleIngredient):
-    _typename = "mushroom"
-
-
-class Fruit(EdibleIngredient):
-    _typename = "fruit"
-
-
-# ---- Herbals --------------------------------------------------------------- #
-class HerbalFlower(HerbalIngredient, Flower): pass
-class HerbalLeaf(HerbalIngredient, Leaf): pass
-class HerbalBark(HerbalIngredient, Bark): pass
-class HerbalRoot(HerbalIngredient, Root): pass
 
 # ---- Wet Ingredient -------------------------------------------------------- #
-class Gel(WetIngredient):
+class Balm(Ingredient.SolidWet):
+    _typename = "balm"
+
+class Cream(Ingredient.SolidWet):
+    _typename = "cream"
+
+class Paste(Ingredient.SolidWet):
+    _typename = "paste"
+
+class Ointment(Ingredient.SolidWet)
+    _typename = "ointment"
+
+
+class Gel(Ingredient.SolidWet):
     _typename = "gel"
     edible =    1
 
-class Oil(WetIngredient):
+class Oil(Ingredient.Wet):
     _typename = "oil"
 
+class Jelly(Ingredient.SolidWet):
+    _typename = "jelly"
 
-class Potion(WetIngredient):
+class Sap(Ingredient.SolidWet):
+    _typename = "sap"
+    _edibility = 6
+
+class Potion(Ingredient.Wet):
     _typename = "potion"
-    _resale_shoptypes = (POTION_SHOP,)
 
+class Elixer(Ingredient.Wet):
+    _typename = "elixer"
 
-class Perfume(WetIngredient):
+class Perfume(Ingredient.Wet):
     _typename = "perfume"
     _resale_shoptypes = (INGREDIENT_SHOP, PERFUME_SHOP)
 
-class Sap(WetIngredient):
-    _typename = "sap"
+class Dye(Ingredient.Wet):
+    _typename = "dye"
+    def __init__(self, color):
+        self._color = color
 
 
-# ---- Consumable ------------------------------------------------------------ #
-class Feather(ConsumableType):
+
+# ---- Dry Ingredient -------------------------------------------------------- #
+class Dust(Ingredient.Dry):
+    _typename = "dust"
+
+
+class Powder(Ingredient.Dry):
+    _typname =  "powder"
+
+
+class Pill(Ingredient.SolidDryEdible):
+    _typename = "pill"
+
+
+class Seed(Ingredient.SolidDryEdible):
+    _typename = "seed"
+    _edibility = 7
+    _resale_shoptypes = (GARDENING_SHOP, SEED_SHOP)
+
+
+class Flower(Ingredient.SolidDryEdible):
+    _edibility = 9
+    _typename = "flower"
+
+
+class Bark(Ingredient.SolidDryEdible):
+    _ediblility = 2
+    _typename = "bark"
+
+
+class Root(Ingredient.SolidDryEdible):
+    _edibility = 2
+    _typename = "root"
+
+
+class Leaf(Ingredient.SolidDryEdible):
+    _edibility = 8
+    _typename = "leaf"
+
+
+class Mushroom(Ingredient.SolidDryEdible):
+    _edibility = 9
+    _typename = "mushroom"
+
+
+class Fruit(Ingredient.SolidDryEdible):
+    _edibility = 9
+    _typename = "fruit"
+
+
+# ---- Ingredient/Crafting---------------------------------------------------- #
+class Feather(Ingredient.SolidDry):
     _typename = "feather"
+    _crafting = 1
 
-
-class Shell(ConsumableType):
+class Shell(Ingredient.SolidDry):
     _typename = "shell"
+    _crafting = 1
 
-
-class Tooth(ConsumableType):
+class Tooth(Ingredient.SolidDry):
     _typename = "tooth"
+    _crafting = 1
 
-
-class Bone(ConsumableType):
+class Bone(Ingredient.SolidDry):
     _typename = "bone"
+    _crafting = 1
 
+class Rock(Ingredient.SolidDry):
+    _typename = "rock"
+
+
+class Gem(Ingredient.SolidDry):
+    _typename = "gem"
+    _crafting = 1
+
+class Crystal(Ingredient.SolidDry):
+    _typename = "crystal"
+    _crafting = 1
+
+
+# ---- Crafting ----------------------------------------------------------- #
+class Ingot(ConsumableType):
+    _typename = "ingot"
+    _crafting = 1
+
+class Cloth(ConsumableType):
+    _typename = "cloth"
+    _crafting = 1
 
 class String(ConsumableType):
     _typename = "string"
+    _crafting = 1
 
 
 class Button(ConsumableType):
     _typename = "button"
-
+    _crafting = 1
 
 class Ribbon(ConsumableType):
     _typename = "ribbon"
-
-
-class Rock(ConsumableType):
-    _typename = "rock"
-
-
-class Gem(ConsumableType):
-    _typename = "gem"
-
-
-class Ingot(ConsumableType):
-    _typename = "ingot"
-
-
-class Cloth(ConsumableType):
-    _typename = "cloth"
-
-
-
+    _crafting = 1
