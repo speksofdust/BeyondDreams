@@ -16,6 +16,7 @@
 # ---------------------------------------------------------------------------- #
 
 import gamedata
+import roster
 
 PARTYID_LEN = 10
 
@@ -28,6 +29,58 @@ def _set_party_dict(data):
         else: break
     data._partyid = x
     gamedata['parties'][data._partyid] = data
+
+
+class PartyRoster(roster.Roster):
+    _maxmembers = 8
+    __slots__ = roster.Roster.__slots__
+
+    def invite_member(self, charid):
+        pass
+
+
+class PlayerPartyRoster(PartyRoster):
+    __slots__ = PartyRoster.__slots__
+
+    def _add_member(self, charid):
+        if self._can_add_member(charid): self._members.append(charid)
+
+
+class NetworkedPartyRoster(PartyRoster):
+    __slots__ = PartyRoster.__slots__
+
+    def _add_member(self, charid):
+        pass
+
+
+class Party(roster._Members):
+    """Base class for all party types."""
+    # uses roster._Members to include sequence methods
+    _isnet = 0 # 1 if networked
+    __slots__ = roster._Members + '_partyid'
+
+    def __eq__(self, x):
+        try: return x._partyid == self._partyid
+        except: raise("Can only compare type 'Party' to instance of 'Party'")
+
+    def __ne__(self, x):
+        try: return x._partyid != self._partyid
+        except: raise("Can only compare type 'Party' to instance of 'Party'")
+
+
+class PlayerParty(Party):
+    __slots__ = Party.__slots__ + '_active'
+    def __init__(self, members):
+        self._active = 0
+        self._members = PlayerPartyRoster(members)
+
+
+class NetworkedParty(Party):
+    _isnet = 1
+    __slots__ = Party.__slots__
+    def __init__(self, *args):
+        self._members = NetworkedPartyRoster()
+
 
 class Party(tuple):
     MAX_CHARS = 8

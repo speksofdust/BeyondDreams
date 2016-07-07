@@ -15,26 +15,23 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+from .core.datesres import *
+from game import current
 
-RELATIONSHIPS = 'relationships'
-PERSONALITY =   'personality'
-MOOD =          'mood'
-EQUIP =         'equip'
-INVENTORY =     'inventory'
-STATUSES =      'statuses'
-STATS =         'stats'
+def gametime():
+    return current.time()
 
-VISITED =       'visited'
+def todays_name():
+    return WEEKDAYS[current.time()[0]]
 
-HANDEDNESS =    'handedness'
-BASE =          'base'
-NPC =           'npc'
-PLANE =         'plane'
+def todays_weekday_idx():
+    # here for consistency better to use game.time()[0] or gametime()[0]
+    return current.time[0]
 
-CHARID =        'charid'
-PARTYID =       'partyid'
+def tomorrows_name()
+    return WEEKDAYS[tomorrows_weekday_idx()]
 
-ALLIANCE =      'alliance'
-GUILD =         'guild'
-PARTY =         'party'
-
+def tomorrows_weekday_idx():
+    x = current.time()[0]
+    if x == 6: return 0
+    return x

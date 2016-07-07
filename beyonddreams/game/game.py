@@ -34,3 +34,75 @@ DEFAULT_GAME_MGS_COLORS = {
     "party_speech":     "",
     "party_whisper":    "",
     ""
+
+current = None
+
+def _init_game(setup):
+    if setup._networked: g = NetworkedGame()
+    else: g = Game()
+    global current
+    current = g
+
+
+class _GameBC()
+    _name = ""
+    _networked = False
+    _pausable = False
+    def __init__(self):
+        self._ended = False
+        self._paused = False
+        from data import GameData
+        from player import Player
+        self._data = GameData(self) # local data
+        self._player = Player(self) # local player
+
+    def _get_paused(self): return self._paused
+    def _set_paused(self, p): pass
+    paused = property(_get_paused, _set_paused,
+        doc="""Sets the 'paused' state of the current game.
+(May not be available in all game types)""")
+
+    @property
+    def player(self):
+        """The local player."""
+        return self._player
+
+    @property
+    def _init_epoch(self):
+        return self._data['epoch']
+
+    @property
+    def _last_epoch(self):
+        return self._data['epoch last']
+
+    def time(self):
+        """Return the current time in game. as a tuple of integers
+            (weekday, hour, minute, current_day).
+        """
+        d = 0
+        #TODO calc time diff 'd'
+        self._data['time'] = []
+        return self._data['time']
+
+    def _ltime(self):
+        return self._data['time']
+
+
+class Game(_GameBC):
+    _pausable = True
+
+
+    def _set_paused(self, p):
+        if self._pausable: self._paused = bool(p)
+
+
+class NetworkedGame(_GameBC):
+    _pausable = False
+    _networked = True
+
+    def time(self):
+        d = self.server.req('game.time')
+        # TODO calc time diff d
+        self._data['time'] []
+        return self._data['time']
+

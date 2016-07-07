@@ -40,7 +40,7 @@ class Char(pdict.PDict):
     """Character data storage class."""
     _ident = VIDENT_TYPES["char"]
     __slots__ = pdict.PDict.__slots__ + ('_gamechar', '_controller',
-        '_specialflags')
+        '_specialflags', '_tempflags')
     def __init__(self, data={}, parseinit=True, **kwargs):
         # Non-Writable values
         self._gamechar = False
@@ -73,10 +73,13 @@ class Char(pdict.PDict):
     def _defaultdict(self):
         return {
                 BASE:           None,
-                NPC:            False,
-                CHARID:         0,  # local charid
+                NPC:            False,    # True if NPC
+                CHARID_LOCAL:   0,
+                CHARID:         0,         # server assigned charid
                 PARTYID:       -1,
                 HANDEDNESS:     0,
+                ALLIANCE:       'none',
+                GUILD:          'none',
                 EQUIP:          Equip(self),
                 INVENTORY:      Inventory(self),
                 STATS:          Stats(self, kwargs),
@@ -183,6 +186,22 @@ class Char(pdict.PDict):
         """True if this character is an undead type or has zombie status."""
         return ("zombie" in self[STATUSES]["bools"] or
             "zombie" in self.famtypes)
+
+    # ---- NPC and auto actions ------------------------------------------ #
+
+    @property
+    def alliance(self):
+        return self[ALLIANCE]
+
+    def _is_foe_of(self, x):
+        """True if x is a foe of this character."""
+        return False
+
+    def _is_neutral_of(self, x):
+        """True if x is neutral to this character."""
+        return True
+
+
 
     # ---- Management ---------------------------------------------------- #
     @property

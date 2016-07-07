@@ -18,47 +18,27 @@
 from screen import BDScreen
 
 
-class Game(BDScreen):
-    _name = "game"
-    _writable = False
-    _pausable = False   # defaults to false is set after __init__ if otherwise
-    _paused = False
+class GameSetup(BDScreen):
+    _name = "game setup"
+
     def __init__(self):
-        self._ended = False
-        self._local_player = None # the main machine local player
-        from .game.data import GameData
-        self._data = GameData(self)
+        self._gametype = -1     # -1 for unset TODO
+        self._networked = False
+        self._pausable = False
 
-    #@classmethod
-    #def load_game(self, fp):
-        #self._init_game
-        # do loading stuff
-        #self._start_game
-
-    @classmethod
-    def new_game(self):
-        self._init_game
-        self._start_game
-
-    def _init_game(self):
-        from .game.player import Player
-        self._local_player = Player(self)
-
-    def _start_game(self):
+    def load_game_config(self):
         pass
 
-    def is_ended(self):
-        """True if the current game has ended."""
-        return self._ended
+    def _can_start(self):
+        return False
 
-    @property
-    def player(self):
-        """The player of this game (at the current machine)."""
-        return self._local_player
+    def _checks(self):
+        if self._networked: self._pausable = False
 
-    def _get_paused(self): return self._paused
-    def _set_paused(self, p):
-        if self._pausable: self._paused = bool(p)
-    paused = property(_get_paused, _set_paused,
-        doc="""Sets the 'paused' state of the current game.
-(May not be available in all game types)""")
+    def start_game(self):
+        """Start the game with the current configuration."""
+        if self._can_start():
+            from .game import game
+            game._init_game(self)
+
+

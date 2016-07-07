@@ -16,7 +16,7 @@
 # ---------------------------------------------------------------------------- #
 
 from shophours import ShopHours
-from .game.data import get_time
+from .game.dates import gametime
 
 
 
@@ -52,24 +52,23 @@ class Shop:
         return self._desc
 
     def todays_hours(self):
-        x = get_time()
-        return self._shophours.today(x[0])
+        return self._shophours.today()
 
-    def is_open(self, day, hour, minute):
+    def is_open(self, wday, hour, minute):
         """True if this shop is currently open at the given
         day, hour, and minute."""
         if self._mclosed:
             from .core.datesres import idx_from_weekday_str
             # special case for 'manually' closing
-            x = get_time()
-            if (x[0] == (day or idx_from_weekday_str): return True
-        return self._shophours.is_open(day, hour, minute)
+            x = gametime()
+            if (x[0] == (wday or idx_from_weekday_str): return True
+        return self._shophours.is_open(wday, hour, minute)
 
     def is_open_now(self):
         """True if this shop is currently open now."""
         if self._mclosed: return False # 'manually' closed
-        x = get_time()
-        return self._shop hours.is_open(x*)
+        x = gametime()
+        return self._shophours.is_open(x*)
 
     def time_till_close(self):
         if self.is_open_now():

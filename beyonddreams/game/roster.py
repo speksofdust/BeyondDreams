@@ -15,26 +15,41 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+import gamedata
 
-RELATIONSHIPS = 'relationships'
-PERSONALITY =   'personality'
-MOOD =          'mood'
-EQUIP =         'equip'
-INVENTORY =     'inventory'
-STATUSES =      'statuses'
-STATS =         'stats'
+class _Members:
+    __slots__ = '_members'
+    def __init__(self, members):
+        self._members = members
 
-VISITED =       'visited'
+    def __len__(self): return len(self._members)
+    def __iter__(self): return iter(self._members)
+    def __getitem__(self, i): return self._members[i]
+    def __setitem__(self, i, v): self._members[i] = v
+    def __contains__(self, x): return x in self._members
 
-HANDEDNESS =    'handedness'
-BASE =          'base'
-NPC =           'npc'
-PLANE =         'plane'
 
-CHARID =        'charid'
-PARTYID =       'partyid'
+class Roster(_Members):
+    _maxmembers = 'inf'
+    __slots__ = _Members.__slots__
+    def __init__(self, members):
+        self._members = members
 
-ALLIANCE =      'alliance'
-GUILD =         'guild'
-PARTY =         'party'
+    def _can_add_member(self, charid):
+        return not(self.is_full and charid not in self)
+
+    def is_full(self):
+        return len(self._members == self._maxmembers)
+
+    def _add_member(self, charid):
+        pass
+
+    def on_member_leave(self, member): pass
+    def on_member_join(self, member): pass
+
+
+class BannedRoster(Roster):
+    __slots__ = Roster.__slots__
+
+
 

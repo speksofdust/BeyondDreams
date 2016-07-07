@@ -15,45 +15,76 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from .core.datesres import*
+from .core.datesres import *
+from .game.dates import *
 
 def _fmtt(t): return "{}:{}".format(t[0], t[1])
+def _fmttx(o, a, b):
+    return '{}:{}-{}:{}'.format(o[a][0], o[a][1], o[b][0], o[b][1])
 
 def _fmtsdtime(t):
-    if t == None: return (None, None)
-    elif len(t) == 1: return (t, 0) # add a 0 for min
-    else return t
+    if t == ((24, 0) or (-1, 0) return t
+    if (t is None or t == -1): return (-1, 0)
+    elif t == 24: return (24, 0)
+    elif len(t) == 1:
+        if t <= -2: t = 0
+        elif t >= 25:
+        else return (t, 0) # add a 0 for min
+    else:
+        if t[1] < 0: return (t[0], 0)
+        elif t[1] > 59: return (t[0], 59]
+        return t
 
 
-class ShopDay:
+class ShopDay(tuple):
     def __init__(self, opentime, closetime, breakstart, breakend):
-        self._opentime =     _fmtsdtime(opentime)
-        self._closetime =    _fmtsdtime(closetime)
-        self._breakstart =   _fmtsdtime(breakstart)
-        self._breakend =     _fmtsdtime(breakend)
+        super().__init__((
+            _fmtsdtime(opentime)
+            _fmtsdtime(closetime)
+            _fmtsdtime(breakstart)
+            _fmtsdtime(breakend)
+            )
+
+    @classmethod
+    def NoBreak(cls, opentime, closetime):
+        return cls(opentime, closetime,
+
+    @classmethod
+    def Open24Hours(cls):
+        return cls((24, 0),(24, 0), (-1, 0), (-1, 0))
+
+    @classmethod
+    def Closed(cls):
+        return cls((-1, -1), (-1, -1), (-1, 0), (-1, 0))
 
     def _is_ob(self, x): return self.opens_at[0] <= x < self.break_start[0]
     def _is_bc(self, x): return self.break_end[0] <= x <= self.closes_at[0]
 
     def __str__(self):
-        return "".join((_fmtt(self.opens_at), "-", _fmtt(self.closes_at), " ",
-        _fmtt(self.break_start) "-", _fmtt(self.break_end)))
+        return "".join((_fmttx(self, 0, 1), " ", _fmttx(self, 2, 3)))
+
+    def hours_as_str(self):
+        if self[0] == 24: return 'Open 24 Hours'
+        elif self[0] == -1: return 'Closed'
+        elif self.has_break():
+            return "".join((_fmttx(self, 0, 1), " break: ", _fmttx(self, 2, 3)))
+        else: return "".join((_fmttx(self, 0, 1)))
 
     @property
     def opens_at(self):
-        return self._opentime
+        return self[0]
 
     @property
     def closes_at(self):
-        return self._closetime
+        return self[1]
 
     @property
     def break_start(self):
-        return self._break_start
+        return self[2]
 
     @property
     def break_end(self):
-        return self._break_end
+        return self[3]
 
     def is_open_hours(self, hour):
         """True if hour is during a time that the shop will be open today.
@@ -61,19 +92,17 @@ class ShopDay:
         return self.opens_at[0] <= x < self.closes_at[0]
 
     def has_break(self):
-        return self._break_start is not None
+        return (self.break_start[0] != (-1 or 24))
 
-    def is_before_break(self, hour):
-        return self.break_start < hour
+    def is_closed_today(self):
+        """True if is not open at all today."""
+        return self.opens_at[0] == -1
 
-    def is_after_break(self, hour):
-        return self.break_end >= hour
-
-    def is_on_break(self, hour):
-        return self.break_start[0] <= hour < self.break_end[0]
 
     def _atopenchk(self, h, m):
-        if self.opens_at[0] < hour: return False
+        if self.opens_at[0] == 24: return True
+        elif self.opens_at[0] == -1 return False
+        elif self.opens_at[0] < hour: return False
         elif self.opens_at[0] == hour and self.opens_at[1] <= min:
             return False
         return True
@@ -86,45 +115,8 @@ class ShopDay:
             return self.closes_at > hour
 
 
-class ShopdayNoBreak(ShopDay):
-    def __init__(self, opentime, closetime):
-        self._opentime =     _fmtsdtime(opentime)
-        self._closetime =    _fmtsdtime(closetime)
-        self._breakstart = self._breakend = (None, None)
-
-    def __str__(self):
-        return "-".join((_fmtt(self.opens_at), _fmtt(self.closes_at)))
-
-    def is_after_break(self, hour): return False
-    is_before_break = is_after_break = is_on_break
-
-    def is_open(self, hour, minute):
-        return self.is_open_hours(hour) and self._atopenchk(hour, min)
-
-
-# ---- Specials ---- #
-
-class _ShopDayClosed(ShopDay):
-    def __init__(self):
-        self._opentime = (None, None)
-        self._closetime = self._opentime
-        self._breakstart = self._opentime
-        self._breakend =    self._opentime
-
-    def __str__(self): return "Closed"
-
-    def is_open(self, hour, minute): return False
-    def is_after_break(self, hour): return False
-    is_before_break = is_on_break = is_after_break # make all these return false
-
-
-class _ShopDayOpen24H(_ShopDayClosed):
-    def __str__(self): return "Open All Day"
-    def is_open(self, hour, minute): return True
-
-
-CLOSED_TODAY = _ShopdayClosed()
-OPEN_ALL_DAY = _ShopDayOpen24H()
+CLOSED_TODAY = ShopDay.Closed()
+OPEN_ALL_DAY = ShopDay.Open24Hours()
 
 
 class ShopWeek(tuple):
@@ -133,21 +125,48 @@ class ShopWeek(tuple):
         super().__init__((sun, mon, tue, wed, thur, fri, sat))
 
     @classmethod
-    def OpenOnlyWeekends(sun, sat):
-        return ShopWeek(sun, sat)
+    def SameWeekdayHours(cls, weekdayhours, sat=CLOSED_TODAY, sun=CLOSED_TODAY):
+        return cls(sun, weekdayhours, weekdayhours, weekdayhours, weekdayhours,
+            weekdayhours, sat)
 
     @classmethod
-    def OpenOnlyWeekdays(mon, tue, wed, thur, fri):
-        return ShopWeek(mon, tue, wed, thur, fri)
+    def ClosedWeekdays(cls, sun, sat):
+        return cls(sun, sat)
 
-    def today(self, day):
-        try: return self[day]
-        except:
-            try: return self[idx_from_weekday_str(day)]
-            except: raise IndexError("Invalid day string: {}".format(day))
+    @classmethod
+    def ClosedWeekends(cls, mon, tue, wed, thur, fri):
+        return cls(mon, tue, wed, thur, fri)
 
-    def is_open(self, day, hour, minute):
-        return self.today(day).is_open(hour, minute)
+    def today(self):
+        return self[gametime()[0]]
+
+    def tommorrow(self):
+        return self[tomorrows_weekday_idx()]
+
+    def is_open(self, wday, hour, minute):
+        return self[wday].is_open(hour, minute)
+
+    def _days_open(self):
+        return iter(self[i] for i in self if not i.is_closed_today())
+
+    def days_open(self):
+        """Return an iterator of weekday names open this week."""
+        return iter(WEEKDAYS[self[i]] for i in self if not i.is_closed_today())
+
+    def is_before_break(self):
+        if self[day].has_break():
+            return self[day]break_start < hour
+        return False
+
+    def is_after_break(self):
+        if self[day].has_break():
+            return self[day]break_end >= hour
+        return False
+
+    def is_on_break(self):
+        if self[day].has_break():
+            return (self[day]break_start[0] <= hour < self[day]break_end[0])
+
 
 
 OPEN_24_7 = ShopWeek(OPEN_ALL_DAY, OPEN_ALL_DAY, OPEN_ALL_DAY,
