@@ -15,7 +15,8 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from .screens import BDScreen
+from screen import BDScreen,
+from screen import CHAR_EDITOR
 
 
 class UndoHist:
@@ -41,16 +42,21 @@ class UndoHist:
 
 
 class CharEditorScreen(BDScreen):
-    _name = "character editor"
+    _name = CHAR_EDITOR
     def __init__(self):
         self._editor = CharEditor()
-
 
     def run(self):
         pass
 
     def has_unsaved_data(self):
         return self._editor._saved
+
+    def exit_to_title(self):
+        pass
+
+    def quit(self):
+        pass
 
 
 class CharEditor:
@@ -63,9 +69,6 @@ class CharEditor:
 
     def load_char(self, char, as_copy=False):
         pass
-
-    def cleanup(self):
-        self._undohist.clear
 
     def new_char(self):
         if self._saved == False:
@@ -94,10 +97,16 @@ class CharEditor:
 
         self._saved = True
 
+    def save_as_preset(self):
+        """Save the current character's state as a character preset."""
+        pass
 
 
+    def _load_preset(self, preset):
+        pass
 
-
+    def _cleanup(self):
+        self._undohist.clear
 
 
 

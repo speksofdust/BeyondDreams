@@ -14,15 +14,35 @@
 #     along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
+
 from chareditor import CharEditorScreen
 from Title import Title
+from game import GameScreen
+from game import GameSetupScreen
 
+# Constant screen names
+TITLE = 'title'
+CHAR_EDITOR = 'character editor'
+GAME = 'game'
+GAME_SETUP = 'game setup'
+CONFIG = 'config'
+
+
+__all__ = ["TITLE", "CHAR_EDITOR", "GAME", "GAME_SETUP", "CONFIG",
+    ]
 
 screens = {
-    "title" :               TitleScreen,
-    "character editor" :    CharEditorScreen,
-
+    TITLE :               TitleScreen,
+    CHAR_EDITOR :    CharEditorScreen,
+    GAME:                 GameScreen,
+    GAME_SETUP:           GameSetup,
+    #CONFIG:               ConfigScreen,
+    #BESTIARY:             BestiaryScreen,
+    #CHAR_VIEWER:          CharViewerScreen,
     }
+
+__all__ = 'screens'
+
 
 
 class ScreenNav:
@@ -45,12 +65,13 @@ class ScreenNav:
         """True if can return to the previous screen."""
         return (self._last is not None or self._current._can_go_back)
 
+    # ---- Handlers ------------------------------------------------------ #
     def go_back(self):
         """Go back to the previous screen, if the current screen permits it."""
         if self.can_go_back():
             self._change_screen(self._last, self._current._cleanup_on_go_back)
 
-    def goto(self, screen):
+    def _goto(self, screen):
         """Goto given screen."""
         if screen != self._current:
             if screen == self._last: self.go_back
@@ -62,8 +83,11 @@ class ScreenNav:
 
     def exit_to_title(self):
         """Exit from the current screen and go back to the title screen."""
-        try: self._current.exit_to_title
-        except AttributeError
+        if self._current.name != TITLE:
+            self._current.exit_to_title
+
+    def quit_to_title(self):
+        self._current.quit
 
     def _change_screen(self, n, cleanup):
         # helper for go_back and goto
@@ -126,7 +150,7 @@ class BDScreen:
             session._screen = self
             self.run
 
-    # Screen Subclasses must override these as needed
+    # Optional
     def pre_run(self):
         """Called before the screen becomes active."""
         raise NotImplementedError
@@ -142,11 +166,15 @@ class BDScreen:
         """Called to end this screen."""
         pass
 
+    # Subclasses must call these
     def exit_to_title(self):
         """Exit this screen and return to the title screen."""
+        raise NotImplementedError
+
+    def quit(self):
+        """Quit the game and return to the desktop."""
         raise NotImplementedError
 
     def cleanup(self):
         """Called to kill this screen after screen transition."""
         pass
-

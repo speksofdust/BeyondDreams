@@ -15,15 +15,18 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from .screens import BDScreen
+from screen import BDScreen
+from screen import TITLE
 
 class TitleScreen(BDScreen):
-    _name = "Title"
-    def __init__(self):
-        pass
+    _name = TITLE
+
 
     def run(self):
         pass
 
     def exit_to_title(self):
-        raise NotImplementedError
+        pass
+
+    def quit(self):
+        pass

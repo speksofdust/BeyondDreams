@@ -16,11 +16,35 @@
 # ---------------------------------------------------------------------------- #
 
 from screen import BDScreen
+from screen import GAME
 
 
-class GameSetup(BDScreen):
+class GameScreen(BDScreen):
+    _name = "game"
+    def __init__(self):
+        super().__init__()
+
+    def exit_to_title(self):
+        pass
+
+    def quit(self):
+        pass
+
+
+class GameSetupScreen(BDScreen):
     _name = "game setup"
+    def __init__(self):
+        super().__init__()
+        self._gamesetup = GameSetup()
 
+    def exit_to_title(self):
+        pass
+
+    def quit(self):
+        pass
+
+
+class GameSetup:
     def __init__(self):
         self._gametype = -1     # -1 for unset TODO
         self._networked = False
