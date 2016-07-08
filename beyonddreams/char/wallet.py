@@ -73,45 +73,47 @@ class CashPocketItem:
         return self >= sum(needed)
 
 
-class WalletPocket(StoragePocket):
-    """Pocket class for wallet objects."""
+class Pockets:
+    class _BC(list):
+        _pockettype = ""
+        __slots__ = list.__slots__
+
+    class Cash(_BC):
+        _pockettype = "cash"
+        __slots__ = list.__slots__
+
+    class Coupon(_BC,):
+        _pockettype = "coupon"
+        __slots__ = list.__slots__
+
+    class Cards(_BC, list):
+        _pockettype = "cards"
+        __slots__ = list.__slots__
 
 
-class CashPocket(WalletPocket):
-    _pockettype = "cash"
-    def __init__(self, zil):
-        self = [zil]
-
-
-class CouponPocket(WalletPocket):
-    _pockettype = "coupons"
-
-
-class CardPocket(WalletPocket):
-    _pockettype = "cards"
-
-
-class Wallet:
+class Wallet(tuple):
     _name = "wallet"
     __slots__ = '_char'
-    def __init__(self, char):
-        self.char = char
-
-    def __str__(self): return self.__repr__()[1:-1]
-    def __repr__(self): return str(self.cash, self.coupons, self.cards)
+    def __init__(self, char, data=[[],[],[]]):
+        super().__init__((
+            Pockets.Cash(data[0]),
+            PocketsCoupons(data[1]),
+            Pockets.Cards(data[2])
+            )
+        self._char = char
 
     @property
     def cash(self):
         """Access the cash pocket."""
-        return self.char['wallet-cash']
+        return self[0]
 
     @property
     def coupons(self):
         """Access the coupons pocket."""
-        return self.char['wallet-coupons']
+        return self[1]
 
     @property
     def cards(self):
         """Access the cards pocket."""
-        return self.char['wallet-cards']
+        return self[2]
 
