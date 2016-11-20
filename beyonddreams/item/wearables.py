@@ -35,7 +35,6 @@ class WearableType(ItemType):
     _multislots =   False   # False or tuple of slots
     _removes =      ()      # items to be remove when equipped
 
-
     def _equipslots(self):
         yield 'default'
         for i in self._equipslots:
@@ -277,9 +276,6 @@ class _Bikini(Swimwear):
     class Bottom(Swimwear.Bottoms):
         _typename = "bikini Bottom"
 
-    class Thong(Swimwear.Bottoms):
-        _typename = "bikini thong"
-
 
 # ---- Armor types ----------------------------------------------------------- #
 class Gauntlet(Armor.Glove):
@@ -348,4 +344,34 @@ class Belt(Accessory):
 
 class Collar(Accessory.Neckwear):
     _typename = "collar"
+
+
+class Classifier:
+    def __init__(self, name, desc="", tags=(), **kwargs):
+        self.name = name
+        self.tags = tags
+        self.desc = desc
+
+
+UNDIES =    19
+SWIM =      20
+ARMOR =     21
+JEWL =      22
+ACC =       23
+
+
+SOCKS = ('socks', LEG)
+
+WEARABLE_CLASSIFIERS = {
+    SWIMWEAR: Classifier('swimwear'),
+    ARMOR: Classifier('armor'),
+}
+
+class WearableMD:
+    def __init__(self, name, classifiers, equipslots=(), desc="" **kwargs):
+        self.name = name
+        self.classifiers = classifiers
+        self.equipslots = equipslots
+        self.desc = desc
+
 
