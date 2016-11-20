@@ -163,6 +163,7 @@ class UserData(_UserStore):
 
 
 class UserChars(_UserStore):
+    """Storage class for user characters."""
     path_suffix = "charlist"
     def __init__(self, user):
         super().__init__(user)
