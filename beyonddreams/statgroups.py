@@ -54,6 +54,17 @@ stats_basemult = {
     'focus':        1,
 }
 
+class StatMeta(MetaDataBaseCls):
+    __slots__ = MetaDataBaseCls.__slots__ + 'abbr', 'min', 'max'
+    def __init__(self, name, abbr, min=0, max=100, desc="", **kwargs):
+        super().__init__(name, desc, *args, **kwargs)
+        if abbr is None: self.abbr = self.name
+        else: self.abbr = abbr
+        self.min = 0
+        self.max = 100
+        try: self._hidden = kwargs['hidden']
+        except: self._hidden = False
+
 
 class Stat:
     def __init__(self, name, abbr, min=0, max=100):
@@ -108,7 +119,7 @@ class _MStam(_MStat, _Stam):
 
 
 class _Health(_EnergyStat):
-    def __init__(self, name, abbr, min=0, max=200)
+    def __init__(self, name, abbr, min=0, max=200):
         Stat.__init__(self, name, abbr, min, max)
 
 
@@ -116,13 +127,30 @@ class _StatConst(dict):
     def __init__(self):
         super().__init__({
             # physical
-            "p-stamina":    _PStam("physical-stamina", "p-stamina"),
-            "p-energy":     _PEnergy("physical-energy", "p-energy"),
-            "strength":     Stat("strength", "str", 1, 200),
-            "agility":      Stat("agility", "agil", 1),
+            "p-stamina":    meta("physical-stamina",
+                                abbr="p-stam",
+                                subcats='physical',
+                                desc="",
+                                ),
+            "p-energy":     _PEnergy("physical-energy",
+                                abbr="p-nrg",
+                                ),
+            "strength":     Stat("strength",
+                                "str",
+                                min=1,
+                                max=200,
+                                desc="",
+                                ),
+            "agility":      Stat("agility",
+                                abbr="agil",
+                                min=1,
+                                desc=""
+                                ),
 
             # mental
-            "m-stamina":    _MStam("mental-stamina", "m-stamina"),
+            "m-stamina":    _MStam("mental-stamina",
+                                "m-stam",
+                                ),
             "m-energy":     _MEnergy("mental-energy", "m-energy"),
             "focus":        Stat("focus", "foc", 1, 200),
             "intellect":    Stat("intellect", "int", 1, 200),
@@ -151,6 +179,7 @@ class _StatConst(dict):
 
     def get_clamped(self, name, v):
         return self.__getitem__(name).clamped(v)
+
 
 # Statuses
 PHYSICAL_STATUSES = ("freeze", "frostbite", 'burn', 'numb', 'stun', 'poisoning',

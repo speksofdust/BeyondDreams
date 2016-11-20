@@ -15,6 +15,30 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+DEFAULT_MSG_SETTINGS = {
+    'joinmsg':   r"/u Has joined.",
+    'leavemsg':  r"/u Has left.",
+    'timefmt':   "[%l:%M:%S]",
+    'colors': {
+        "normal":       "#CCCCCC",
+        "user":         "#BFF0FF",
+        "whisper_recv": "#7BA59E",
+        "whisper_send": "#1E90FF",
+        "user_warning": "#FF5600",
+        "chan":         "#1A0000",
+        "bot":          "#1AAFBB",
+        "user_mentioned": "#757200",
+        "important":    "#A5F378",
+        "server":       "#757575",
+        "admin":        "#800080",
+        "help":         "#DDDDDD",
+        "notice":       "#E5E545",
+        "warn":         "#FFA500",
+        "error":        "#FF0000",
+        "divline":      "#CCCCCC"
+        }
+};
+
 # msgcodes
 NORMAL =        0   # normal text
 USER =          1   # users own text
@@ -22,9 +46,10 @@ WHISPER_RECV =  2   # recieved whisper
 WHISPER_SEND =  3   # sent whisper
 USER_WARNING =  4   # warning text recieved by user (ie you are banned)
 CHAN =          5   # for user joined/left/kicked/booted/banned etc.
-BOT =           6   # channel bot
+
 USER_MENTIONED = 7 # text where own username was mentioned
 
+INFO =          8
 IMPORTANT =     9   # text marked as important
 SERVER =        10  # server messages
 ADMIN =         11  # admin message
@@ -36,29 +61,14 @@ ERROR =         15
 DIV_LINE =      20  # normal divider line
 DIV_LINE_DASH = 21  # dashed divider line
 
+BOT =           50  # channel bot
+BOT2 =          51  # channel bot2
+
 DIV_LINE_CODES = 20, 21
 
-ALL_CODES = (0,1,2,3,4,5,6,7, 9, 10,11,12,13,14,15, 20,21)
+ALL_CODES = (0,1,2,3,4,5,6, 8,9, 10,11,12,13,14,15, 20,21, 50, 51)
 
-DEFAULT_TIMEFMT = "[%l:%M:%S]"
 
-DEFAULT_MSG_COLORS = {
-    "normal":       "#CCCCCC",
-    "user":         "#BFF0FF",
-    "whisper_recv": "#7BA59E",
-    "whisper_send": "#1E90FF",
-    "user_warning": "#FF5600",
-    "chan":         "#1A0000",
-    "bot":          "#1AAFBB",
-    "user_mentioned": "#757200",
-    "important":    "#A5F378",
-    "server":       "#757575",
-    "admin":        "#800080",
-    "notice":       "#E5E545",
-    "warn":         "#FFA500",
-    "error":        "#FF0000",
-    "divline":      "#CCCCCC"
-    }
 
 import session
 
@@ -96,7 +106,7 @@ class GlobalChan:
     def _set_default_codes(self, codes):
         session.user.config['msg-globchan-showcodes-default'] = list(set(codes))
     default_codes = property(_get_default_codes, _set_default_codes,
-        doc="The default shown message codes."
+            doc="The default shown message codes.")
 
     def _get_shown(self):
         session.user.config['msg-globchan-showcodes-last']
@@ -122,20 +132,14 @@ class GlobalChan:
         self.codes = self.default_codes
 
 
-class Chan(list):
-    """Message channel class."""
-    _default_msgcode = NORMAL
-    def __init__(self, name):
-        self._name =  name
+class _Console(list):
+    __slots__ = list.__slots__ + "_unread", "_closed"
+    def __init__(self):
         self._unread = 0
-
-    def __del__(self):
-        self = None
-        self._name = None
+        self._closed = False
 
     def clear(self):
-        """Clear all messages."""
-        self._items = [:]
+        self._items = []
         self._unread = 0
 
     @property
@@ -153,23 +157,23 @@ class Chan(list):
         return self[-1].timestamp
 
     @property
-    def last_message(self):
-        """The last message."""
+    def last(self):
+        """The last message or log."""
         return self[-1]
 
     def add_div_line(self, code):
         if code in DIV_LINE_CODES:
             self.append(DivLine(code))
 
-    def new_message(self, msg, msgcode='default'):
+    def add_new(self, msg, msgcode='default'):
         """Append a new message to this channel."""
         if msg:
             if (msgcode == 'default' or not msgcode):
-                self.append(Message(self._default_msgcode, msg)
-            else self.append(Message(msgcode, msg))
+                self.append(Message(self._default_msgcode, msg))
+            else: self.append(Message(msgcode, msg))
             self._unread += 1
 
-    def _dump_scrollback(self, filepath):
+    def _dump(self, filepath):
         """Dump all messages from this channel to a text file."""
         with open(filepath, 'wb') as f:
             f.write(self.name)
@@ -178,7 +182,21 @@ class Chan(list):
 
     def close(self):
         """Close this channel."""
-        channels[self._name]
+        self._closed = True
+
+
+class Chan(_Console):
+    """Message channel class."""
+    __slots__ = _Console.__slots__ + "_name"
+    _default_msgcode = NORMAL
+    def __init__(self, name):
+        self._name =  name
+        self._unread = 0
+        self._closed = False
+
+    def __del__(self):
+        self = None
+        self._name = None
 
 
 class Message(str):
@@ -206,9 +224,51 @@ class Message(str):
 
 class DivLine:
     """Text Divider Line"""
+    __slots__ = "_msgcode"
     def __init__(self, msgcode):
         self._msgcode = msgcode
 
     def _get_divline(code, length):
         if code == DIV_LINE_DASH: return "-"*length
         else: return "—"*length
+
+
+class Console(_Console):
+    """Error console."""
+    _default_msgcode = ERROR
+    _default_verbosity = 2
+    def __init__(self):
+        self.name = "console"
+
+    def log(self, msg, msgcode='default'):
+        """Append a new message to this channel."""
+        if msg:
+            if (msgcode == 'default' or not msgcode):
+                self.append(Message(self._default_msgcode, msg))
+            else: self.append(Message(msgcode, msg))
+            self._unread += 1
+
+def _log_err(self, msg):
+    if msg:
+        self.append(Message(ERROR, msg))
+        self._unread += 1
+
+def _log_warn(self, msg):
+    if msg:
+        self.append(Message(WARN, msg))
+        self._unread += 1
+
+def _maxverbosity():
+    import session
+    try: return session._user['config']['console.verbosity']
+    except: return Console._default_verbosity
+
+def _log_info(self, msg, verbosity=2):
+    if (msg and verbosity <= _maxverbosity()):
+        self.append(Message(INFO, msg))
+        self._unread += 1
+
+
+Console.log.error = _log_err
+Console.log.warn = _log_warn
+Console.log.info = _log_info

@@ -38,6 +38,12 @@ getversion.revision = _gvc
 
 
 def _start():
+    # first get a console up
+    from msg import Console
+    console = Console()
+    console.log.info(
+                    "Initalizing Beyond Dreams <Version: {}>...".format(
+                    VERSION), verbosity=0)
     from core.paths import set_localcfg_path
     set_localcfg_path()
 
@@ -52,14 +58,20 @@ def _start():
     # init session then run xsquare app
     global session
     session = _Session()
+    session.console = console
+    if session._initargs:
+        "::Beyond Dreams Session started <using initargs: {}>".format(
+            str(session._initargs[1:-1]))
+    else: session.console.log.info(
+        "::Beyond Dreams Session started::", verbosity=10)
     xsquare.app.run()
-
 
 class _Session:
     def __init__(self):
         from user import User
         from screen import ScreenNav
-
+        self._initargs = []
+        self.console = None
         self._user = None
         self._screen = ScreenNav() # The current screen
 
@@ -78,4 +90,5 @@ class _Session:
         self._globvars.update
         try: self._user.logout("q")
         except: pass
+        self.console.log_info("::Quit BeyondDreams Session::", verbosity=10)
 

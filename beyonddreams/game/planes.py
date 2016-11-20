@@ -16,12 +16,9 @@
 # ---------------------------------------------------------------------------- #
 
 REALMS = {
-
-
 }
 
 PLANES = {
-
     # primaries
     'mortal':   MortalPlane(),  # normal plane
     'spirit':   SpiritPlane(),

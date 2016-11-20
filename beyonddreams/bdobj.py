@@ -22,23 +22,67 @@ class BDObjSet:
     pass
 
 
+
+OB_IDS = {               # sub ob ids
+    "furnature":    1000,
+    "chest":        1001,
+    "trunk":        1002,
+    "clothing":     100, # 101-299
+
+    "weapon":       300, # 301-399
+
+    "consumable":   400, # 401-
+}
+
+
+class ObSubDict(dict):
+    __slots__ = dict.__slots__ + "_keyname"
+    def __init__(self, items, keyname):
+        self._keyname = keyname
+        super().__init__(self, items)
+
+    @property
+    def name(self): return self._keyname
+
+    @property
+    def primary_id(self): return OB_IDS[self._keyname]
+
+
+class MetaDataBaseCls:
+    ptype = ""
+    _metatags = ""
+    __slots__ = 'name', 'desc', 'subcats'
+    def __init__(self, name, desc="" **kwargs):
+        self.name = name
+        self.desc = desc
+        parse_kwarg()
+        try: self._subcats = kwargs['subcats']
+        except: self._subcats = ()
+        try: self._inctags = kwargs['inctags']
+        except: self._inctags = ()
+
+    #@property
+    #def primary_id(self): return OB_IDS[self.name]
+
+    def catagories(self):
+        yield self._ptype
+        for i in self._subcats: yield i
+
+    def catagory_names(self):
+        yield self.ptype
+        for i in self._subcats:
+            try: yield i.name
+            except: yield i
+
+
 class BDObj:
-    _object_type = -1
-    _cattype = ""   # Primary catagory type for this obtype
-    _typename = ""
-    _typedesc = ""
-    _objset = None
+    _meta = None
+    _ob_set = None
     _bwt = 1.0      # Base weight must be float
 
     @property
-    def typename(self):
-        """The name of this object type. (boots, couch, sword)"""
-        return self._typename
-
-    @property
-    def name(self):
-        """The name of this specific object. (ie: 'brown leather boots')"""
-        return self._name
+    def meta(self):
+        return self._meta
 
     def is_in_set(self):
         """True if this item is part of a set."""
@@ -96,18 +140,4 @@ class Storage:
 
     def space_remaining(self):
         return self._max_slots - self._space_used()
-
-
-class Sittable: pass
-
-
-
-
-
-
-
-
-
-
-
 

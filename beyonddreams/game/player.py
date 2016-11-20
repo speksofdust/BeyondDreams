@@ -32,7 +32,7 @@ class CharRoster(BDList):
     def sort_by(self, kw, reverse):
         if kw in self._sort_kwds:
             from operator import attrgetter
-            self.sort(key=attrgetter(kw) reverse=reverse)
+            self.sort(key=attrgetter(kw), reverse=reverse)
 
     def idx_from_name(self, name):
         for i in self:
@@ -42,7 +42,7 @@ class CharRoster(BDList):
         try: return self._chars.index(char)
         except:
             try: return idx_from_name(char)
-            except: raise IndexError("Cannot get index from item: {}".format(x)
+            except: raise IndexError("Cannot get index from item: {}".format(x))
 
 
 class _Party(GameDataAccessor):
@@ -138,7 +138,8 @@ class Party(BDSelectedItemList, CharRoster):
         """Return an iterator of characters that are currently alive and available
         for play, sorted by highest health to lowest."""
         from operator import attrgetter
-        for i in sorted(self, key=attrgetter(i.health))
+        x = sorted(self, key=attrgetter(i.health))
+        for i in x:
             if i.is_alive(): yield i
 
     def get_alive(self):
@@ -156,7 +157,23 @@ class Player:
     def __init__(self, game):
         self._game =    game
         self._party =   Party()
-        self._pid =     0   # always 0 if not in online game
+        self._pid =     0   # player id -- always 0 if not in online game
+
+    def __eq__(self, other): return this._pid == other._pid
+    def __ne__(self, other): return this._pid != other._pid
+
+    # ---- Network only ------------------------------------ #
+    #def _req_pid(self):
+    #   try:
+    #       self._pid = self._game.server.send
+    #   except:
+    #       self._game.console.log()
+
+    def _on_svr_refreshed(self, svr):
+        # networked only
+        #self._pid = svr.sendreq('pid')
+        pass
+    # ------------------------------------------------------ #
 
     @property
     def game(self):
