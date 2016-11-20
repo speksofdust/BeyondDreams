@@ -19,13 +19,13 @@ from shophours import ShopHours
 from .game.dates import gametime
 
 
-
 class Shop:
     _shoptype = ""
     _default_hours = None
     _desc = ""
+    _tags = ()
     def __init__(self, shophours=None):
-        if shophours = None:
+        if shophours is None:
             self._shophours = self._default_hours
         else: self._shophours = shophours
 
@@ -34,6 +34,10 @@ class Shop:
     _mclosed = property(get_mclosed, set_mclosed,
         doc="""The manually closed state of this shop. Used to temporary close
         down the shop.""")
+
+    #@property
+    #def icon(self):
+    #    return SHOP_ICONS[self._shoptype]
 
     @property
     def shoptype(self):
@@ -51,6 +55,10 @@ class Shop:
     def desc(self):
         return self._desc
 
+    def tags(self):
+        yield self._shoptype
+        for i in self._tags: yield i
+
     def todays_hours(self):
         return self._shophours.today()
 
@@ -61,14 +69,14 @@ class Shop:
             from .core.datesres import idx_from_weekday_str
             # special case for 'manually' closing
             x = gametime()
-            if (x[0] == (wday or idx_from_weekday_str): return True
+            if (x[0] == (wday or idx_from_weekday_str)): return True
         return self._shophours.is_open(wday, hour, minute)
 
     def is_open_now(self):
         """True if this shop is currently open now."""
         if self._mclosed: return False # 'manually' closed
         x = gametime()
-        return self._shophours.is_open(x*)
+        return self._shophours.is_open(*x)
 
     def time_till_close(self):
         if self.is_open_now():
