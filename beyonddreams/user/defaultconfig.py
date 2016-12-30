@@ -21,7 +21,7 @@ DEFAULT_USER_CONFIG = {
 
 
     "sidepanel-defaultorder-game":     (0,1,2),
-    "session-confirm-logout":           1,  # 0-False, 1-True, 2-InMainMenuOnly
+    "session-confirm-logout":           1,  # 0-False, 1-True, 2-only if Not in MainMenu
 
     # game stuff
 
@@ -37,11 +37,28 @@ DEFAULT_USER_CONFIG = {
     "volume-menu-sfx":                  60,
     "volume-menu-music":                90,
 
-    "censors-allow-toggle":             False,
+    "censors-allow-toggle":             0,
     "censors-mode":                     0,
     "censors-size":                     1.0,
     }
 
+
+DEFAULT_HUD_CONFIG = {
+    # compass
+    "compass-show":             0,
+    "compass-size":             100, # percent
+    "compass-opacity":          25,
+    # map
+    "map-show":                 0,
+    "map-size":                 100, # percent
+    "map-opacity":              25,
+    "map-icons-size":           100, # percent
+    "map-icons-show": {
+        "hide-all":             0, # hides all icons
+        "markers":              0, # user markers
+        "next-target":          0,
+    }
+}
 
 
 DEFAULT_KEY_SET = {
@@ -102,6 +119,10 @@ DEFAULT_KEY_SET = {
     "fullscreen-toggle":        "F11",
     "pause":                    "PAUSE",
     "quit":                     ("ALT", "Q"),
+
+    # HUD
+    "hud-toggle-compass":       ("ALT", "F12"),
+    "hud-toggle-map":           ("ALT", "F11"),
 
     # censors -- only used if 'censors-allow-toggle' is enabled in user settings
     "censor-toggle":            ("ALT", "F2"),
