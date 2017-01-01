@@ -15,9 +15,18 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from xsquare.utils.iterutils import tupilize
+#from xsquare.utils.iterutils import tupilize
 
 from statgroups import statgroups
+
+
+PRIMARY_FAMS = "reptile", "insect", "beast", "plant", "mechanical", "goo"
+SECONDARY_FAMS = "poison", "psychic", "aquatic", "sqirit", "undead", "demon", "fae"
+AUX_FAMS = ("parasitic",)
+ELEMENTALS = "dark", "light", "fire", "cold", "water", "wind", "electric"
+
+
+def tuplize(*args): return args
 
 
 class FamTypeData(tuple):
@@ -33,7 +42,7 @@ class FamTypeData(tuple):
             ))
 
     @property
-    def primary:
+    def primary(self):
         return self[0]
 
     @property
@@ -65,7 +74,7 @@ class FamTypeData(tuple):
         return iter(i for i in self.immunities if i in statgroups.ELEMENTALS)
 
     def _sum_res(self, i, name):
-        try: return sum(self[i][name] // len(self[i][name])
+        try: return sum(self[i][name] // len(self[i][name]))
         except: return 0
 
     def _calc_resistance(self, name):
@@ -100,6 +109,7 @@ class FamTypeDD(FamType, dict):
     def __init_ft(self, *immunities, **kwargs):
         if self._famorder == 3: # make elems immune to own elem by default
             immunities + (self._name,)
+            self[self._name] = 100
         else: self._immunities = immunities
         # init override mechanism so we dont have to call this every time
         super().__init__({
@@ -139,16 +149,17 @@ class FamTypeDD(FamType, dict):
 
             # Group type bonuses
             "physical":         0,  # any physical
-            "non-physical"      0,  # any non-physical (spirit, psychic, etc.)
+            "non-physical":     0,  # any non-physical (spirit, psychic, etc.)
             "elemental":        0,  # any elemental
             "non-elemental":    0,  # any non-elemental
-            "transforma":       0,  # any transform
+            "any-transform":    0,  # any transform
             "animal-transform": 0,  # transform into any animal
             })
-            # set default overrides to 0 for immunities
-            for i in immunities:
-                if self[i] != 0: self[i] = 0
+            # set default overrides to 100 for immunities
+        for i in immunities: self[i] = 100
 
+    @property
+    def desc(self): return self.__doc__
 
     @property
     def name(self):
@@ -189,6 +200,7 @@ class PrimaryFam(FamTypeDD):
 
 class SecondaryFam(FamTypeDD):
     _famorder = 1
+    _compatable_types = () # compatable primary family types
 
 class AuxFam(FamType):
     _famorder = 2
@@ -196,11 +208,12 @@ class AuxFam(FamType):
 class ElemFam(FamType):
     _famorder = 3
     _elem_opp = ""
+    _associated_status = ""
     __slots__ = ()
 
     @property
     def opp_name(self):
-    """The elemental opposite name."""
+        """The elemental opposite name."""
         return self._elem_opp
 
     @property
@@ -208,6 +221,12 @@ class ElemFam(FamType):
         """The elemental opposite data."""
         try: return famtypes[self._elem_opp]
         except: return None
+
+    def associated_status(self):
+        """Status effect that may be added in conjunction with an attack of this elemental type."""
+        return self._associated_status
+
+    def has_opposite(self): return bool(self._elem_opp)
 
 
 # ---- Primaries -- (char can be only one) ----------------------------------- #
@@ -217,6 +236,7 @@ class Reptile(PrimaryFam):
         self.__init_ft()
         self["cold"] =       -15
         self["paralysis"] = 10
+        self["acid"] = 10
 
 
 class Insect(PrimaryFam):
@@ -243,21 +263,29 @@ class Beast(PrimaryFam):
 class Plant(PrimaryFam):
     _name = "plant"
     def __init__(self):
-        self.__init_ft()
+        self.__init_ft(("paralysis", "dumb", "confusion", "blind"))
         self["frozen"] =    -40
         self["fire"] =      -15
-        self["cold"] =       -20
-        self["water"] =     40
+        self["cold"] =      -50
+        self["water"] =     50
 
 
 class Mechanical(PrimaryFam):
     _name = "mechanical"
     def __init__(self):
         self.__init_ft(("poisoning", "frostbite", "burn", "dumb", "confusion",
-            "stun", "paralysis", "bleed", "numb")
+            "stun", "paralysis", "bleed", "numb", "mutagen"))
         self["frozen"] =    95
-        self["electric"] =  -10
+        self["electric"] =  -50
         self["water"] =     -10
+
+
+class Inorganic(PrimaryFam):
+    _name = "inorganic"
+    def __init__(self):
+        self.__init_ft(("poisioning", "frostbite", "burn", "dumb", "confusion",
+            "stun", "paralysis", "bleed", "numb", "mutagen"))
+        self["frozen"] = 95
 
 
 class Goo(PrimaryFam):
@@ -271,13 +299,23 @@ class Goo(PrimaryFam):
 
 
 # ---- Secondaries -- (char can be multiple as long as compatible) ----------- #
+class BioMechanical(SecondaryFam):
+    _compatable_types = Reptile, Insect, Beast
+    _name = "bio mechanical"
+    def __init__(self):
+        self.__init_ft(())
+        self["electric"] = -50
+
+
 class Poison(SecondaryFam):
-    _name = "poisoning"
+    _compatable_types = Reptile, Insect, Beast, Plant, Goo
+    _name = "poison"
     def __init__(self):
         self.__init_ft("poisoning",)
 
 
 class Psychic(SecondaryFam):
+    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "psychic"
     def __init__(self):
         self.__init_ft(())
@@ -285,40 +323,48 @@ class Psychic(SecondaryFam):
 
 
 class Aquatic(SecondaryFam):
+    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "aquatic"
     def __init__(self):
         self.__init_ft("water",)
         self["frozen"] =    20
-        self["mutagen"] =   -5
-        self["electric"] =  -15
+        self["mutagen"] =   -10
+        self["electric"] =  -50
 
 
 class Spirit(SecondaryFam):
+    _compatable_types = Reptile, Insect, Beast, Goo
     _name = "spirit"
+    # Note Spirit attacks work one way unless both entities are on the spirit plane
+    #   Spirit type can attack but can only be affected by spirit attacks from
+    #   other planes
     def __init__(self):
         self.__init_ft((statgroups['all-physical']))
         self["psychic"] =   -10
 
 
 class Undead(SecondaryFam):
+    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "undead"
     def __init__(self):
-        self.__init_ft(('zombie',))
-        self["fire"] =      -5
-        self["heal"] =      -10
+        self.__init_ft(('undead',))
+        self["fire"] =      -25
+        self["heal"] =      -25
         self["cold"] =       10
-        self["mutagen"] =   20
+        self["mutagen"] =   50
 
 
 class Demon(SecondaryFam):
+    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "demon"
     def __init__(self):
         self.__init_ft()
-        self["zombie"] =    20
+        self["undead"] =    20
         self["mutagen"] =   50
 
 
 class Fae(SecondaryFam):
+    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "fae"
     def __init__(self):
         self.__init_ft()
@@ -330,56 +376,79 @@ class Fae(SecondaryFam):
 
 # ---- Elementals ------------------------------------------------------------ #
 class Dark(ElemFam):
-    _name = "fire"
-    _elem_opp = 'light'
+    _name = "dark"
+    _elem_opp = "light"
+    _associated_status
     def __init__(self):
         self.__init_ft()
 
 
 class Light(ElemFam):
     _name = "light"
-    _elem_opp = 'dark'
+    _elem_opp = "dark"
+    _associated_status = "blind"
     def __init__(self):
         self.__init_ft()
+        self["blind"] = 50 # associated status
+        self["dark"] = -50 # elem opp
 
 
 class Fire(ElemFam):
     _name = "fire"
-    _elem_opp = 'cold'
-    _elem_weak = 'water'
+    _elem_opp = "water"
+    _associated_status = "burn"
     def __init__(self):
         self.__init_ft()
+        self["burn"] = 50   # associated status
+        self["water"] = -50 # elem opp
+        self["cold"] = -25  # weak-ish
 
 
 class Cold(ElemFam):
     _name = "cold"
-    _elem_opp = 'fire'
+    _associated_status = "frostbite"
     def __init__(self):
         self.__init_ft()
+        self["frostbite"] = 50 # associated status
+        self["fire"] = -50  # weak
 
 
 class Water(ElemFam):
     _name = "water"
-    _elem_weak = 'electric'
+    _elem_opp = "fire"
+    #_associated_status = ""
     def __init__(self):
         self.__init_ft()
+        self["fire"] = -50 # elem opp
+        self["electric"] = -50 # weak
 
 
 class Wind(ElemFam):
     _name = "wind"
+    #_associated_status = ""
     def __init__(self):
         self.__init_ft()
 
 
 class Electric(ElemFam):
     _name = "electric"
+    _associated_status = "paralysis"
     def __init__(self):
         self.__init_ft()
+        self["paralysis"] = 50 # elem opp
 
 
 # ---- Auxillaries -- (char can be multiple as long as compatible) ----------- #
 class Parasitic(AuxFam):
+    """A creature that feeds off of other creatures."""
     _name = "parasitic"
+    def __init__(self):
+        self.__init_ft()
+
+
+class Possessed(AuxFam):
+    """A creature or object that has been taken control of by some other entity."""
+    _name = "possessed"
     def __init__(self):
         self.__init_ft()
 
@@ -403,10 +472,11 @@ class FamTypes(FamTypesCommon, dict):
             'spirit':           Spirit(),
             'undead':           Undead(),
             "demon":            Demon(),
-            'fae':              Fae()
+            'fae':              Fae(),
 
             # aux
             'parasitic':        Parasitic(),
+            'possessed':        Possessed(),
 
             # elementals
             "dark":         Dark(),
@@ -417,18 +487,32 @@ class FamTypes(FamTypesCommon, dict):
             "wind":         Wind(),
             "electric":     Electric(),
             })
+        # Add elemental opposites
+        self['dark']._elem_opp = Light
+        self['dark']["light"] = -50
+
+        self['light']._elem_opp = Dark
+        self['light']["dark"] = -50
+
+        self['fire']._elem_opp = Water
+        self['fire']["water"] = -50
+
+        self['water']._elem_opp = Fire
+        self['water']["fire"] = -50
+
+
 
     def primaries(self):
-        return iter(i for i in self if i._famorder == 0)
+        return iter(self.keys[i] for i in PRIMARY_FAMS)
 
     def secondaries(self):
-        return iter(i for i in self if i._famorder == 1)
+        return iter(self.keys[i] for i in SECONDARY_FAMS)
 
     def auxillaries(self):
-        return iter(i for i in self if i._famorder == 2)
+        return iter(self.keys[i] for i in AUX_FAMS)
 
     def elementals(self):
-        return iter(i for i in self if i._famorder == 3)
+        return iter(self.keys[i] for i in ELEMENTALS)
 
 
 famtypes = Famtypes()
@@ -462,8 +546,8 @@ class _TCDSS:
 
         def __getitem__(self, i):
             if isinstance(i, int): return self._keys(i)
-            elif: try: return self[i]
-            else: raise KeyError
+            try: return self[i]
+            except: raise KeyError
 
         def __iadd__(self): raise NotImplementedError
 
