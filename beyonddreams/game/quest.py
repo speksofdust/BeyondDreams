@@ -40,11 +40,18 @@ class _QCommon:
     # Mixin for Quest and QuestTask
     @property
     def name(self):
-        return self._name
+        return self[1]
+
+    @property
+    def state(self):
+        return self[2]
 
     @property
     def statename(self):
-        return QUEST_STATES[self._state]
+        return QUEST_STATES[self[2]]
+
+    def is_optional(self):
+        return self[3]
 
 
 class _QContainerCommon:
@@ -52,71 +59,95 @@ class _QContainerCommon:
 
     def not_started(self):
         """Return an iterator of all yet to be started items."""
-        return iter(i for i in self if i._state = 0)
+        return iter(i for i in self if i.state == 0)
 
     def incomplete(self):
         """Return an iterator of all incomplete items."""
-        return iter(i for i in self if i._state == 1)
+        return iter(i for i in self if i.state == 1)
 
     def completed(self):
         """Return an iterator of all completed items."""
-        return iter(i for i in self if i._state = 2)
+        return iter(i for i in self if i.state == 2)
 
     def failed(self):
         """Return an iterator of all failed items."""
-        return iter(i for i in self if i._state = 3)
+        return iter(i for i in self if i.state == 3)
 
 
 class _QContainerCommonX(_QCommon, _QContainerCommon): pass
 
 
-class QuestTask(_QuestCommon):
-    def __init__(self, quest, name, optional=False, is_last=False):
-        self._quest = quest
-        self._state = 0
-        self._name = name
-        self._optional = bool(optional)
-        self._is_last_task = False
+class QuestTask(tuple, _QuestCommon):
+    def __init__(self, qid, name, optional=0, is_last=0):
+        super().__init__((
+            qid,
+            name,
+            0,      # state
+            optional,
+            is_last,
+            ))
 
     def on_started_task(self):
-        self._state = 1
+        self[2] = 1
 
     def on_completed_task(self, qm):
-        self._state = 2
+        self[2] = 2
+        qm.get_by_qid(self[qid]).update_state(2, self.is_optional(), self[4])
 
     def on_failed_task(self, qm):
-        self._state = 3
+        self[2] = 3
+        if not self.is_optional():
+            qm.get_by_qid(self[qid]).update_state(3, False)
 
 
 class Quest(tuple, _QContainerCommonX):
-    def __init__(self, name):
-        self._name = name
+    def __init__(self, qid, name):
+        super().__init__((
+            qid,
+            name,
+            0, # state
+            0, # optional
+            [], # tasks
+            ))
 
-        super().__init__()
+    def update_state(self, taskstate, optional, is_last=False):
+        if taskstate == 3: self[1] = 3 # failed
+        elif taskstate == 2:
+            if is_last:
+                self[2] = 2 # completed
+            # else: pass # TODO retrieve next task
 
-    @property
-    def _state(self):
-        if any(i._state == 3 for i in self.required_tasks()): return 3 #failed
-        elif any(i._state == 2 for i in self.required_tasks()):
-            if all(i._state == 2 for i in self.required_tasks(): return 0 #not started
-            return 1 # incomplete
-        else: return 2 # completed
+
+    #@property #### is this still needed ####
+    #def _state(self):
+    #    if any(i.state == 3 for i in self.required_tasks()): return 3 #failed
+    #    elif any(i.state == 2 for i in self.required_tasks()):
+    #        # check if not started
+    #        if all(i.state == 2 for i in self.required_tasks()): return 0
+    #        return 1 # incomplete
+    #    else: return 2 # completed
 
     def required_tasks(self):
         """Return an iterator of all non optional items."""
-        return iter(i for i in self if i._optional == False)
+        return iter(i for i in self[4] if i.is_optional())
 
     def optional_tasks(self):
         """Return an iterator of all optional items."""
-        return iter(i for i in self if i._optional)
+        return iter(i for i in self[4] if not i.is_optional())
 
 
 class QuestManager(list, _QContainerCommon):
     def __init__(self):
-        self = []
+        super().__init__([])
+
+    def _get_by_qid(self, qid):
+        for i in self:
+            if i[0] == qid:
+                return i
+        raise ValueError("qid does not exist")
 
     def _ct_state(self, state):
-        return len(i for i in self if i._state == state)
+        return len(i for i in self if i.state == state)
 
     def failed_count(self): return self._ct_state(3)
     def completed_count(self): return self._ct_state(2)
