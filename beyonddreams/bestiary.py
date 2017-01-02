@@ -18,6 +18,7 @@
 
 __all__ = ()
 
+
 class BestiaryBase(dict):
     _sort_attrs = 'id', 'name'
     _sort_attrs_special = ()
@@ -44,32 +45,39 @@ class BestiaryBase(dict):
 all_entries = BestiaryBase() # The full bestiary
 
 
-class _ItemDrops(tuple):
-    def __init__(self, common, uncommon, rare, exrare):
-        super().__init__((common, uncommon, rare, exrare)
+class ItemDrops:
+    def __init__(self, common, uncommon, rare=(), exrare=()):
+        self._common = common
+        self._uncommon = uncommon
+        self._rare =    rare
+        self._exrare =  exrare
+
+
+    def _get_drop(self, luck):
+        pass
+
 
     def common(self):
-        return self[0]
+        return self._common
 
     def uncommon(self):
-        return self[1]
+        return self._uncommon
 
     def rare(self):
-        return self[2]
+        return self._rare
 
     def exrare(self):
-        return self[3]
+        return self._exrare
 
 
 class BestiaryEntry:
-    __slots__ = "_name", "_fam", "_id" "_drops"
-    def __init__(self, name, entry_id, fam, itemdrops):
+    __slots__ = "_name", "_famtypedata", "_id" "_drops"
+    def __init__(self, name, entry_id, famtypedata, drops):
         self._name = name
         self._id =  entry_id
-        self._fam = fam
+        self._famtypedata = famtypedata
+        self._drops = drops
         all_entries[self._name] = self  # add to entries
-        self._drops = _ItemDrops()
-
 
     def __str__(self): return ", ".join(self.name, self.id, self.fam)
 
@@ -83,10 +91,28 @@ class BestiaryEntry:
         """The entry id."""
         return self._id
 
-    @property
-    def fam(self):
+    def fam_types(self):
         """Family types data."""
-        return self._fam
+        return self._famtypedata
+
+
+#eulomus = BestiaryEntry(
+    #"eulomus", 100,
+    #FamTypeData("reptile",),
+    #ItemDrops(
+        #("eulomus scale",)
+        #("eulomus tooth")
+        #),
+    #)
+
+#greater_eulomus = BestiaryEntry(
+    #"greater eulomus", 101,
+    #FamTypeData("reptile",),
+    #ItemDrops(
+        #("eulomus scale",)
+        #("eulomus tooth",)
+        #),
+    #)
 
 
 class PlayerBestiaryEntry:

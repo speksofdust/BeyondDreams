@@ -29,37 +29,84 @@ ELEMENTALS = "dark", "light", "fire", "cold", "water", "wind", "electric"
 def tuplize(*args): return args
 
 
-class FamTypeData(tuple):
-    __slots__ = tuple.__slots__
+class FamTypeData:
+    __slots__ = ("pri", "sec", "elem", "aux", "classifiers")
     """Storage class for fam type data."""
-    def __init__(self, primary, secondaries=(), classifiers=(), auxillaries=(),
-        elementals=()):
-        super().__init__((primary,
-            tuplize(secondaries),
-            tuplize(classifiers),
-            tuplize(auxillaries),
-            tuplize(elementals)
-            ))
+    def __init__(self, pri, sec=(), elem=(), aux=(), classifiers=()):
+        self._pri = pri
+        self._sec = tuplize(sec)
+        self._elem = tuplize(elem)
+        self._aux = tuplize(aux)
 
     @property
     def primary(self):
-        return self[0]
+        return self._pri
 
     @property
     def secondaries(self):
-        return self[1]
-
-    @property
-    def classifiers(self):
-        return self[2]
-
-    @property
-    def auxillaries(self):
-        return self[3]
+        return self._sec
 
     @property
     def elementals(self):
-        return self[4]
+        return self._elem
+
+    @property
+    def auxillaries(self):
+        return self._aux
+
+    def __len__(self):
+        # must have at least a primary type set hence the 1
+        return 1 + len(self._sec) + len(self._elem) + len(self._aux)
+
+    def __iter__(self):
+        yield self._pri
+        for i in self._sec: yield i
+        for i in self._elem: yield i
+        for i in self._aux: yield i
+
+    def __contains__(self, x):
+        if isinstance(str, x): return x in self.__iter__()
+        raise TypeError("Expected a str.")
+
+    def __isne__(self, x):
+        if (x is self): return False
+        if isinstance(FamTypeData, x):
+            return set(self.__iter__()) != set(x.__iter__())
+        raise TypeError("Invalid type for comparison.")
+
+    def __iseq__(self, x):
+        if (x is self): return True
+        if isinstance(FamTypeData, x):
+            return set(self.__iter__()) == set(x.__iter__())
+        raise TypeError("Invalid type for comparison.")
+
+
+    def is_elemental_type(self):
+        """True if is at least one elemental type."""
+        return bool(self._elem)
+
+    def get_total(self, name):
+        """Return the total sum of a given stat (name) out of all family types for
+        this."""
+        return 0 + (i[name] for i in self.__iter__())
+
+    def _get_nonzeroed_count(self, name):
+        # used for averaging totals -- returns the number of non-zero values
+        # see get_averaged_total
+        return len(i for i in self.__iter__() if i[name] != 0)
+
+    def get_averaged_total(self, name, retval_on_zerodiv_error=0):
+        """Sum and return the averaged total for a given stat (name) out of all
+        family types for this."""
+        try: self.get_total / self._get_nonzeroed_count(name)
+        except: return retval_on_zerodiv_error
+
+    def get_floor_averaged_total(self, name, retval_on_zerodiv_error=0):
+        """Same as get_averaged_total except uses floor division for calculating
+        the average."""
+        try: self.get_total // self._get_nonzeroed_count(name)
+        except: return retval_on_zerodiv_error
+
 
     def immunities(self):
         """Return an iterator of all combined immunities."""
@@ -501,7 +548,6 @@ class FamTypes(FamTypesCommon, dict):
         self['water']["fire"] = -50
 
 
-
     def primaries(self):
         return iter(self.keys[i] for i in PRIMARY_FAMS)
 
@@ -537,6 +583,7 @@ class FamAffinities(FamTypes):
         return iter(famtypes.elementals)
 
 
+# ---- Classifiers ----------------------------------------------------------- #
 class _TCDSS:
     class ClassifierTuple(Tuple):
         """Classifier Tuple container."""
@@ -599,4 +646,11 @@ class _TCDSS:
 
     def _gettc_by_idx(self, tcd_name, i):
         return self.__slots__[tcdname].keys()[i]
+
+
+class EntryTypeClassifier:
+    __slots__ = ("_evo", "_stance"):
+    def __init__(self, evo, stance):
+        self._evo = evo
+        self._stance = stance
 
