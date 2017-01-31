@@ -21,8 +21,10 @@ from statgroups import statgroups
 
 
 PRIMARY_FAMS = "reptile", "insect", "beast", "plant", "mechanical", "goo"
-SECONDARY_FAMS = "poison", "psychic", "aquatic", "sqirit", "undead", "demon", "fae"
-AUX_FAMS = ("parasitic",)
+SECONDARY_FAMS = ("biomechanical", "poison", "psychic", "aquatic", "sqirit", "undead",
+    "demon", "fae")
+INORGANIC_TYPES = ("stone", "metal")
+AUX_FAMS = ("parasitic", "possessed")
 ELEMENTALS = "dark", "light", "fire", "cold", "water", "wind", "electric"
 
 
@@ -149,6 +151,7 @@ class FamType:
 
 
 class FamTypeDD(FamType, dict):
+    _compatable_types = ()
     __slots__ = dict.__slots__
     def __init__(self):
         self.__init_ft(self)
@@ -161,7 +164,8 @@ class FamTypeDD(FamType, dict):
         # init override mechanism so we dont have to call this every time
         super().__init__({
             # status effects
-            "frozen":       50,
+            "frozen":       0,
+            "stone":        0,
             "frostbite":    0,
             "burn":         0,
             "numb":         0,
@@ -212,6 +216,9 @@ class FamTypeDD(FamType, dict):
     def name(self):
         return self._name
 
+    def compatable_types(self):
+        return iter(famtypes.keys[i] for i in self._compatable_types)
+
     def altered(self):
         for i in self._immunities: yield i
         for i in self:
@@ -249,6 +256,9 @@ class SecondaryFam(FamTypeDD):
     _famorder = 1
     _compatable_types = () # compatable primary family types
 
+class InorganicFam(SecondaryFam):
+    _compatable_types = INORGANIC_TYPES
+
 class AuxFam(FamType):
     _famorder = 2
 
@@ -279,25 +289,28 @@ class ElemFam(FamType):
 # ---- Primaries -- (char can be only one) ----------------------------------- #
 class Reptile(PrimaryFam):
     _name = "reptile"
+    _compatable_types = SECONDARY_FAMS
     def __init__(self):
         self.__init_ft()
-        self["cold"] =       -15
+        self["cold"] =       -50
         self["paralysis"] = 10
         self["acid"] = 10
 
 
 class Insect(PrimaryFam):
     _name = "insect"
+    _compatable_types = SECONDARY_FAMS
     def __init__(self):
         self.__init_ft()
         self["frozen"] -= 15
-        self["cold"] =       -5
-        self["fire"] =      -5
+        self["cold"] =       -25
+        self["fire"] =      -25
         self["poisoning"] = -10
 
 
 class Beast(PrimaryFam):
     _name = "beast"
+    _compatable_types = SECONDARY_FAMS
     def __init__(self):
         self.__init_ft()
         self["frozen"] += 25
@@ -309,16 +322,19 @@ class Beast(PrimaryFam):
 
 class Plant(PrimaryFam):
     _name = "plant"
+    _compatable_types = ("poison", "psychic", "aquatic", "undead", "demon", "fae")
     def __init__(self):
         self.__init_ft(("paralysis", "dumb", "confusion", "blind"))
-        self["frozen"] =    -40
-        self["fire"] =      -15
+        self["frozen"] =    -50
+        self["fire"] =      -25
         self["cold"] =      -50
         self["water"] =     50
+        self["electric"] =  50
 
 
 class Mechanical(PrimaryFam):
     _name = "mechanical"
+    _compatable_types = INORGANIC_TYPES
     def __init__(self):
         self.__init_ft(("poisoning", "frostbite", "burn", "dumb", "confusion",
             "stun", "paralysis", "bleed", "numb", "mutagen"))
@@ -329,6 +345,7 @@ class Mechanical(PrimaryFam):
 
 class Inorganic(PrimaryFam):
     _name = "inorganic"
+    _compatable_types = INORGANIC_TYPES
     def __init__(self):
         self.__init_ft(("poisioning", "frostbite", "burn", "dumb", "confusion",
             "stun", "paralysis", "bleed", "numb", "mutagen"))
@@ -337,9 +354,12 @@ class Inorganic(PrimaryFam):
 
 class Goo(PrimaryFam):
     _name = "goo"
+    _compatable_types = ("poison", "psychic", "aquatic", "sqirit", "undead",
+        "demon", "fae")
     def __init__(self):
         self.__init_ft(("frostbite", "burn", "paralysis", "bleed"))
         self["frozen"] =    -50
+        self["cold"] =      -50
         self["water"] =     20
         self["physical"] =  200 # physical attack need more exclusive value
         self["psychic"] = 25
@@ -347,31 +367,31 @@ class Goo(PrimaryFam):
 
 # ---- Secondaries -- (char can be multiple as long as compatible) ----------- #
 class BioMechanical(SecondaryFam):
-    _compatable_types = Reptile, Insect, Beast
     _name = "bio mechanical"
+    _compatable_types = "reptile", "insect", "beast"
     def __init__(self):
         self.__init_ft(())
         self["electric"] = -50
 
 
 class Poison(SecondaryFam):
-    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "poison"
+    _compatable_types = "reptile", "insect", "beast", "plant", "goo"
     def __init__(self):
         self.__init_ft("poisoning",)
 
 
 class Psychic(SecondaryFam):
-    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "psychic"
+    _compatable_types = ("reptile", "insect", "beast", "plant", "goo") + INORGAINC_TYPES
     def __init__(self):
         self.__init_ft(())
         self["psychic"] = 25
 
 
 class Aquatic(SecondaryFam):
-    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "aquatic"
+    _compatable_types = "reptile", "insect", "beast", "plant", "goo"
     def __init__(self):
         self.__init_ft("water",)
         self["frozen"] =    20
@@ -380,8 +400,8 @@ class Aquatic(SecondaryFam):
 
 
 class Spirit(SecondaryFam):
-    _compatable_types = Reptile, Insect, Beast, Goo
     _name = "spirit"
+    _compatable_types = "reptile", "insect", "beast", "goo"
     # Note Spirit attacks work one way unless both entities are on the spirit plane
     #   Spirit type can attack but can only be affected by spirit attacks from
     #   other planes
@@ -391,8 +411,8 @@ class Spirit(SecondaryFam):
 
 
 class Undead(SecondaryFam):
-    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "undead"
+    _compatable_types = "reptile", "insect", "beast", "plant", "goo"
     def __init__(self):
         self.__init_ft(('undead',))
         self["fire"] =      -25
@@ -402,8 +422,8 @@ class Undead(SecondaryFam):
 
 
 class Demon(SecondaryFam):
-    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "demon"
+    _compatable_types = "reptile", "insect", "beast", "plant", "goo"
     def __init__(self):
         self.__init_ft()
         self["undead"] =    20
@@ -411,14 +431,27 @@ class Demon(SecondaryFam):
 
 
 class Fae(SecondaryFam):
-    _compatable_types = Reptile, Insect, Beast, Plant, Goo
     _name = "fae"
+    _compatable_types = "reptile", "insect", "beast", "plant", "goo"
     def __init__(self):
         self.__init_ft()
         self["poisoning"] =    -25
         self["acid"] =      -25
         self["mutagen"] =   -25
         self["animal-transform"] = 10
+
+
+# ---- Inorganic Types ------------------------------------------------------- #
+# used with mechanical, biomechanical, and inorganic
+class Stone(SecondaryFam):
+    _name = "Stone"
+    def __init__(self):
+        self.__init_ft()
+
+class Metal(SecondaryFam):
+    _name = "metal"
+    def __init__(self):
+        self.__init_ft()
 
 
 # ---- Elementals ------------------------------------------------------------ #
@@ -521,6 +554,10 @@ class FamTypes(FamTypesCommon, dict):
             "demon":            Demon(),
             'fae':              Fae(),
 
+            # inorgainc only
+            'stone':            Stone(),
+            'metal':            Metal(),
+
             # aux
             'parasitic':        Parasitic(),
             'possessed':        Possessed(),
@@ -534,7 +571,7 @@ class FamTypes(FamTypesCommon, dict):
             "wind":         Wind(),
             "electric":     Electric(),
             })
-        # Add elemental opposites
+        # Add elemental opposites and set values
         self['dark']._elem_opp = Light
         self['dark']["light"] = -50
 
@@ -552,7 +589,16 @@ class FamTypes(FamTypesCommon, dict):
         return iter(self.keys[i] for i in PRIMARY_FAMS)
 
     def secondaries(self):
+        """Secondaries including inorganic secondaries."""
+        for i in SECONDARY_FAMS: yield self.keys[i]
+        for i in INORGANIC_TYPES: yield self.keys[i]
+
+    def secondaries_exclusive(self):
+        """Secondaries excluding inorganic secondaries."""
         return iter(self.keys[i] for i in SECONDARY_FAMS)
+
+    def inorganics(self):
+        return iter(self.keys[i] for i in INORGANIC_TYPES)
 
     def auxillaries(self):
         return iter(self.keys[i] for i in AUX_FAMS)
@@ -575,6 +621,9 @@ class FamAffinities(FamTypes):
 
     def secondaries(self):
         return iter(famtypes.secondaries)
+
+    def inorganics(self):
+        return iter(famtypes.inorganics)
 
     def auxillaries(self):
         return iter(famtypes.auxillaries)
@@ -649,7 +698,7 @@ class _TCDSS:
 
 
 class EntryTypeClassifier:
-    __slots__ = ("_evo", "_stance"):
+    __slots__ = ("_evo", "_stance")
     def __init__(self, evo, stance):
         self._evo = evo
         self._stance = stance
