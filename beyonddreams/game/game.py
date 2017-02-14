@@ -33,9 +33,9 @@ DEFAULT_GAME_MGS_COLORS = {
     "char_whisper":     "",
     "party_speech":     "",
     "party_whisper":    "",
-    ""
+    }
 
-current = None
+current = _GameBC # current game
 
 def _init_game(setup):
     if setup._networked: g = NetworkedGame()
@@ -44,10 +44,11 @@ def _init_game(setup):
     current = g
 
 
-class _GameBC()
+class _GameBC():
     _name = ""
     _networked = False
     _pausable = False
+    _gid = "00000000" # game id -- used for syncing
     def __init__(self):
         self._ended = False
         self._paused = False
@@ -75,7 +76,7 @@ class _GameBC()
     def _last_epoch(self):
         return self._data['epoch last']
 
-    def time(self):
+    def time_tuple(self):
         """Return the current time in game. as a tuple of integers
             (weekday, hour, minute, current_day).
         """
@@ -87,10 +88,13 @@ class _GameBC()
     def _ltime(self):
         return self._data['time']
 
+    def time(self):
+        from dates import GameTime
+        return GameTime.now()
+
 
 class Game(_GameBC):
     _pausable = True
-
 
     def _set_paused(self, p):
         if self._pausable: self._paused = bool(p)
@@ -101,8 +105,9 @@ class NetworkedGame(_GameBC):
     _networked = True
 
     def time(self):
+        # for networked games we request the current *in game* time from server
         d = self.server.req('game.time')
         # TODO calc time diff d
-        self._data['time'] []
+        self._data['time'] = []
         return self._data['time']
 

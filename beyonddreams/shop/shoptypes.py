@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------- #
 #                                                                              #
-#     This program is free software(Shop): you can redistribute it and/or modify     #
+#     This program is free software(shop.): you can redistribute it and/or modify     #
 #     it under the terms of the GNU General Public License as published by     #
 #     the Free Software Foundation, either version 3 of the License, or        #
 #     (at your option) any later version.                                      #
@@ -11,117 +11,172 @@
 #     GNU General Public License for more details.                             #
 #                                                                              #
 #     You should have received a copy of the GNU General Public License        #
-#     along with this program. If not, see <http(Shop)://www.gnu.org/licenses/>.     #
+#     along with this program. If not, see <http(shop.)://www.gnu.org/licenses/>.     #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-from shop import Shop
+import shop
 from shop.shopnames import *
 from shophours import ShopWeek
 from shophours import ShopDay, CLOSED_TODAY, ShopdayNoBreak
 
-SHOPICONS = {
-    PAWN_SHOP:          (),
-    POTION_SHOP:        (),
-    PHARMACY:           (),
-    WEAPON_SHOP:        (),
-    BLACKSMITH:         (),
-    SEED_SHOP:          (),
-    GARDENING_SHOP:     (),
-    INGREDIENT_SHOP:    (),
-    TALOR:              (),
-    CLOTHING_SHOP:      (),
-    DRESSMAKER:         (),
-    BAR:                (),
-    HOTEL:              (),
-    INN:                (),
-    JEWLER:             (),
-    GUILDHOUSE:         (),
-    GUILDOFFICE:        (),
-    BANK:               ()
-};
 
-SERVICES = "services"
-GOODS = "goods"
-
-class PawnShop(Shop):
-    _shoptype = PAWN
+class PawnShop(shop.Store):
+    name = "pawn shop"
+    _icon = ()
     _default_hours = ShopWeek()
+    _tags = ("pawn",)
 
-class PotionShop(Shop):
-    _shoptype = POTION_SHOP
-    _default_hours = ShopWeek()
 
-class Pharmacy(Shop):
-    _shoptype = PHARMACY
-    _default_hours = ShopWeek()
-
-class WeaponShop(Shop):
-    _shoptype = WEAPON_SHOP
-    _default_hours = ShopWeek()
-
-class Blacksmith (Shop):
-    _shoptype = BLACKSMITH
-    _default_hours = ShopWeek()
-    _tags = (SERVICES,)
-
-class SeedShop(Shop):
-    _shoptype = SEED_SHOP
-    _default_hours = ShopWeek()
-
-class GardeningShop(Shop):
-    _shoptype = GARDENING_SHOP
-    _default_hours = ShopWeek()
-
-class HerbShop(Shop):
-    _shoptype = HERB_SHOP
-    _default_hours = ShopWeek()
-
-class IngredientShop(Shop):
-    _shoptype = INGREDIENT_SHOP
-    _default_hours = ShopWeek()
-
-class Talor(Shop):
-    _shoptype = TALOR
-    _default_hours = ShopWeek()
-    _tags = "clothing", SERVICES
-
-class ClothingShop(Shop):
-    _shoptype = CLOTHING_SHOP
-    _default_hours = ShopWeek()
-    _tags = "clothing"
-
-class DressMaker(Shop):
-    _shoptype = DressMaker
-    _default_hours = ShopWeek()
-    _tags = "clothing", SERVICES
-
-class FabricShop(Shop):
-    _shoptype = FABRIC_SHOP
-    _default_hours = ShopWeek()
-
-class Bar(Shop):
-    _shoptype = BAR
-    _default_hours = ShopWeek()
-
-class Hotel(Shop):
-    _shoptype = HOTEL
-    _default_hours = ShopWeek()
-
-class Inn(Shop):
-    _shoptype = INN
-    _default_hours = ShopWeek()
-
-class Jeweler(Shop):
-    _shoptype = JEWELER
-    _default_hours = ShopWeek()
-
-class GuildHouse(Shop):
-    _shoptype = GUILD_HOUSE
+class Bank(shop.Service):
+    name = "bank"
+    _icon = ()
     _default_hours = ShopWeek()
 
 
+# ---- Alchemy? -------------------------------------------------------------- #
+class IngredientShop(shop.Store):
+    name = "ingredient shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = "alchemy", "ingredients"
 
-class GuildOffice(Shop):
-    _shoptype = GUILD_OFFICE
+
+class PotionShop(shop.Store):
+    name = "potion shop"
+    _icon = ()
+    shoptype = GOODS
+    _default_hours = ShopWeek()
+    _tags = "alchemy", "potion"
+
+
+# ---- Health ---------------------------------------------------------------- #
+class Pharmacy(shop.Store):
+    name = "pharmacy"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+class Gym(shop.Service):
+    name = "gym"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+# ---- Weapons & Armor ------------------------------------------------------- #
+class WeaponShop(shop.Store):
+    name = "weapon shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = "weapons"
+
+
+class Armory(shop.Store):
+    name = "armory"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = "armor"
+
+
+class Blacksmith (shop.Service):
+    name = "blacksmith"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+# ---- Gardening ------------------------------------------------------------- #
+class SeedShop(shop.Store):
+    name = "seed shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _shoptags = "store"
+
+
+class GardeningShop(shop.Store):
+    name = "gardening shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("gardening",)
+
+
+class HerbShop(shop.Store):
+    name = "herb shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = "crafting", "ingredients"
+
+
+# ---- Clothing -------------------------------------------------------------- #
+class ClothingShop(shop.Store):
+    name = "clothing shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("clothing",)
+
+
+class Jeweler(shop.Both):
+    name = "jeweler"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("jewelry",)
+
+
+class Talor(shop.Both):
+    name = "talor"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("clothing",)
+
+
+class DressMaker(shop.Both):
+    name = "dressmaker"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("clothing",)
+
+
+class FabricShop(shop.Store):
+    name = "fabric shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("clothing",)
+
+
+# ---- Rest and Relaxation ---- #
+class Bar(shop.Service):
+    name = "bar"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+class Hotel(shop.Service):
+    name = "hotel"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+class Inn(shop.Service):
+    name = "inn"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+class Spa(shop.Service):
+    name = "spa"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+# ---- Guild Related ---- #
+class GuildHouse(shop.Service):
+    name = "guild house"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("guild",)
+
+
+class GuildOffice(shop.Service):
+    name = "guild office"
+    _icon = ()
     _default_hours = ShopWeek.SameWeekdayHours(sat, sun=CLOSED_TODAY)
+    _tags = ("guild",)

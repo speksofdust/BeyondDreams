@@ -16,46 +16,52 @@
 # ---------------------------------------------------------------------------- #
 
 from .core.datesres import *
-from .game.dates import *
+from .game import current
 
 def _fmtt(t): return "{}:{}".format(t[0], t[1])
 def _fmttx(o, a, b):
     return '{}:{}-{}:{}'.format(o[a][0], o[a][1], o[b][0], o[b][1])
 
 def _fmtsdtime(t):
-    if t == ((24, 0) or (-1, 0) return t
+    if t == (24, 0) or (-1, 0): return t
     if (t is None or t == -1): return (-1, 0)
     elif t == 24: return (24, 0)
     elif len(t) == 1:
         if t <= -2: t = 0
-        elif t >= 25:
-        else return (t, 0) # add a 0 for min
+        elif t >= 25: return 24 # clamp to 24 -- unlikely
+        else: return (t, 0) # add a 0 for min
     else:
         if t[1] < 0: return (t[0], 0)
-        elif t[1] > 59: return (t[0], 59]
+        elif t[1] > 59: return (t[0], 59)
         return t
 
 
 class ShopDay(tuple):
-    def __init__(self, opentime, closetime, breakstart, breakend):
+    def __init__(self, opentime, closetime, breakstart, breakend, *args):
+        if "nofmt" in args:
+            # can be used to speed up initalization a bit
+            #   especially when were loading big town maps
+            # **be careful with this -- bad values may cause weird things
+            #   especially with anything that relies on this data
+            super().__init__((opentime, closetime, breakstart, breakend))
         super().__init__((
-            _fmtsdtime(opentime)
-            _fmtsdtime(closetime)
-            _fmtsdtime(breakstart)
-            _fmtsdtime(breakend)
-            )
+            _fmtsdtime(opentime),
+            _fmtsdtime(closetime),
+            _fmtsdtime(breakstart),
+            _fmtsdtime(breakend),
+            ))
 
     @classmethod
-    def NoBreak(cls, opentime, closetime):
-        return cls(opentime, closetime,
+    def NoBreak(cls, opentime, closetime, *args):
+        return cls(opentime, closetime)
 
     @classmethod
     def Open24Hours(cls):
-        return cls((24, 0),(24, 0), (-1, 0), (-1, 0))
+        return cls((24, 0),(24, 0), (-1, 0), (-1, 0), "no-fmt")
 
     @classmethod
     def Closed(cls):
-        return cls((-1, -1), (-1, -1), (-1, 0), (-1, 0))
+        return cls((-1, -1), (-1, -1), (-1, 0), (-1, 0), "no-fmt")
 
     def _is_ob(self, x): return self.opens_at[0] <= x < self.break_start[0]
     def _is_bc(self, x): return self.break_end[0] <= x <= self.closes_at[0]
@@ -101,7 +107,7 @@ class ShopDay(tuple):
 
     def _atopenchk(self, h, m):
         if self.opens_at[0] == 24: return True
-        elif self.opens_at[0] == -1 return False
+        elif self.opens_at[0] == -1: return False
         elif self.opens_at[0] < hour: return False
         elif self.opens_at[0] == hour and self.opens_at[1] <= min:
             return False
@@ -138,10 +144,12 @@ class ShopWeek(tuple):
         return cls(mon, tue, wed, thur, fri)
 
     def today(self):
-        return self[gametime()[0]]
+        return self[current.time_tuple()[0]]
 
     def tommorrow(self):
-        return self[tomorrows_weekday_idx()]
+        x = current.time_tuple()[0]
+        if x + 1 == 6: return self[0]
+        return self[x + 1]
 
     def is_open(self, wday, hour, minute):
         return self[wday].is_open(hour, minute)
@@ -153,19 +161,19 @@ class ShopWeek(tuple):
         """Return an iterator of weekday names open this week."""
         return iter(WEEKDAYS[self[i]] for i in self if not i.is_closed_today())
 
-    def is_before_break(self):
+    def is_before_break(self, day, hour):
         if self[day].has_break():
-            return self[day]break_start < hour
+            return self[day].break_start < hour
         return False
 
-    def is_after_break(self):
+    def is_after_break(self, day, hour):
         if self[day].has_break():
-            return self[day]break_end >= hour
+            return self[day].break_end >= hour
         return False
 
-    def is_on_break(self):
+    def is_on_break(self, day, hour):
         if self[day].has_break():
-            return (self[day]break_start[0] <= hour < self[day]break_end[0])
+            return (self[day].break_start[0] <= hour < self[day].break_end[0])
 
 
 

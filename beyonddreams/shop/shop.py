@@ -19,8 +19,8 @@ from shophours import ShopHours
 from .game.dates import gametime
 
 
-class Shop:
-    _shoptype = ""
+class _Shop:
+    name = ""
     _default_hours = None
     _desc = ""
     _tags = ()
@@ -38,14 +38,6 @@ class Shop:
     #@property
     #def icon(self):
     #    return SHOP_ICONS[self._shoptype]
-
-    @property
-    def shoptype(self):
-        return self._shoptype
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def hours(self):
@@ -88,3 +80,33 @@ class Shop:
 
             pass
         else: return 0,0,0 # already open
+
+
+class Store(_Shop):
+    def __init__(self, shophours=None):
+        if shophours is None:
+            self._shophours = self._default_hours
+        else: self._shophours = shophours
+
+    def is_store(self): return True
+    def is_service(self): return False
+
+
+class Service(_Shop):
+    def __init__(self, shophours=None):
+        if shophours is None:
+            self._shophours = self._default_hours
+        else: self._shophours = shophours
+
+    def is_store(self): return False
+    def is_service(self): return True
+
+
+class Both(_Shop):
+    def __init__(self, shophours=None):
+        if shophours is None:
+            self._shophours = self._default_hours
+        else: self._shophours = shophours
+
+    def is_store(self): return True
+    def is_service(self): return True

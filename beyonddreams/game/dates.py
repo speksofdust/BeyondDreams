@@ -18,20 +18,48 @@
 from .core.datesres import *
 from game import current
 
+
+class GameTime:
+    def __init__(self, wd, h, m, d):
+        self._wd = wd
+        self._h = h
+        self._m = m
+        self._d = d
+
+    @classmethod
+    def now(cls):
+        return cls(*current.time_tuple())
+
+    @property
+    def weekday(self): return self._wd
+
+    @property
+    def hour(self): return self._h
+
+    @property
+    def minute(self): return self._m
+
+    @property
+    def day(self): return self._d
+
+    def todays_name(self): return WEEKDAYS[self._wd]
+
+    def tomorrows_name(self):WEEKDAYS[tomorrows_weekday_idx()]
+
+    def tomorrows_weekday_idx(self):
+        if self._wd + 1 == 6: return 0
+        return self._wd + 1
+
+
 def gametime():
-    return current.time()
+    return current.time_tuple()
 
-def todays_name():
-    return WEEKDAYS[current.time()[0]]
+def _gt_wd(): return current.time_tuple()[0]
+def _gt_hour(): return current.time_tuple()[1]
+def _gt_min(): return current.time_tuple()[2]
+def _gt_day(): return current.time_tuple()[3]
 
-def todays_weekday_idx():
-    # here for consistency better to use game.time()[0] or gametime()[0]
-    return current.time[0]
-
-def tomorrows_name()
-    return WEEKDAYS[tomorrows_weekday_idx()]
-
-def tomorrows_weekday_idx():
-    x = current.time()[0]
-    if x == 6: return 0
-    return x
+gametime.weekday = _gt_wd
+gametime.hour = _gt_hour
+gametime.min = _gt_min
+gametime.day = _gt_day
