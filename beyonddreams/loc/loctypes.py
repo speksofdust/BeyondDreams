@@ -14,3 +14,11 @@
 #     along with this program. If not, see <http://www.gnu.org/licenses/>.     #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
+
+
+class LocationType:
+    typename = ""
+    _is_map = 1 # True if represents a game map
+    __slots__ = ()
+
+

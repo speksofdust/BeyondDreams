@@ -15,9 +15,15 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
+from loctypes import LocationType
 from .core.datesres import *
 from .game import current
+from .game.dates import gametime
 
+
+# ---------------------------------------------------------------------------- #
+#    Shop Hours                                                                #
+# ---------------------------------------------------------------------------- #
 def _fmtt(t): return "{}:{}".format(t[0], t[1])
 def _fmttx(o, a, b):
     return '{}:{}-{}:{}'.format(o[a][0], o[a][1], o[b][0], o[b][1])
@@ -204,3 +210,266 @@ __ALL__ = ('OPEN_24_7', 'CLOSED_TODAY', 'OPEN_ALL_DAY')
     #if c > 12: return "{}{}A = ShopDay{}".format(o, c - 12, nb)
     #return "{}{}P = ShopDay{}".format(o, c, nb)
 
+
+# ---------------------------------------------------------------------------- #
+#     Shop Type Base Classes                                                   #
+# ---------------------------------------------------------------------------- #
+class _Shop(LocationType):
+    _is_map = 0
+    _default_hours = None
+    _desc = ""
+    _tags = ()
+    __slots__ = LocationType.__slots__ + "_shophours"
+    def __init__(self, shophours=None):
+        if shophours is None:
+            self._shophours = self._default_hours
+        else: self._shophours = shophours
+
+    def get_mclosed(self): return self._mclosed
+    def set_mclosed(self, x): self._mclosed = bool(x)
+    _mclosed = property(get_mclosed, set_mclosed,
+        doc="""The manually closed state of this shop. Used to temporary close
+        down the shop.""")
+
+    #@property
+    #def icon(self):
+    #    return SHOP_ICONS[self._shoptype]
+
+    @property
+    def hours(self):
+        return self._shophours
+
+    @property
+    def desc(self):
+        return self._desc
+
+    def tags(self):
+        yield self._shoptype
+        for i in self._tags: yield i
+
+    def todays_hours(self):
+        return self._shophours.today()
+
+    def is_open(self, wday, hour, minute):
+        """True if this shop is currently open at the given
+        day, hour, and minute."""
+        if self._mclosed:
+            from .core.datesres import idx_from_weekday_str
+            # special case for 'manually' closing
+            x = gametime()
+            if (x[0] == (wday or idx_from_weekday_str)): return True
+        return self._shophours.is_open(wday, hour, minute)
+
+    def is_open_now(self):
+        """True if this shop is currently open now."""
+        if self._mclosed: return False # 'manually' closed
+        x = gametime()
+        return self._shophours.is_open(*x)
+
+    def time_till_close(self):
+        if self.is_open_now():
+            pass
+        else: return 0,0,0 # already closed
+
+    def time_till_open(self):
+        if not self.is_open_now():
+
+            pass
+        else: return 0,0,0 # already open
+
+
+class Store(_Shop):
+    __slots__ = _Shop.__slots__
+    def __init__(self, shophours=None):
+        if shophours is None:
+            self._shophours = self._default_hours
+        else: self._shophours = shophours
+
+    def is_store(self): return True
+    def is_service(self): return False
+
+
+class Service(_Shop):
+    __slots__ = _Shop.__slots__
+    def __init__(self, shophours=None):
+        if shophours is None:
+            self._shophours = self._default_hours
+        else: self._shophours = shophours
+
+    def is_store(self): return False
+    def is_service(self): return True
+
+
+class Both(_Shop): # both store and service
+    __slots__ = _Shop.__slots__
+    def __init__(self, shophours=None):
+        if shophours is None:
+            self._shophours = self._default_hours
+        else: self._shophours = shophours
+
+    def is_store(self): return True
+    def is_service(self): return True
+
+
+# ---------------------------------------------------------------------------- #
+#     Shop Types                                                               #
+# ---------------------------------------------------------------------------- #
+class PawnShop(shop.Store):
+    typename = "pawn shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("pawn",)
+
+
+class Bank(shop.Service):
+    typename = "bank"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+# ---- Alchemy? -------------------------------------------------------------- #
+class IngredientShop(shop.Store):
+    typename = "ingredient shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = "alchemy", "ingredients"
+
+
+class PotionShop(shop.Store):
+    typename = "potion shop"
+    _icon = ()
+    shoptype = GOODS
+    _default_hours = ShopWeek()
+    _tags = "alchemy", "potion"
+
+
+# ---- Health ---------------------------------------------------------------- #
+class Pharmacy(shop.Store):
+    typename = "pharmacy"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+class Gym(shop.Service):
+    typename = "gym"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+# ---- Weapons & Armor ------------------------------------------------------- #
+class WeaponShop(shop.Store):
+    typename = "weapon shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = "weapons"
+
+
+class Armory(shop.Store):
+    typename = "armory"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = "armor"
+
+
+class Blacksmith (shop.Service):
+    typename = "blacksmith"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+# ---- Gardening ------------------------------------------------------------- #
+class SeedShop(shop.Store):
+    typename = "seed shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _shoptags = "store"
+
+
+class GardeningShop(shop.Store):
+    typename = "gardening shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("gardening",)
+
+
+class HerbShop(shop.Store):
+    typename = "herb shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = "crafting", "ingredients"
+
+
+# ---- Clothing -------------------------------------------------------------- #
+class ClothingShop(shop.Store):
+    typename = "clothing shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("clothing",)
+
+
+class Jeweler(shop.Both):
+    typename = "jeweler"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("jewelry",)
+
+
+class Talor(shop.Both):
+    typename = "talor"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("clothing",)
+
+
+class DressMaker(shop.Both):
+    typename = "dressmaker"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("clothing",)
+
+
+class FabricShop(shop.Store):
+    typename = "fabric shop"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("clothing",)
+
+
+# ---- Rest and Relaxation ---- #
+class Bar(shop.Service):
+    typename = "bar"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+class Hotel(shop.Service):
+    typename = "hotel"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+class Inn(shop.Service):
+    typename = "inn"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+class Spa(shop.Service):
+    typename = "spa"
+    _icon = ()
+    _default_hours = ShopWeek()
+
+
+# ---- Guild Related ---- #
+class GuildHouse(shop.Service):
+    typename = "guild house"
+    _icon = ()
+    _default_hours = ShopWeek()
+    _tags = ("guild",)
+
+
+class GuildOffice(shop.Service):
+    typename = "guild office"
+    _icon = ()
+    _default_hours = ShopWeek.SameWeekdayHours(sat, sun=CLOSED_TODAY)
+    _tags = ("guild",)
