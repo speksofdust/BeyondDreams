@@ -19,7 +19,7 @@ from .core.bddata import BDDataDict
 import gameaccessors as gacc
 from location import Visited
 from .char.char import GameChars
-from party import parties
+import party
 
 
 gamedata = None
@@ -49,6 +49,7 @@ def _do_loading_stuff(filepath):
     # do json.loads stuff
 
     gamedata = GameData(, jparse=True)
+
 
 
 class GameData(BDDataDict):
@@ -116,11 +117,6 @@ class GameData(BDDataDict):
         try: return self['parties'][partyid]
         except:
             return None
-
-    @property
-    def playerparty
-        """Access the player party data."""
-        return self.party_by_id(self['playerpartyid']
 
     @property
     def chars(self):

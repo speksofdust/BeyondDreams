@@ -15,164 +15,87 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-import gamedata
-import roster
+from data import gamedata
 
 PARTYID_LEN = 10
+MAX_PARTY_SIZE = 8
+
+def parties(): return gamedata['parties']
+
+def get_party_from_id(partyid):
+    return gamedata.party_by_id(partyid)
+
+def is_full(partyid):
+    global MAX_PARTY_SIZE
+    return len(gamedata['parties'][partyid]) == MAX_PARTY_SIZE
 
 
-def _set_party_dict(data):
-    from xsquare.utils.strutils import rand_alphanumeric
-    x = rand_alphanumeric(PARTYID_LEN)
-    while True:
-        if cid in gamedata['parties']: x = rand_alphanumeric(PARTYID_LEN)
-        else: break
-    data._partyid = x
-    gamedata['parties'][data._partyid] = data
+class PartyChars(list):
+    def __init__(self, party):
+        self._party = party
+        super().__init__([]) # TODO
+
+    def _update_party_char(self, char, value):
+        gamedata['parties'][self._party._partyid][char.charid] = value
+
+    def charids(self):
+        return iter(i for i in gamedata['parties'][self._party._partyid])
+
+    def names(self):
+        return iter(gamedata['gamechars'][i]['name']['first'] for
+            i in self.charids())
 
 
-class PartyRoster(roster.Roster):
-    _maxmembers = 8
-    __slots__ = roster.Roster.__slots__
+class Party:
+    def __init__(self, partyid):
+        self._partyid = partyid
+        self._active = 0
+        self._chars = PartyChars
 
-    def invite_member(self, charid):
-        pass
-
-
-class PlayerPartyRoster(PartyRoster):
-    __slots__ = PartyRoster.__slots__
-
-    def _add_member(self, charid):
-        if self._can_add_member(charid): self._members.append(charid)
-
-
-class NetworkedPartyRoster(PartyRoster):
-    __slots__ = PartyRoster.__slots__
-
-    def _add_member(self, charid):
-        pass
-
-
-class Party(roster._Members):
-    """Base class for all party types."""
-    # uses roster._Members to include sequence methods
-    _isnet = 0 # 1 if networked
-    __slots__ = roster._Members + '_partyid'
+    def __len__(self): return len(self._chars)
+    def __iter__(self): return iter(i for i in self._chars)
+    def __contains__(self, x): return x in self._chars
 
     def __eq__(self, x):
-        try: return x._partyid == self._partyid
-        except: raise("Can only compare type 'Party' to instance of 'Party'")
+        try: self._partyid == x.partyid
+        except:
+            raise TypeError("Can only compare to Party type.")
 
     def __ne__(self, x):
-        try: return x._partyid != self._partyid
-        except: raise("Can only compare type 'Party' to instance of 'Party'")
+        try: self._partyid != x.partyid
+        except:
+            raise TypeError("Can only compare to Party type.")
+
+    def _get_active(self): return self._active
+    def _set_active(self, x):
+        if x <= 0: self._active = 0
+        elif x >= MAX_PARTY_SIZE: self._active = MAX_PARTY_SIZE
+        else: self._active = x
+    active = property(_get_active, _set_active)
+
+    def on_member_leave(self, char):
+        gamedata['parties'][self._partyid]
+        if len(self) - 1 != 0:
+            if self.index(char) == self._active:
+                self._active = 0
+            del self[char.charid]
+            del self._chars[char]
+
+    def _get_party_raw(self): return gamedata['parties'][self._party._partyid]
+
+    def is_full(self): return len(self._party) == MAX_PARTY_SIZE
+
+    def has_member(self, char): pass
+
+    def has_member_by_charid(self, charid):
+        return charid in self._chars.charids()
 
 
 class PlayerParty(Party):
-    __slots__ = Party.__slots__ + '_active'
-    def __init__(self, members):
-        self._active = 0
-        self._members = PlayerPartyRoster(members)
+    def __init__(self):
+        self._partyid = gamedata['playerpartyid']
+        self._party = gamedata.playerparty
 
 
-class NetworkedParty(Party):
-    _isnet = 1
-    __slots__ = Party.__slots__
-    def __init__(self, *args):
-        self._members = NetworkedPartyRoster()
+playerparty = None
 
-
-class Party(tuple):
-    MAX_CHARS = 8
-    __slots__ = tuple.__slots__ + ("_partyid")
-    def __init__(self, data=((active), [members]), jparse=False, **kwargs):
-        super().__init__(data)
-        if jparse:  # convert json data to proper classes
-            self[0] = tuple(self[0])
-            self[1] = PartyMembers(self[1])
-        try:
-            self._partyid = kwargs['partyid']
-            if self._partyid in gamedata['parties']:
-                # partyid already taken
-                if not self.members: _set_party_dict(self)
-                elif gamedata['partyid'].members != self.members:
-                    _set_party_dict(self)
-                    for i in self.members:
-                        gamedata['chars'][i]._partyid = self._partyid
-                else: pass # party already created
-        except: _set_party_dict(self)
-
-    def _get_active(self): return self[0][0]
-    def _set_active(self, x):
-        if x > len(self[1]): self[0][0] = len(self[1])
-        elif x < 0: self[0][0] = 0
-        else: self[0][0] = x
-    active = property(_get_active, _set_active,
-        doc="The currently active character.")
-
-    @property
-    def members(self):
-        return self[1]
-
-    def is_player_party(self):
-        """True if this party is controlled by the local player."""
-        return self._partyid == gamedata['playerpartyid']
-
-    def is_full(self):
-        """True if no more members can be added to this party."""
-        return len(self.members) == self.MAX_CHARS
-
-    def party_size(self):
-        """The current number of party members."""
-        return len(self.members)
-
-    def next(self):
-        """Return the next party member after the active one."""
-        return self.members[self.active + 1]
-
-    def prev(self):
-        """Return the previous party member before the active one."""
-        return self.members[self.active - 1]
-
-    def sort_members(self, key, reverse=False):
-        x = self.members[self.active] # remember which member is active
-        self.members.sort(key, reverse)
-        self.active = self.members.index(x) # update the active member
-
-    def can_add_member(self, char):
-        return (char._npc or char in self.members)
-
-    def disban(self):
-        for i in self.members:
-            self._on_member_leave()
-        del gamedata['parties'][self._partyid]
-
-    # ---- Events -------------------------------------------------------- #
-    def _on_member_leave(self, member):
-        self.members[i]._partyid = -1
-        del self.members[i]
-
-    def on_member_leave(self, member):
-        if self.members.index(member) == self.active: self.active = 0
-        self.members[i]._partyid = -1
-        del self.members[i]
-
-    def on_member_join(self, member):
-        pass
-
-
-    class PartyMembers(list):
-        # stored as charids
-        __slots__ = list.__slots__
-
-        def chardata(self):
-            """Return an iterator of chardata."""
-            return iter(gamedata['chars'][i] for i in self)
-
-        def alive(self):
-            """Return an iterator of all alive party members."""
-            return iter(i for i in self.chardata if i.is_alive())
-
-        def names(self):
-            """Return an iterator of all party member's."""
-            return iter(i.name for i in self.chardata)

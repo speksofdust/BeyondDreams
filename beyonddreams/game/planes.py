@@ -23,6 +23,7 @@ PLANES = {
     'mortal':   MortalPlane(),  # normal plane
     'spirit':   SpiritPlane(),
     'dead':     DeadPlane(),
+    'traversal': TraversalPlane(), # transfer through portals
 
     # secondaries
     'dream':    DreamPlane(),   # dreaming on any plane
@@ -31,9 +32,9 @@ PLANES = {
     # dual
     'null':     NullPlane()
 }
-PPLANES = 'mortal', 'spirit', 'dead', 'null'
-SPLANES = 'dream', 'none', 'null'
-DPLANES = ('null',)
+PPLANES = 'mortal', 'spirit', 'dead', 'null', 'traversal'   # primary
+SPLANES = 'dream', 'none', 'null'               # secondary
+DPLANES = ('null',)                             # dual
 
 class Plane:
     _order = 0  # 0 - primary 1 - secondary 2 - any
@@ -96,6 +97,13 @@ class MortalPlane(PrimaryPlane):
         # check if become spirit
         #
         pass
+
+class TraversalPlane(PrimaryPlane):
+    _name = "traversal"
+
+    def on_die(self, char):
+        pass
+
 
 class DreamPlane(SecondaryPlane):
     _name = "dream"

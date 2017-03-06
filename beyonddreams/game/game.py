@@ -43,12 +43,21 @@ def _init_game(setup):
     global current
     current = g
 
+def _end_game_fully(game):
+    # free up resources etc.
+    global current
+    import party
+    party.playerparty = None
+
+    # finally
+    current = _GameBC
 
 class _GameBC():
     _name = ""
+    _gid = "00000000" # game id -- used for syncing
+    # flags
     _networked = False
     _pausable = False
-    _gid = "00000000" # game id -- used for syncing
     def __init__(self):
         self._ended = False
         self._paused = False
@@ -56,6 +65,8 @@ class _GameBC():
         from player import Player
         self._data = GameData(self) # local data
         self._player = Player(self) # local player
+        import party
+        party.playerparty = PlayerParty() # gamedata must be initalized first
 
     def _get_paused(self): return self._paused
     def _set_paused(self, p): pass
