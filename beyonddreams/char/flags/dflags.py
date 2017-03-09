@@ -15,28 +15,34 @@
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
-RESERVED = 0
-IN_SAVEPOINT = 49
-IN_ENCOUNTER = 50
+RESERVED =        0,
+SUFFOCATED =      111,
+DROWNED =         112,
 
-# Factors
-FT_NONE = 150
-FT_NULL = 151
-FT_HALF = 152
-FT_2X =   153
-FT_4X =   154
-FT_FULL = 155
-FACTORS = (FT_NONE, FT_NULL, FT_2X, FT_4X, FT_FULL)
+# last hit
+STABBED =         113,
+BEATEN =          114,
+ELECTROCUTED =    115,
+BURNED =          116,
+FROZE =           117,
+FROZEN =          118,
 
+# status(s) maxed
+BLED =            120, # bleed level maxed
+POISIONED =       121, # poisoning level maxed
+DRANK =           122, # drunk & poisioning levels maxed
 
-CHARFLAGS = {
-    # cast flags
-    "aura":             1000,
-    "fire":             1100,
-    "ice":              1101,
-    "wind":             1102,
-    "elec":             1103,
-    "light":            1108,
-    "dark":             1109,
-    "mag":              1111,
-}
+# misc
+REVIVED_WHILE_ZOMBIE =170,
+
+# barely revivable
+GUTTED =          198,
+HALVED =          199, # split in half
+
+# non-revivable dflags
+BEHEADED =        200,
+EXPLODED =        201,
+VAPORIZED =       202,
+FLATTENED =       203,
+
+MAX_REVIVABLE = 199
